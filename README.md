@@ -19,10 +19,26 @@ Many papers contribute a lot to this repository. I am very sorry for only listin
 - SAS (I use SAS on WRDS Cloud)
 - Python (I use Pandas to play with data)
 
+## Method
+
+### Equity Characteristics
+
+This topic is summaried by **Green Hand Zhang** and **Hou Xue Zhang**.
+
+### Portfolio Characteristics
+
+Portfolio charactaristics is the equal-weighted / value-weighted averge of the characteristics for all equities in the portfolio.
+
+The portfolios includes and not limited to:
+
+- Characteristics-sorted Portfolio, see the listed papers and also [Deep Learning in Characteristics-Sorted Factor Models](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3243683)
+- DGTW Benchmark, see [Measuring Mutual Fund Performance with Characteristic‐Based Benchmarks](https://doi.org/10.1111/j.1540-6261.1997.tb02724.x)
+- Industry portfolio
+
 ## Codes
 
 - Calculate equity characteristics with SAS code, mainly refering to [Green Hand Zhang 2017 RFS and its SAS code](https://drive.google.com/file/d/0BwwEXkCgXEdRQWZreUpKOHBXOUU/view).
 - Portfolio characteristics, mainly refering to [WRDS Financial Ratios Suite](https://wrds-www.wharton.upenn.edu/pages/support/research-wrds/sample-programs/wrds-sample-programs/wrds-financial-ratios-suite/).
-
+- DGTW code refers to [this WRDS code](https://wrds-www.wharton.upenn.edu/pages/support/applications/python-replications/characteristic-based-benchmarks-daniel-grinblatt-titman-and-wermers-1997-python-version/)
 
 **All comments are welcome.**
