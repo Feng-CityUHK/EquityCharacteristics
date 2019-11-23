@@ -3,8 +3,9 @@
 
 For financial researches, we need equity characteristics. This repository is a toolkit to calculate asset characteristics in individual equity level and portfolio level.
 
-Many papers contribute a lot to this repository. I am very sorry for only listing the following 4 papers.
+Many papers contribute a lot to this repository. I am very sorry for only listing the following 5 papers.
 - **Common risk factors in the returns on stocks and bonds** by [Fama and French 1993 JFE](https://doi.org/10.1016/0304-405X(93)90023-5)
+-  **Measuring Mutual Fund Performance with Characteristic‐Based Benchmarks** by [**DANIEL, GRINBLATT, TITMAN, WERMERS** 1997 JF](https://doi.org/10.1111/j.1540-6261.1997.tb02724.x)
 - **A five-factor asset pricing model** by [Fama and French 2015 JFE](https://doi.org/10.1016/j.jfineco.2014.10.010)
   - [French's Data Library](http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html)
 - **The Characteristics that Provide Independent Information about Average U.S. Monthly Stock Returns** by [Green Han Zhang 2017 RFS](https://doi.org/10.1093/rfs/hhx019)
@@ -32,7 +33,7 @@ Portfolio charactaristics is the equal-weighted / value-weighted averge of the c
 The portfolios includes and not limited to:
 
 - Characteristics-sorted Portfolio, see the listed papers and also [Deep Learning in Characteristics-Sorted Factor Models](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3243683)
-- DGTW Benchmark, see [Measuring Mutual Fund Performance with Characteristic‐Based Benchmarks](https://doi.org/10.1111/j.1540-6261.1997.tb02724.x)
+- DGTW Benchmark, see [DGTW 1997 JF](https://doi.org/10.1111/j.1540-6261.1997.tb02724.x)
 - Industry portfolio
 
 ## Codes
