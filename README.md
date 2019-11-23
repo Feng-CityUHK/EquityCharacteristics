@@ -8,7 +8,7 @@ Many papers contribute a lot to this repository. I am very sorry for only listin
 -  **Measuring Mutual Fund Performance with Characteristic‐Based Benchmarks** by [DANIEL, GRINBLATT, TITMAN, WERMERS 1997 JF](https://doi.org/10.1111/j.1540-6261.1997.tb02724.x)
 - **A five-factor asset pricing model** by [Fama and French 2015 JFE](https://doi.org/10.1016/j.jfineco.2014.10.010)
   - [French's Data Library](http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html)
-- **The Characteristics that Provide Independent Information about Average U.S. Monthly Stock Returns** by [Green Han Zhang 2017 RFS](https://doi.org/10.1093/rfs/hhx019)
+- **The Characteristics that Provide Independent Information about Average U.S. Monthly Stock Returns** by [Green Hand Zhang 2017 RFS](https://doi.org/10.1093/rfs/hhx019)
   - [sas code from Green's website](https://drive.google.com/file/d/0BwwEXkCgXEdRQWZreUpKOHBXOUU/view)
 - **Replicating Anormalies** by [Hou Xue Zhang 2018 RFS](https://doi.org/10.1093/rfs/hhy131)
   - [Anormaly Portfolios by Zhang's website](http://global-q.org/index.html)
