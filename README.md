@@ -14,7 +14,7 @@ Many papers contribute a lot to this repository. I am very sorry for only listin
 
 ## Prerequisite
 
-- Read on the listed papers
+- Read the listed papers
 - [WRDS](https://wrds-web.wharton.upenn.edu) account with subscription to CRSP, Compustat and IBES.
 - SAS (I use SAS on WRDS Cloud)
 - Python (I use Pandas to play with data)
