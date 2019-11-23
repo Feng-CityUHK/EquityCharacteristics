@@ -6,6 +6,8 @@ For financial researches, we need equity characteristics. This repository is a t
 Many papers contribute a lot to this repository. I am very sorry for only listing the following 5 papers.
 - **Common risk factors in the returns on stocks and bonds** by [Fama and French 1993 JFE](https://doi.org/10.1016/0304-405X(93)90023-5)
 -  **Measuring Mutual Fund Performance with Characteristic‐Based Benchmarks** by [DANIEL, GRINBLATT, TITMAN, WERMERS 1997 JF](https://doi.org/10.1111/j.1540-6261.1997.tb02724.x)
+  - [Benchmarks on Wermer's website](http://terpconnect.umd.edu/~wermers/ftpsite/Dgtw/coverpage.htm)
+
 - **A five-factor asset pricing model** by [Fama and French 2015 JFE](https://doi.org/10.1016/j.jfineco.2014.10.010)
   - [French's Data Library](http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html)
 - **The Characteristics that Provide Independent Information about Average U.S. Monthly Stock Returns** by [Green Hand Zhang 2017 RFS](https://doi.org/10.1093/rfs/hhx019)
@@ -40,6 +42,6 @@ The portfolios includes and not limited to:
 
 - Calculate equity characteristics with SAS code, mainly refering to [SAS code by Green Hand Zhang](https://drive.google.com/file/d/0BwwEXkCgXEdRQWZreUpKOHBXOUU/view).
 - Portfolio characteristics, mainly refering to [WRDS Financial Ratios Suite](https://wrds-www.wharton.upenn.edu/pages/support/research-wrds/sample-programs/wrds-sample-programs/wrds-financial-ratios-suite/).
-- DGTW code refers to [this WRDS code](https://wrds-www.wharton.upenn.edu/pages/support/applications/python-replications/characteristic-based-benchmarks-daniel-grinblatt-titman-and-wermers-1997-python-version/)
+- DGTW code refers to [this python code](https://wrds-www.wharton.upenn.edu/pages/support/applications/python-replications/characteristic-based-benchmarks-daniel-grinblatt-titman-and-wermers-1997-python-version/) or [this SAS code](https://wrds-www.wharton.upenn.edu/pages/support/applications/portfolio-construction-and-market-anomalies/characteristic-based-benchmarks-daniel-grinblatt-titman-and-wermers-1997/)
 
 **All comments are welcome.**
