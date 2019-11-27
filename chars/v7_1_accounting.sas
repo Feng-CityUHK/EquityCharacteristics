@@ -49,7 +49,7 @@ data crspm2; set crspm2;
 	end;
 run;
 
-libname chars '/scratch/cityuhk/xinchars/';
+libname chars '/scratch/cityuhk/xinhe/tmp';
 data chars.crspm2_prc; set crspm2; run;
 proc export data = crspm2(where=(year(date)=2018))
 outfile='/scratch/cityuhk/xintempv6/crspm2_prc.csv' dbms=csv replace; run;
@@ -72,7 +72,7 @@ data crspm2; set crspm2;
 	end;
 run;
 
-libname chars '/scratch/cityuhk/xinchars/';
+libname chars '/scratch/cityuhk/xinhe/tmp';
 data chars.crspm2_me; set crspm2; run;
 proc export data = crspm2(where=(year(date)=2018))
 outfile='/scratch/cityuhk/xintempv6/crspm2_me.csv' dbms=csv replace; run;
@@ -103,7 +103,7 @@ proc sort data=crspm2a nodupkey; by permno date;run;
 /* crspm2a is a monthly table:  */
 /* DATE	NCUSIP	TICKER	PERMNO	PERMCO	SHRCD	EXCHCD	PRC	RET	SHROUT	CFACPR	CFACSHR	RETX	DLRET	retadj	ME */
 
-libname chars '/scratch/cityuhk/xinchars/';
+libname chars '/scratch/cityuhk/xinhe/tmp';
 data chars.crspm2a; set crspm2a; run;
 proc export data = crspm2a(where=(year(date)=2018))
 outfile='/scratch/cityuhk/xintempv6/crspm2a.csv' dbms=csv replace; run;
@@ -180,7 +180,7 @@ create table data
 							else xsga0=0;
 						run;
 
-libname chars '/scratch/cityuhk/xinchars/';
+libname chars '/scratch/cityuhk/xinhe/tmp';
 data chars.funda; set data; run;
 proc export data = data(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/funda.csv' dbms=csv replace; run;
@@ -252,7 +252,7 @@ data temp; set temp;
   if last.year;
 run;
 
-libname chars '/scratch/cityuhk/xinchars/';
+libname chars '/scratch/cityuhk/xinhe/tmp';
 data chars.temp; set temp; run;
 proc export data = temp(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/temp.csv' dbms=csv replace; run;
@@ -268,7 +268,7 @@ intnx('month',a.datadate,0,'End')=intnx('month',b.date,0,'End')
 ;
 quit;
 
-libname chars '/scratch/cityuhk/xinchars/';
+libname chars '/scratch/cityuhk/xinhe/tmp';
 data chars.temp1; set temp1; run;
 proc export data = temp1(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/temp1.csv' dbms=csv replace; run;
@@ -514,7 +514,7 @@ data data2;
 	end;
 	run;
 
-libname chars '/scratch/cityuhk/xinchars/';
+libname chars '/scratch/cityuhk/xinhe/tmp';
 data chars.data2; set data2; run;
 proc export data = data2(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/data2.csv' dbms=csv replace; run;
@@ -685,7 +685,7 @@ orgcap=orgcap_1/avgat;
 if count=1 then orgcap=.;
 run;
 
-libname chars '/scratch/cityuhk/xinchars/';
+libname chars '/scratch/cityuhk/xinhe/tmp';
 data chars.data2_plus; set data2; run;
 proc export data = data2(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/data2_plus.csv' dbms=csv replace; run;
@@ -751,12 +751,12 @@ data temp; set temp;
 za_dy=dy;
 run;
 
-libname chars '/scratch/cityuhk/xinchars/';
+libname chars '/scratch/cityuhk/xinhe/tmp';
 data chars.temp_real; set temp; run;
 proc export data = temp(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/temp_real2018.csv' dbms=csv replace; run;
 
-libname chars '/scratch/cityuhk/xinchars/';
+libname chars '/scratch/cityuhk/xinhe/tmp';
 data chars.temp_real; set temp; run;
 proc export data = temp(where=(year(datadate)=2017))
 outfile='/scratch/cityuhk/xintempv6/temp_real2017.csv' dbms=csv replace; run;
@@ -796,7 +796,7 @@ z_dy = %ttm12(mdivpay)/mcap_crsp;
 if permno ne lag11(permno) then z_dy=.;
 run;
 
-libname chars '/scratch/cityuhk/xinchars/';
+libname chars '/scratch/cityuhk/xinhe/tmp';
 data chars.temp2; set temp2; run;
 proc export data = temp2(where=(year(date)=2018))
 outfile='/scratch/cityuhk/xintempv6/temp2.csv' dbms=csv replace; run;
@@ -839,7 +839,7 @@ proc sort data=data ;
 	by gvkey datadate;
 run;
 
-libname chars '/scratch/cityuhk/xinchars/';
+libname chars '/scratch/cityuhk/xinhe/tmp';
 data chars.data_q; set data; run;
 proc export data = data(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/data_q.csv' dbms=csv replace; run;
@@ -873,7 +873,7 @@ intnx('month',a.datadate,0,'End')=intnx('month',b.datadate,0,'End')
 ;
 quit;
 
-libname chars '/scratch/cityuhk/xinchars/';
+libname chars '/scratch/cityuhk/xinhe/tmp';
 data chars.data_q_real; set data; run;
 proc export data = data(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/data_q_real.csv' dbms=csv replace; run;
