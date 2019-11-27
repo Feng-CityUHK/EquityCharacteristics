@@ -1,0 +1,2253 @@
+1                                                          The SAS System                           00:59 Tuesday, November 26, 2019
+
+NOTE: Copyright (c) 2016 by SAS Institute Inc., Cary, NC, USA. 
+NOTE: SAS (r) Proprietary Software 9.4 (TS1M6) 
+      Licensed to UNIVERSITY OF PENNSYLVANIA - SFA T&R, Site 70055201.
+NOTE: This session is executing on the Linux 3.10.0-1062.el7.x86_64 (LIN X64) platform.
+
+
+
+NOTE: Analytical products:
+      
+      SAS/STAT 15.1
+      SAS/ETS 15.1
+      SAS/OR 15.1
+      SAS/IML 15.1
+      SAS/QC 15.1
+
+NOTE: Additional host information:
+
+ Linux LIN X64 3.10.0-1062.el7.x86_64 #1 SMP Thu Jul 18 20:25:13 UTC 2019 x86_64 Red Hat Enterprise Linux Server release 7.7 
+      (Maipo) 
+
+      *** Welcome to Wharton Research Data Services (WRDS) ***
+
+WRDS is developed and run by the Wharton School at the University of
+Pennsylvania. We provide access to the databases that define empirical,
+seminal research in the fields of accounting, banking, economics,
+finance, insurance, management, marketing, public policy, risk
+management, and statistics.
+
+If you are not an authorized user of this system, disconnect now.
+All activity is strictly monitored. There may be severe criminal and
+civil penalties for unauthorized access or use of computing resources.
+
+Please report any problems to wrds-support@wharton.upenn.edu.
+
+------------------------------------------------------------------------------
+
+             *** Wharton Research Data Services (WRDS) on SSRN ***
+
+Submit to the WRDS Research Paper Series (RPS) on SSRN – a searchable
+repository of all papers submitted to SSRN that cite WRDS in their work.
+This RPS will elevate researchers’ visibility, increase your Eigenfactor®
+score, and build a specialized research base for others to explore easily.
+
+  View Abstracts:            http://bit.ly/2qOrt9f
+  Submit to the WRDS RPS:    http://bit.ly/2rjrENk
+
+------------------------------------------------------------------------------
+
+
+
+
+NOTE: SAS initialization used:
+      real time           0.12 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: AUTOEXEC processing beginning; file is /home/cityuhk/xinhe97/autoexec.sas.
+
+2                                The SAS System 00:59 Tuesday, November 26, 2019
+
+NOTE: Libref AHA was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/aha/sasdata/annual_survey
+      Engine(2):        V9 
+      Physical Name(2): /wrds/aha/sasdata/it_survey
+      Engine(3):        V9 
+      Physical Name(3): /wrds/aha/sasdata/hcris
+      Engine(4):        V9 
+      Physical Name(4): /wrds/aha/sasdata/annual_survey_3years
+      Engine(5):        V9 
+      Physical Name(5): /wrds/aha/sasdata/it_survey_3years
+      Engine(6):        V9 
+      Physical Name(6): /wrds/aha/sasdata/hcris_3years
+      Engine(7):        V9 
+      Physical Name(7): /wrds/aha/sasdata/annual_survey_history
+NOTE: Libref AHASAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/aha
+NOTE: Libref AUDIT was successfully assigned as follows: 
+      Levels:           5
+      Engine(1):        V9 
+      Physical Name(1): /wrds/audit/sasdata/audit_comp
+      Engine(2):        V9 
+      Physical Name(2): /wrds/audit/sasdata/corp_legal
+      Engine(3):        V9 
+      Physical Name(3): /wrds/audit/sasdata/oia
+      Engine(4):        V9 
+      Physical Name(4): /wrds/audit/sasdata/sedar
+      Engine(5):        V9 
+      Physical Name(5): /wrds/audit/sasdata/acct_os
+NOTE: Libref BANK was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/bank/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/bank/sasdata/commercial
+      Engine(3):        V9 
+      Physical Name(3): /wrds/bank/sasdata/holding
+NOTE: Libref BLOCK was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/blockholders/sasdata
+NOTE: Libref BOARDEX was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/boardex/sasdata/na
+      Engine(2):        V9 
+      Physical Name(2): /wrds/boardex/sasdata/eur
+      Engine(3):        V9 
+      Physical Name(3): /wrds/boardex/sasdata/uk
+      Engine(4):        V9 
+      Physical Name(4): /wrds/boardex/sasdata/row
+NOTE: Libref BOARDSMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/boardex
+NOTE: Libref BVD was successfully assigned as follows: 
+      Levels:           10
+      Engine(1):        V9 
+      Physical Name(1): /wrds/bvd/sasdata/ama_v
+      Engine(2):        V9 
+      Physical Name(2): /wrds/bvd/sasdata/ama_l
+      Engine(3):        V9 
+      Physical Name(3): /wrds/bvd/sasdata/ama_m
+      Engine(4):        V9 
+      Physical Name(4): /wrds/bvd/sasdata/ama_s
+      Engine(5):        V9 
+      Physical Name(5): /wrds/bvd/sasdata/bankf
+      Engine(6):        V9 
+      Physical Name(6): /wrds/bvd/sasdata/is
+      Engine(7):        V9 
+      Physical Name(7): /wrds/bvd/sasdata/os
+      Engine(8):        V9 
+      Physical Name(8): /wrds/bvd/sasdata/bvdorbis/ob_l
+      Engine(9):        V9 
+      Physical Name(9): /wrds/bvd/sasdata/bvdorbis/ob_m
+      Engine(10):        V9 
+      Physical Name(10): /wrds/bvd/sasdata/bvdorbis/ob_s
+NOTE: Libref BVDLGCY was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/bvdlegacy/sasdata/bs
+NOTE: Libref BVDSAMP was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/bvd_ama
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/bvd_bs
+      Engine(3):        V9 
+      Physical Name(3): /wrds/samples/sasdata/bvdorbis
+NOTE: Libref CALCBNCH was successfully assigned as follows: 
+      Levels:           16
+      Engine(1):        V9 
+      Physical Name(1): /wrds/calcbench/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/calcbench/sasdata/ap_ar
+      Engine(3):        V9 
+      Physical Name(3): /wrds/calcbench/sasdata/business_combinations
+      Engine(4):        V9 
+      Physical Name(4): /wrds/calcbench/sasdata/commitment_contingency
+      Engine(5):        V9 
+      Physical Name(5): /wrds/calcbench/sasdata/concentration_risk
+      Engine(6):        V9 
+      Physical Name(6): /wrds/calcbench/sasdata/derivatives_hedging
+      Engine(7):        V9 
+      Physical Name(7): /wrds/calcbench/sasdata/discontinued_ops
+      Engine(8):        V9 
+      Physical Name(8): /wrds/calcbench/sasdata/equity_investments
+      Engine(9):        V9 
+      Physical Name(9): /wrds/calcbench/sasdata/equity_compensation
+      Engine(10):        V9 
+      Physical Name(10): /wrds/calcbench/sasdata/fair_value
+      Engine(11):        V9 
+      Physical Name(11): /wrds/calcbench/sasdata/business_segments
+      Engine(12):        V9 
+      Physical Name(12): /wrds/calcbench/sasdata/goodwill
+      Engine(13):        V9 
+      Physical Name(13): /wrds/calcbench/sasdata/income_tax
+      Engine(14):        V9 
+      Physical Name(14): /wrds/calcbench/sasdata/inventory
+      Engine(15):        V9 
+      Physical Name(15): /wrds/calcbench/sasdata/leases
+      Engine(16):        V9 
+      Physical Name(16): /wrds/calcbench/sasdata/equity_repurchases
+NOTE: Libref CALCSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/calcbench
+NOTE: Libref CBOE was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/cboe/sasdata
+NOTE: Libref CENTRIS was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/centris/sasdata
+NOTE: Libref CIQ was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/capitaliq/sasdata/helper
+      Engine(2):        V9 
+      Physical Name(2): /wrds/capitaliq/sasdata/pplintel
+      Engine(3):        V9 
+      Physical Name(3): /wrds/capitaliq/sasdata/keydev
+      Engine(4):        V9 
+      Physical Name(4): /wrds/capitaliq/sasdata/capstructure
+      Engine(5):        V9 
+      Physical Name(5): /wrds/capitaliq/sasdata/ratings
+      Engine(6):        V9 
+      Physical Name(6): /wrds/capitaliq/sasdata/transactions
+      Engine(7):        V9 
+      Physical Name(7): /wrds/capitaliq/sasdata/transcripts
+NOTE: Libref CIQSAMP was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ciqsamp/sasdata/capstructure
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ciqsamp/sasdata/helper
+      Engine(3):        V9 
+      Physical Name(3): /wrds/ciqsamp/sasdata/keydev
+      Engine(4):        V9 
+      Physical Name(4): /wrds/ciqsamp/sasdata/pplintel
+      Engine(5):        V9 
+      Physical Name(5): /wrds/ciqsamp/sasdata/ratings
+      Engine(6):        V9 
+      Physical Name(6): /wrds/ciqsamp/sasdata/transactions
+      Engine(7):        V9 
+      Physical Name(7): /wrds/ciqsamp/sasdata/transcripts
+NOTE: Libref CISDM was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/morningstar/sasdata/cisdm
+NOTE: Libref CISDMSMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/morningstar
+NOTE: Libref CLRVT was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/clrvt/sasdata/drugs
+NOTE: Libref CLRVTSMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/clrvt
+NOTE: Libref COMPB was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/bank
+NOTE: Libref COMPBD was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/d_bank
+NOTE: Libref COMPG was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/global
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/global/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/global/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/global/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/global/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/global/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/global/security
+NOTE: Libref COMPGD was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/d_global
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/d_global/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/d_global/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/d_global/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/d_global/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/d_global/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/d_global/security
+NOTE: Libref COMPA was successfully assigned as follows: 
+      Levels:           14
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/naa
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/naa/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/naa/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/naa/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/naa/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/naa/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/naa/industry
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/naa/insider
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/naa/institution
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/naa/pension
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/naa/rating
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/naa/security
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/naa/segments_current
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/naa/transparency
+NOTE: Libref COMPM was successfully assigned as follows: 
+      Levels:           14
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/nam
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/nam/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/nam/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/nam/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/nam/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/nam/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/nam/industry
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/nam/insider
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/nam/institution
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/nam/pension
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/nam/rating
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/nam/security
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/nam/segments_current
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/nam/transparency
+NOTE: Libref COMPMCUR was successfully assigned as follows: 
+      Levels:           14
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/nam_current
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/nam_current/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/nam_current/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/nam_current/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/nam_current/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/nam_current/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/nam_current/industry
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/nam_current/insider
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/nam_current/institution
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/nam_current/pension
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/nam_current/rating
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/nam_current/security
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/nam_current/segments_current
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/nam_current/transparency
+NOTE: Libref COMPNAD was successfully assigned as follows: 
+      Levels:           14
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/d_na
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/d_na/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/d_na/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/d_na/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/d_na/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/d_na/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/d_na/industry
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/d_na/insider
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/d_na/institution
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/d_na/pension
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/d_na/rating
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/d_na/security
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/d_na/segments_current
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/d_na/transparency
+NOTE: Libref COMPDCUR was successfully assigned as follows: 
+      Levels:           14
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/d_na_current
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/d_na_current/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/d_na_current/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/d_na_current/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/d_na_current/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/d_na_current/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/d_na_current/industry
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/d_na_current/insider
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/d_na_current/institution
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/d_na_current/pension
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/d_na_current/rating
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/d_na_current/security
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/d_na_current/segments_current
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/d_na_current/transparency
+NOTE: Libref COMPSEG was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/seghist
+NOTE: Libref COMPSEGD was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/d_seghist
+NOTE: Libref EXECCOMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/execcomp
+NOTE: Libref COMPD was successfully assigned as follows: 
+      Levels:           23
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/d_seghist
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/d_na
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/d_na/company
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/d_na/currency
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/d_na/dictionary
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/d_na/economy
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/d_na/index
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/d_na/industry
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/d_na/insider
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/d_na/institution
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/d_na/pension
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/d_na/rating
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/d_na/security
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/d_na/segments_current
+      Engine(15):        V9 
+      Physical Name(15): /wrds/comp/sasdata/d_na/transparency
+      Engine(16):        V9 
+      Physical Name(16): /wrds/comp/sasdata/d_bank
+      Engine(17):        V9 
+      Physical Name(17): /wrds/comp/sasdata/d_global
+      Engine(18):        V9 
+      Physical Name(18): /wrds/comp/sasdata/d_global/company
+      Engine(19):        V9 
+      Physical Name(19): /wrds/comp/sasdata/d_global/currency
+      Engine(20):        V9 
+      Physical Name(20): /wrds/comp/sasdata/d_global/dictionary
+      Engine(21):        V9 
+      Physical Name(21): /wrds/comp/sasdata/d_global/economy
+      Engine(22):        V9 
+      Physical Name(22): /wrds/comp/sasdata/d_global/index
+      Engine(23):        V9 
+      Physical Name(23): /wrds/comp/sasdata/d_global/security
+NOTE: Libref COMP was successfully assigned as follows: 
+      Levels:           26
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/d_seghist
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/d_na
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/d_na/company
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/d_na/currency
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/d_na/dictionary
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/d_na/economy
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/d_na/index
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/d_na/industry
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/d_na/insider
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/d_na/institution
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/d_na/pension
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/d_na/rating
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/d_na/security
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/d_na/segments_current
+      Engine(15):        V9 
+      Physical Name(15): /wrds/comp/sasdata/d_na/transparency
+      Engine(16):        V9 
+      Physical Name(16): /wrds/comp/sasdata/d_bank
+      Engine(17):        V9 
+      Physical Name(17): /wrds/comp/sasdata/d_global
+      Engine(18):        V9 
+      Physical Name(18): /wrds/comp/sasdata/d_global/company
+      Engine(19):        V9 
+      Physical Name(19): /wrds/comp/sasdata/d_global/currency
+      Engine(20):        V9 
+      Physical Name(20): /wrds/comp/sasdata/d_global/dictionary
+      Engine(21):        V9 
+      Physical Name(21): /wrds/comp/sasdata/d_global/economy
+      Engine(22):        V9 
+      Physical Name(22): /wrds/comp/sasdata/d_global/index
+      Engine(23):        V9 
+      Physical Name(23): /wrds/comp/sasdata/d_global/security
+      Engine(24):        V9 
+      Physical Name(24): /wrds/comp/sasdata/execcomp
+      Engine(25):        V9 
+      Physical Name(25): /wrds/comp/sasdata/filings
+      Engine(26):        V9 
+      Physical Name(26): /wrds/comp/sasdata/marginaltax
+NOTE: Libref COMPH was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/ph
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/pit
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/urq
+NOTE: Libref COMPSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/compsamp/sasdata
+NOTE: Libref COMPSNAP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/snapshot
+NOTE: Libref COMSCORE was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comscore/sasdata
+NOTE: Libref CONTRIB was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/contributors/sasdata/rq
+      Engine(2):        V9 
+      Physical Name(2): /wrds/contributors/sasdata/shale
+NOTE: Libref CRSPA was successfully assigned as follows: 
+      Levels:           8
+      Engine(1):        V9 
+      Physical Name(1): /wrds/crsp/sasdata/a_stock
+      Engine(2):        V9 
+      Physical Name(2): /wrds/crsp/sasdata/a_stock62
+      Engine(3):        V9 
+      Physical Name(3): /wrds/crsp/sasdata/a_indexes
+      Engine(4):        V9 
+      Physical Name(4): /wrds/crsp/sasdata/a_ccm
+      Engine(5):        V9 
+      Physical Name(5): /wrds/crsp/sasdata/a_treasuries
+      Engine(6):        V9 
+      Physical Name(6): /wrds/crsp/sasdata/a_treas_bd
+      Engine(7):        V9 
+      Physical Name(7): /wrds/crsp/sasdata/a_treas_bm
+      Engine(8):        V9 
+      Physical Name(8): /wrds/crsp/sasdata/a_ziman
+NOTE: Libref CRSPQ was successfully assigned as follows: 
+      Levels:           9
+      Engine(1):        V9 
+      Physical Name(1): /wrds/crsp/sasdata/q_stock
+      Engine(2):        V9 
+      Physical Name(2): /wrds/crsp/sasdata/q_indexes
+      Engine(3):        V9 
+      Physical Name(3): /wrds/crsp/sasdata/q_ccm
+      Engine(4):        V9 
+      Physical Name(4): /wrds/crsp/sasdata/q_mutualfunds
+      Engine(5):        V9 
+      Physical Name(5): /wrds/crsp/sasdata/q_stock62
+      Engine(6):        V9 
+      Physical Name(6): /wrds/crsp/sasdata/q_treasuries
+      Engine(7):        V9 
+      Physical Name(7): /wrds/crsp/sasdata/q_treas_bd
+      Engine(8):        V9 
+      Physical Name(8): /wrds/crsp/sasdata/q_treas_bm
+      Engine(9):        V9 
+      Physical Name(9): /wrds/crsp/sasdata/q_ziman
+NOTE: Libref CRSPM was successfully assigned as follows: 
+      Levels:           8
+      Engine(1):        V9 
+      Physical Name(1): /wrds/crsp/sasdata/m_stock
+      Engine(2):        V9 
+      Physical Name(2): /wrds/crsp/sasdata/m_indexes
+      Engine(3):        V9 
+      Physical Name(3): /wrds/crsp/sasdata/m_ccm
+      Engine(4):        V9 
+      Physical Name(4): /wrds/crsp/sasdata/m_stock62
+      Engine(5):        V9 
+      Physical Name(5): /wrds/crsp/sasdata/m_treasuries
+      Engine(6):        V9 
+      Physical Name(6): /wrds/crsp/sasdata/m_treas_bd
+      Engine(7):        V9 
+      Physical Name(7): /wrds/crsp/sasdata/m_treas_bm
+      Engine(8):        V9 
+      Physical Name(8): /wrds/crsp/sasdata/m_ziman
+NOTE: Libref CRSP was successfully assigned as follows: 
+      Levels:           9
+      Engine(1):        V9 
+      Physical Name(1): /wrds/crsp/sasdata/a_stock
+      Engine(2):        V9 
+      Physical Name(2): /wrds/crsp/sasdata/a_stock62
+      Engine(3):        V9 
+      Physical Name(3): /wrds/crsp/sasdata/a_indexes
+      Engine(4):        V9 
+      Physical Name(4): /wrds/crsp/sasdata/a_ccm
+      Engine(5):        V9 
+      Physical Name(5): /wrds/crsp/sasdata/a_treasuries
+      Engine(6):        V9 
+      Physical Name(6): /wrds/crsp/sasdata/a_treas_bd
+      Engine(7):        V9 
+      Physical Name(7): /wrds/crsp/sasdata/a_treas_bm
+      Engine(8):        V9 
+      Physical Name(8): /wrds/crsp/sasdata/a_ziman
+      Engine(9):        V9 
+      Physical Name(9): /wrds/crsp/sasdata/q_mutualfunds
+NOTE: Libref CRSPSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/crspsamp/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/crsp_mf
+NOTE: Libref CSMAR was successfully assigned as follows: 
+      Levels:           12
+      Engine(1):        V9 
+      Physical Name(1): /wrds/csmar/sasdata/trading
+      Engine(2):        V9 
+      Physical Name(2): /wrds/csmar/sasdata/financial
+      Engine(3):        V9 
+      Physical Name(3): /wrds/csmar/sasdata/funds_mkt_research
+      Engine(4):        V9 
+      Physical Name(4): /wrds/csmar/sasdata/ma
+      Engine(5):        V9 
+      Physical Name(5): /wrds/csmar/sasdata/ipo_a
+      Engine(6):        V9 
+      Physical Name(6): /wrds/csmar/sasdata/af
+      Engine(7):        V9 
+      Physical Name(7): /wrds/csmar/sasdata/cd
+      Engine(8):        V9 
+      Physical Name(8): /wrds/csmar/sasdata/cg
+      Engine(9):        V9 
+      Physical Name(9): /wrds/csmar/sasdata/ini
+      Engine(10):        V9 
+      Physical Name(10): /wrds/csmar/sasdata/colc
+      Engine(11):        V9 
+      Physical Name(11): /wrds/csmar/sasdata/rs
+      Engine(12):        V9 
+      Physical Name(12): /wrds/csmar/sasdata/hld
+NOTE: Libref CUSIPM was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/cusip/sasdata
+NOTE: Libref DEALSCAN was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/tfn/sasdata/dealscan
+NOTE: Libref DJONES was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/djones/sasdata
+NOTE: Libref DMEF was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/dmef/sasdata
+NOTE: Libref DOE was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/doe/sasdata
+NOTE: Libref EMDB was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/emdbd
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/emdbm
+NOTE: Libref ETFG was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/etfg/sasdata/industry
+      Engine(2):        V9 
+      Physical Name(2): /wrds/etfg/sasdata/fund_flow
+      Engine(3):        V9 
+      Physical Name(3): /wrds/etfg/sasdata/analytics
+      Engine(4):        V9 
+      Physical Name(4): /wrds/etfg/sasdata/constituents
+NOTE: Libref ETFGSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/etfg
+NOTE: Libref EUREKA was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/eureka/sasdata
+NOTE: Libref EURSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/eureka
+NOTE: Libref FACTSET was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/factset/sasdata/ff_usc
+      Engine(2):        V9 
+      Physical Name(2): /wrds/factset/sasdata/ff_int
+      Engine(3):        V9 
+      Physical Name(3): /wrds/factset/sasdata/own
+      Engine(4):        V9 
+      Physical Name(4): /wrds/factset/sasdata/common
+      Engine(5):        V9 
+      Physical Name(5): /wrds/factset/sasdata/own_v5
+      Engine(6):        V9 
+      Physical Name(6): /wrds/factset/sasdata/ff_usc_v3
+      Engine(7):        V9 
+      Physical Name(7): /wrds/factset/sasdata/ff_int_v3
+NOTE: Libref FSSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/factset
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/revere
+NOTE: Libref FDIC was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/fdic/sasdata
+NOTE: Libref FF was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/ff/sasdata
+NOTE: Libref FISD was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/mergent/sasdata/fisd
+      Engine(2):        V9 
+      Physical Name(2): /wrds/mergent/sasdata/naic
+NOTE: Libref FISDSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/fisdsamp/sasdata
+NOTE: Libref FTSE was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/ftse/sasdata/russell
+NOTE: Libref FTSESAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/ftse
+NOTE: Libref FRB was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/frb/sasdata
+NOTE: Libref GINSIGHT was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ginsight/sasdata/all
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ginsight/sasdata/basic
+      Engine(3):        V9 
+      Physical Name(3): /wrds/ginsight/sasdata/common
+      Engine(4):        V9 
+      Physical Name(4): /wrds/ginsight/sasdata/econ_analytics
+NOTE: Libref GMI was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/gmiratings/sasdata
+NOTE: Libref GOVPX was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/govpx/sasdata
+NOTE: Libref GOVPXSMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/govpx
+NOTE: Libref HBASEPRM was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/hbase/sasdata/premium
+NOTE: Libref HBASE was successfully assigned as follows: 
+      Levels:           1
+      Engine(1):        V9 
+      Physical Name(1): /wrds/hbase/sasdata/premium
+NOTE: Libref HBASESMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/hbase
+NOTE: Libref HFR was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/hfr/sasdata/hfrdb_academic_dead
+      Engine(2):        V9 
+      Physical Name(2): /wrds/hfr/sasdata/hfrdb_academic_live
+      Engine(3):        V9 
+      Physical Name(3): /wrds/hfr/sasdata/hfrdb_dead
+      Engine(4):        V9 
+      Physical Name(4): /wrds/hfr/sasdata/hfrdb_live
+NOTE: Libref HFRSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/hfrsamp/sasdata/hfrdb
+NOTE: Libref IBES was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ibes/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ibes/sasdata/iga
+      Engine(3):        V9 
+      Physical Name(3): /wrds/ibes/sasdata/guidance
+NOTE: Libref IBESCORP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/ibes/sasdata/corporate
+NOTE: Libref IBESKPI was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/ibes/sasdata/kpi
+NOTE: Libref IFGR was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/infogroup/sasdata/business
+      Engine(2):        V9 
+      Physical Name(2): /wrds/infogroup/sasdata/residential
+NOTE: Libref IFGRSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/infogroup/business
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/infogroup/residential
+NOTE: Libref IMS was successfully assigned as follows: 
+      Levels:           9
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ims/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ims/sasdata/recent_standard_plus
+      Engine(3):        V9 
+      Physical Name(3): /wrds/ims/sasdata/recent_premium
+      Engine(4):        V9 
+      Physical Name(4): /wrds/ims/sasdata/historical_standard_plus
+      Engine(5):        V9 
+      Physical Name(5): /wrds/ims/sasdata/historical_premium
+      Engine(6):        V9 
+      Physical Name(6): /wrds/ims/sasdata/historical_3years_standard_plus
+      Engine(7):        V9 
+      Physical Name(7): /wrds/ims/sasdata/historical_3years_premium
+      Engine(8):        V9 
+      Physical Name(8): /wrds/ims/sasdata/historical_5years_standard_plus
+      Engine(9):        V9 
+      Physical Name(9): /wrds/ims/sasdata/historical_5years_premium
+NOTE: Libref IMSSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/ims
+NOTE: Libref IRI was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/iri/sasdata
+NOTE: Libref ISS was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/riskmetrics/sasdata/incentive_lab
+      Engine(2):        V9 
+      Physical Name(2): /wrds/riskmetrics/sasdata/incentive_lab/europe
+NOTE: Libref ISSM was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/issm/sasdata
+NOTE: Libref KLD was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/kld/sasdata
+NOTE: Libref KPISAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/ibeskpi
+NOTE: Libref KTMINE was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ktmine/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ktmine/sasdata/corptree
+NOTE: Libref KTSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/ktmine
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/ktmine/corptree
+NOTE: Libref LEVIN was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/levin/sasdata
+NOTE: Libref LVNSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/levin
+NOTE: Libref LSPD was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/lspd/sasdata/monthly
+      Engine(2):        V9 
+      Physical Name(2): /wrds/lspd/sasdata/daily
+NOTE: Libref LSPDSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/lspd
+NOTE: Libref MARKIT was successfully assigned as follows: 
+      Levels:           10
+      Engine(1):        V9 
+      Physical Name(1): /wrds/markit/sasdata/cds
+      Engine(2):        V9 
+      Physical Name(2): /wrds/markit/sasdata/red
+      Engine(3):        V9 
+      Physical Name(3): /wrds/markit/sasdata/cdx_composites
+      Engine(4):        V9 
+      Physical Name(4): /wrds/markit/sasdata/cdx_constituents
+      Engine(5):        V9 
+      Physical Name(5): /wrds/markit/sasdata/itraxx_asia_composites
+      Engine(6):        V9 
+      Physical Name(6): /wrds/markit/sasdata/itraxx_europe_composites
+      Engine(7):        V9 
+      Physical Name(7): /wrds/markit/sasdata/itraxx_sovx_composites
+      Engine(8):        V9 
+      Physical Name(8): /wrds/markit/sasdata/itraxx_asia_constituents
+      Engine(9):        V9 
+      Physical Name(9): /wrds/markit/sasdata/itraxx_europe_constituents
+      Engine(10):        V9 
+      Physical Name(10): /wrds/markit/sasdata/itraxx_sovx_constituents
+NOTE: Libref MSFANLY was successfully assigned as follows: 
+      Levels:           5
+      Engine(1):        V9 
+      Physical Name(1): /wrds/markit/sasdata/msf_analytics_bonds
+      Engine(2):        V9 
+      Physical Name(2): /wrds/markit/sasdata/msf_analytics_eqty_amer
+      Engine(3):        V9 
+      Physical Name(3): /wrds/markit/sasdata/msf_analytics_eqty_euro
+      Engine(4):        V9 
+      Physical Name(4): /wrds/markit/sasdata/msf_analytics_eqty_asia
+      Engine(5):        V9 
+      Physical Name(5): /wrds/markit/sasdata/msf_analytics_eqty_other
+NOTE: Libref MSFINST was successfully assigned as follows: 
+      Levels:           5
+      Engine(1):        V9 
+      Physical Name(1): /wrds/markit/sasdata/msf_inst_bonds
+      Engine(2):        V9 
+      Physical Name(2): /wrds/markit/sasdata/msf_inst_eqty_amer
+      Engine(3):        V9 
+      Physical Name(3): /wrds/markit/sasdata/msf_inst_eqty_asia
+      Engine(4):        V9 
+      Physical Name(4): /wrds/markit/sasdata/msf_inst_eqty_euro
+      Engine(5):        V9 
+      Physical Name(5): /wrds/markit/sasdata/msf_inst_eqty_other
+NOTE: Libref MRKTSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/markit/cdsred
+NOTE: Libref MFL was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/mfl/sasdata
+NOTE: Libref MSRB was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/msrb/sasdata
+NOTE: Libref MSRBSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/msrb
+NOTE: Libref NASTRAQ was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/nastraq/sasdata
+NOTE: Libref OMTRIAL was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/optionmetrics
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/optionmetrics/europe
+NOTE: Libref OPTIONM was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/optionm/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/optionm/sasdata/europe
+NOTE: Libref OTC was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/otc/sasdata/endofday
+NOTE: Libref PACAP was successfully assigned as follows: 
+      Levels:           8
+      Engine(1):        V9 
+      Physical Name(1): /wrds/pacap/sasdata/hk
+      Engine(2):        V9 
+      Physical Name(2): /wrds/pacap/sasdata/id
+      Engine(3):        V9 
+      Physical Name(3): /wrds/pacap/sasdata/ja
+      Engine(4):        V9 
+      Physical Name(4): /wrds/pacap/sasdata/ks
+      Engine(5):        V9 
+      Physical Name(5): /wrds/pacap/sasdata/my
+      Engine(6):        V9 
+      Physical Name(6): /wrds/pacap/sasdata/sn
+      Engine(7):        V9 
+      Physical Name(7): /wrds/pacap/sasdata/tw
+      Engine(8):        V9 
+      Physical Name(8): /wrds/pacap/sasdata/th
+NOTE: Libref PHLX was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/phlx/sasdata
+NOTE: Libref PPUBLICA was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ppublica/sasdata/d4d
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ppublica/sasdata/rx_checkup
+NOTE: Libref PPUBSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/ppublica/d4d
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/ppublica/rx_checkup
+WARNING: One or more libraries specified in the concatenated library PREQIN do 
+         not exist.  These libraries were removed from the concatenation.
+NOTE: Libref PREQIN was successfully assigned as follows: 
+      Levels:           1
+      Engine(1):        V9 
+      Physical Name(1): /wrds/preqin/sasdata/private_equity
+NOTE: Libref PREQSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/preqin
+NOTE: Libref PUBLIC was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/public/sasdata/climate/noaa
+      Engine(2):        V9 
+      Physical Name(2): /wrds/public/sasdata/legal/govtrack
+      Engine(3):        V9 
+      Physical Name(3): /wrds/public/sasdata/macroecon/bea
+      Engine(4):        V9 
+      Physical Name(4): /wrds/public/sasdata/macroecon/bls
+      Engine(5):        V9 
+      Physical Name(5): /wrds/public/sasdata/healthcare/hcup
+      Engine(6):        V9 
+      Physical Name(6): /wrds/public/sasdata/healthcare/meps
+      Engine(7):        V9 
+      Physical Name(7): /wrds/public/sasdata/taxis
+NOTE: Libref PWT was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/pwt/sasdata
+NOTE: Libref RENT was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/rent/sasdata
+NOTE: Libref REPRISK was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/reprisk/sasdata/pm
+      Engine(2):        V9 
+      Physical Name(2): /wrds/reprisk/sasdata/std
+      Engine(3):        V9 
+      Physical Name(3): /wrds/reprisk/sasdata
+NOTE: Libref REPSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/reprisk
+NOTE: Libref REVERE was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/factset/sasdata/revere_common
+      Engine(2):        V9 
+      Physical Name(2): /wrds/factset/sasdata/revere_supply_chain
+      Engine(3):        V9 
+      Physical Name(3): /wrds/factset/sasdata/revere_geo_rev
+      Engine(4):        V9 
+      Physical Name(4): /wrds/factset/sasdata/revere_ind_class
+NOTE: Libref RISK was successfully assigned as follows: 
+      Levels:           12
+      Engine(1):        V9 
+      Physical Name(1): /wrds/riskmetrics/sasdata/directors
+      Engine(2):        V9 
+      Physical Name(2): /wrds/riskmetrics/sasdata/governance
+      Engine(3):        V9 
+      Physical Name(3): /wrds/riskmetrics/sasdata/proposals
+      Engine(4):        V9 
+      Physical Name(4): /wrds/riskmetrics/sasdata/incentive_lab
+      Engine(5):        V9 
+      Physical Name(5): /wrds/riskmetrics/sasdata/incentive_lab/europe
+      Engine(6):        V9 
+      Physical Name(6): /wrds/riskmetrics/sasdata/votes
+      Engine(7):        V9 
+      Physical Name(7): /wrds/riskmetrics/sasdata/voting_analytics
+      Engine(8):        V9 
+      Physical Name(8): /wrds/riskmetrics/sasdata/voting_analytics/issrec
+      Engine(9):        V9 
+      Physical Name(9): /wrds/riskmetrics/sasdata/voting_analytics/mf
+      Engine(10):        V9 
+      Physical Name(10): /wrds/riskmetrics/sasdata/voting_analytics/proposals
+      Engine(11):        V9 
+      Physical Name(11): 
+      /wrds/riskmetrics/sasdata/voting_analytics/voteresults_global
+      Engine(12):        V9 
+      Physical Name(12): 
+      /wrds/riskmetrics/sasdata/voting_analytics/voteresults_us
+NOTE: Libref RISKSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/riskmetrics
+NOTE: Libref RPNA was successfully assigned as follows: 
+      Levels:           5
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ravenpack/sasdata/common
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ravenpack/sasdata/dow_jones_edition
+      Engine(3):        V9 
+      Physical Name(3): /wrds/ravenpack/sasdata/full_edition
+      Engine(4):        V9 
+      Physical Name(4): /wrds/ravenpack/sasdata/pr_edition
+      Engine(5):        V9 
+      Physical Name(5): /wrds/ravenpack/sasdata/web_edition
+NOTE: Libref RPNASAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/ravenpack
+NOTE: Libref SDC was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/tfn/sasdata/sdc_ma
+      Engine(2):        V9 
+      Physical Name(2): /wrds/tfn/sasdata/sdc_ni
+NOTE: Libref SDCSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/tfn/sdc_ma
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/tfn/sdc_ni
+NOTE: Libref SECSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/sec
+NOTE: Libref SNAPSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/comp_snap
+NOTE: Libref SNL was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/snl/sasdata
+NOTE: Libref SNLBR was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/snl/sasdata/bank_reg
+NOTE: Libref SNLSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/snl
+NOTE: Libref SPRAT was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/sprat
+NOTE: Libref SUSTAIN was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/sustain/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/sustain/sasdata/na_only
+NOTE: Libref SUSTSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/sustain
+NOTE: Libref TAQ was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/taq/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/nyse/sasdata/wrds_taqs_ct
+      Engine(3):        V9 
+      Physical Name(3): /wrds/nyse/sasdata/wrds_taqs_nbbo
+      Engine(4):        V9 
+      Physical Name(4): /wrds/nyse/sasdata/wrds_taqs_iid_v1
+NOTE: Libref TAQMSEC was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/nyse/sasdata/taqms/ct
+      Engine(2):        V9 
+      Physical Name(2): /wrds/nyse/sasdata/taqms/cq
+      Engine(3):        V9 
+      Physical Name(3): /wrds/nyse/sasdata/taqms/mast
+      Engine(4):        V9 
+      Physical Name(4): /wrds/nyse/sasdata/taqms/nbbo
+      Engine(5):        V9 
+      Physical Name(5): /wrds/nyse/sasdata/taqms/nbbod2m
+      Engine(6):        V9 
+      Physical Name(6): /wrds/nyse/sasdata/wrds_taqms_wct
+      Engine(7):        V9 
+      Physical Name(7): /wrds/nyse/sasdata/wrds_taqms_iid
+NOTE: Libref TAQSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/taqsamp/sasdata
+NOTE: Libref TAQMSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/taqmssamp/sasdata
+NOTE: Libref TASS was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/tfn/sasdata/tass
+NOTE: Libref TFN was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/tfn/sasdata/s12
+      Engine(2):        V9 
+      Physical Name(2): /wrds/tfn/sasdata/s34
+      Engine(3):        V9 
+      Physical Name(3): /wrds/tfn/sasdata/insiders
+NOTE: Libref TOTALQ was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/contributors/sasdata/total_q
+NOTE: Libref TRACE was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/trace/sasdata/standard
+      Engine(2):        V9 
+      Physical Name(2): /wrds/trace/sasdata/enhanced
+NOTE: Libref TROWN was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/tfn/sasdata/ownership
+NOTE: Libref TRSAMP was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/ibes_guidance
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/tass
+      Engine(3):        V9 
+      Physical Name(3): /wrds/samples/sasdata/worldscope
+NOTE: Libref TRWS was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/tfn/sasdata/worldscope
+NOTE: Libref TWOIQ was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/2iq/sasdata
+NOTE: Libref TWOIQSMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/2iq
+NOTE: Libref WAPPSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/ciqevtstudy
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/ciqintevtstudy
+NOTE: Libref WQA was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/wqa/sasdata
+NOTE: Libref WRDSSEC was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/sec/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/sec/sasdata/common
+      Engine(3):        V9 
+      Physical Name(3): /wrds/sec/sasdata/sa
+      Engine(4):        V9 
+      Physical Name(4): /wrds/sec/sasdata/insiders
+NOTE: Libref WRDSAPPS was successfully assigned as follows: 
+      Levels:           11
+      Engine(1):        V9 
+      Physical Name(1): /wrds/wrdsapps/sasdata/intevtstudy
+      Engine(2):        V9 
+      Physical Name(2): /wrds/wrdsapps/sasdata/ciqintevtstudy
+      Engine(3):        V9 
+      Physical Name(3): /wrds/wrdsapps/sasdata/finratio
+      Engine(4):        V9 
+      Physical Name(4): /wrds/wrdsapps/sasdata/ravtaqevtstudy
+      Engine(5):        V9 
+      Physical Name(5): /wrds/wrdsapps/sasdata/gindices
+      Engine(6):        V9 
+      Physical Name(6): /wrds/wrdsapps/sasdata/bond
+      Engine(7):        V9 
+      Physical Name(7): /wrds/wrdsapps/sasdata/linking/iclink
+      Engine(8):        V9 
+      Physical Name(8): /wrds/wrdsapps/sasdata/linking/oclink
+      Engine(9):        V9 
+      Physical Name(9): /wrds/wrdsapps/sasdata/linking/tclink
+      Engine(10):        V9 
+      Physical Name(10): /wrds/wrdsapps/sasdata/linking/bdxinslink
+      Engine(11):        V9 
+      Physical Name(11): /wrds/wrdsapps/sasdata/longrunevt
+NOTE: Libref ZACKS was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/zacks/sasdata
+NOTE: Libref ZACKSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/zacks
+
+NOTE: AUTOEXEC processing completed.
+
+1          
+2          /*CRSP-IBES link*/
+3          %iclink (ibesid=ibes.id, crspid=crspq.stocknames, outset=work.iclink)
+3        ! ;
+
+### START. Creating IBES-CRSP Link Table: ICLINK
+## IBES NAMES (ID) Dataset Used:  ibes.id
+## CRSP NAMES (ID) Dataset Used:  crspq.stocknames
+## Step1: Linking using CUSIPs...
+ERROR: User does not have appropriate authorization level for file 
+       CRSPQ.STOCKNAMES.DATA.
+WARNING: No data sets qualify for WHERE processing.
+WARNING: The data set WORK._CRSP1 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+ERROR: File WORK._CRSP2.DATA does not exist.
+WARNING: The data set WORK._CRSP2 may be incomplete.  When this step was 
+         stopped there were 0 observations and 2 variables.
+ERROR: File WORK._LINK1_1.DATA does not exist.
+WARNING: The variable TICKER in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable PERMNO in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The data set WORK._LINK1_2 may be incomplete.  When this step was 
+         stopped there were 0 observations and 3 variables.
+## Step2: Linking using TICKERs...
+ERROR: File WORK._NOMATCH3.DATA does not exist.
+WARNING: The variable sdates in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The data set WORK._NOMATCH3 may be incomplete.  When this step was 
+         stopped there were 0 observations and 2 variables.
+ERROR: User does not have appropriate authorization level for file 
+       CRSPQ.STOCKNAMES.DATA.
+WARNING: No data sets qualify for WHERE processing.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+WARNING: The data set WORK._CRSP1 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+WARNING: Data set WORK._CRSP1 was not replaced because this step was stopped.
+WARNING: Data set WORK._CRSP2 was not replaced because this step was stopped.
+ERROR: File WORK._LINK2_1.DATA does not exist.
+WARNING: The data set WORK._LINK2_2 may be incomplete.  When this step was 
+         stopped there were 0 observations and 6 variables.
+ERROR: Variable TICKER not found.
+WARNING: The variable ticker in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable permno in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable permno in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+## Step3: Finalizing Links and Scores...
+ERROR: Variable TICKER not found.
+ERROR: Variable PERMNO not found.
+## Step4: Link Table work.iclink Ready...
+### DONE .
+
+4          
+5          /*PART1 Buypct*/
+6          /* Linking Compustat GVKEY and IBES Tickers using ICLINK
+6        !     */
+7          /* For unmatched GVKEYs, use header IBTIC link in Compustat Security
+7        ! file        */
+
+
+8          proc sql;
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of 
+      statements.
+8        !           create table gvkeys
+9            as select distinct a.gvkey, b.lpermco as permco, b.lpermno as
+9        ! permno,
+10           coalesce (b.linkenddt,'31dec9999'd) as linkenddt format date9.,
+11           coalesce (d.ticker, c.ibtic) as ticker, b.linkdt format date9.
+12           from comp.idxcst_his a
+13           left join crsp.ccmxpf_linktable
+14                    (where=(usedflag=1 and linkprim in ('P','C'))) b
+15           on a.gvkey=b.gvkey
+16           left join comp.security c
+17           on a.gvkey=c.gvkey
+18           left join iclink (where=(score in (0,1))) d
+19           on b.lpermno=d.permno
+20          order by gvkey, linkdt, ticker;
+NOTE: Statement not executed due to NOEXEC option.
+21         quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+22         data gvkeys; set gvkeys;
+ERROR: File WORK.GVKEYS.DATA does not exist.
+23           by gvkey linkdt ticker;
+24           if last.linkdt;
+25         run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.GVKEYS may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+26         
+27         proc sql;
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of 
+      statements.
+28         create table ibes_sum
+29         as select a.*,b.permno
+30         from ibes.recdsum a,
+31          (select distinct ticker,permno,
+32                min(linkdt) as mindt,max(linkenddt) as maxdt
+33                from gvkeys group by ticker, permno) b
+34            where a.ticker=b.ticker and b.mindt<=a.statpers<=b.maxdt;
+NOTE: Statement not executed due to NOEXEC option.
+35            quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+36         
+
+
+37         proc sort data=ibes_sum; by permno statpers; run;
+ERROR: File WORK.IBES_SUM.DATA does not exist.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+38         
+
+
+39         data ibes_sum_june(rename=(buypct=pct_june));
+40         set ibes_sum;
+ERROR: File WORK.IBES_SUM.DATA does not exist.
+41         if month(statpers)=6;
+42         format statpers date9.;
+43         run;
+
+WARNING: The variable buypct in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.IBES_SUM_JUNE may be incomplete.  When this step was 
+         stopped there were 0 observations and 1 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+44         
+45         
+46         /*proc export data=ibes_sum_june outfile="ibes_sum_june.csv"
+47         dbms=csv replace;
+48         run;*/
+49         
+50         /*PART2 CRSP return*/
+51         /*Create a CRSP Subsample with Monthly Stock and Event Variables */
+52         
+53         %let msevars=ticker ncusip shrcd exchcd;
+54         %let msfvars =  prc ret retx shrout cfacpr cfacshr;
+55         
+56         %include '/wrds/crsp/samples/crspmerge.sas';
+182        
+183        %crspmerge(s=m,start=01jan1980,end=30jun2019,
+184        sfvars=&msfvars,sevars=&msevars,filters=exchcd in (1,2,3) and shrcd
+184      ! in (10,11));
+
+
+
+
+
+#### ## # Merging CRSP Stock File (msf) and Event File (mse) # ## ####
+#### ### ## #
+#### ### ## #
+#### ### ## #
+ERROR: File WORK.SEDATA.DATA does not exist.
+ERROR: File WORK.SFDATA.DATA does not exist.
+WARNING: The variable permco in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable permno in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable date in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable prc in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable ret in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable retx in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable shrout in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable cfacpr in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable cfacshr in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The data set WORK.CRSP_M may be incomplete.  When this step was 
+         stopped there were 0 observations and 4 variables.
+#### ### ## #
+ERROR: Variable DATE not found.
+ERROR: Variable PERMNO not found.
+#### ### ## #
+#### ## # Done: Dataset work.crsp_m Created! # ## ####
+
+185        
+186        /* CRSP_M is sorted by date and permno and has historical returns
+186      !  */
+187        /* as well as historical share codes and exchange codes
+187      !  */
+188        /* Add CRSP delisting returns */
+
+
+189        proc sql;
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of 
+      statements.
+189      !           create table crspm2
+190         as select a.*, b.dlret,
+191          sum(1,ret)*sum(1,dlret)-1 as retadj "Return adjusted for
+191      ! delisting",
+192          abs(a.prc)*a.shrout as MEq 'Market Value of Equity'
+193         from crsp_m  a left join crsp.msedelist(where=(missing(dlret)=0)) b
+194         on a.permno=b.permno and
+195            intnx('month',a.date,0,'E')=intnx('month',b.DLSTDT,0,'E')
+196         order by a.date, a.permco, MEq;
+NOTE: Statement not executed due to NOEXEC option.
+197        quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+198        
+199        /* There are cases when the same firm (permco) has two or more
+199      !   */
+200        /* securities (permno) at same date. For the purpose of ME for
+200      !   */
+201        /* the firm, we aggregated all ME for a given permco, date. This
+201      !   */
+202        /* aggregated ME will be assigned to the Permno with the largest ME
+202      !   */
+
+
+203        data crspm2a (drop = Meq); set crspm2;
+ERROR: File WORK.CRSPM2.DATA does not exist.
+204          by date permco Meq;
+205          retain ME;
+206          if first.permco and last.permco then do;
+207            ME=meq;
+208          output; /* most common case where a firm has a unique permno*/
+209          end;
+210          else do ;
+211            if  first.permco then ME=meq;
+212            else ME=sum(meq,ME);
+213            if last.permco then output;
+214          end;
+215        run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.CRSPM2A may be incomplete.  When this step was 
+         stopped there were 0 observations and 1 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+216        
+217        /* There should be no duplicates*/
+218        proc sort data=crspm2a nodupkey; by permno date;run;
+ERROR: Variable PERMNO not found.
+ERROR: Variable DATE not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+219        
+220        /* - Create a File with Market Equity (ME)                */
+
+
+221        data crspm3 (keep=permno date retadj exchcd shrcd me LME weight_port
+221      ! cumretx);
+222             set crspm2a;
+223         by permno date;
+224         retain me_base weight_port cumretx;
+225         Lpermno=lag(permno);
+226         LME=lag(me);
+227         weight_port = LME;
+228             if first.permno then do;
+229             LME=me/(1+retx); cumretx=sum(1,retx); me_base=LME;weight_port=.;
+229      ! end;
+230        output crspm3;
+231        run;
+
+WARNING: The variable date in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable retadj in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable exchcd in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable shrcd in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+NOTE: The data set WORK.CRSPM3 has 0 observations and 5 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+232        
+233        proc sort data=crspm3 nodupkey;by permno date;run;
+ERROR: Variable DATE not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+234        
+235        /*Part3: Merge buypct and return*/
+236        
+
+
+237        proc sql;
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of 
+      statements.
+238           create table variables
+239           as select a.date,a.shrcd,a.exchcd,a.me,a.retadj,a.weight_port,
+240           b.*
+241           from crspm3  a inner join ibes_sum_june b
+242           on a.permno=b.permno and
+243           intnx('month', b.statpers, 1, 'E') <= intnx('month', a.date, 0,
+243      ! 'E')<= intnx('month', b.statpers, 12, 'E')
+244           order by a.permno,a.date;
+NOTE: Statement not executed due to NOEXEC option.
+245           quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+246        
+247        /* identify every stock */
+
+
+248        data portmember; set variables;
+ERROR: File WORK.VARIABLES.DATA does not exist.
+249         if me>0 then do;
+250         positiveme=1;
+251         if pct_june>=10 then pct10=1;
+252         if pct_june>=20 then pct20=1;
+253         if pct_june>=30 then pct30=1;
+254         if pct_june>=40 then pct40=1;
+255         if pct_june>=50 then pct50=1;
+256         if pct_june>=60 then pct60=1;
+257         if pct_june>=70 then pct70=1;
+258         if pct_june>=80 then pct80=1;
+259         if pct_june>=90 then pct90=1;
+260         end;
+261         else positiveme=0;
+262         keep permno date pct_june pct10 pct20 pct30 pct40 pct50 pct60 pct70
+262      ! pct80 pct90 positiveme exchcd shrcd ;
+263         run;
+
+WARNING: The variable permno in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable date in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable exchcd in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable shrcd in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.PORTMEMBER may be incomplete.  When this step was 
+         stopped there were 0 observations and 11 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+264        
+265        
+266        proc sql;
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of 
+      statements.
+267          create table vars as
+268          select a.*,b.pct_june,b.pct10, b.pct20, b.pct30, b.pct40, b.pct50,
+268      ! b.pct60,
+269        b.pct70, b.pct80, b.pct90,b.positiveme
+270          from variables as a, portmember as b
+271          where a.permno=b.permno and a.date=b.date;
+NOTE: Statement not executed due to NOEXEC option.
+272        quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+273        
+274        
+275        /* Calculate monthly time series of weighted average portfolio
+275      ! returns */
+276        /*loop*/
+277        %let portlist=pct10 pct20 pct30 pct40 pct50 pct60 pct70 pct80 pct90;
+278        
+279        %macro loop(portlist);
+280        %local i port;
+281        %do i=1 %to %sysfunc(countw(&portlist));
+282           %let port = %scan(&portlist, &i);
+283        
+284        proc sort data=vars (where=(not missing(&port))) out=vars0&port ; by
+284      ! date;run;
+285        
+286        data vars&port (keep=date permno ticker shrcd exchcd retadj
+286      ! weight_port ME pct_june
+287        meanrec medrec stdev numrec numup numdown buypct sellpct holdpct
+287      ! USfirm) ;
+288        retain date permno ticker shrcd exchcd retadj weight_port ME pct_june
+289        meanrec medrec stdev numrec numup numdown buypct sellpct holdpct
+289      ! USfirm;
+290        set vars0&port;
+291        format date date9.;
+292        run;
+293        
+294        proc export data=vars&port outfile="vars&port..csv"
+295        dbms=csv replace;
+296        run;
+297        
+298        /*vwret*/
+299        proc means data=vars0&port noprint;
+300         where weight_port>0 and positiveme=1 and exchcd in (1,2,3) and shrcd
+300      !  in (10,11);
+301         by date;
+302         var retadj;
+303         weight weight_port;
+304         output out=vwret_&port (drop= _type_ _freq_ ) mean=vwret_&port.
+304      ! n=n_firms_&port.;
+305        run;
+306        /*ewret*/
+307        proc means data=vars0&port noprint;
+308         where weight_port>0 and positiveme=1 and exchcd in (1,2,3) and shrcd
+308      !  in (10,11);
+309         by date;
+310         var retadj;
+311         output out=ewret_&port (drop= _type_ _freq_ ) mean=ewret_&port.
+311      ! n=n_firms_&port.;
+312        run;
+313        
+314        
+315        %end;
+316        %mend;
+317        
+318        %loop(&portlist);
+
+
+ERROR: File WORK.VARS.DATA does not exist.
+ERROR: No data set open to look up variables.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VARS0PCT10 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: The data set WORK.VARSPCT10 has 0 observations and 19 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT10.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+ERROR: Variable WEIGHT_PORT not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VWRET_PCT10 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT10.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.EWRET_PCT10 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: File WORK.VARS.DATA does not exist.
+ERROR: No data set open to look up variables.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VARS0PCT20 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: The data set WORK.VARSPCT20 has 0 observations and 19 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT20.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+ERROR: Variable WEIGHT_PORT not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VWRET_PCT20 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT20.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.EWRET_PCT20 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: File WORK.VARS.DATA does not exist.
+ERROR: No data set open to look up variables.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VARS0PCT30 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: The data set WORK.VARSPCT30 has 0 observations and 19 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT30.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+ERROR: Variable WEIGHT_PORT not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VWRET_PCT30 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT30.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.EWRET_PCT30 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: File WORK.VARS.DATA does not exist.
+ERROR: No data set open to look up variables.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VARS0PCT40 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: The data set WORK.VARSPCT40 has 0 observations and 19 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT40.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+ERROR: Variable WEIGHT_PORT not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VWRET_PCT40 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT40.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.EWRET_PCT40 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: File WORK.VARS.DATA does not exist.
+ERROR: No data set open to look up variables.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VARS0PCT50 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: The data set WORK.VARSPCT50 has 0 observations and 19 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT50.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+ERROR: Variable WEIGHT_PORT not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VWRET_PCT50 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT50.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.EWRET_PCT50 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: File WORK.VARS.DATA does not exist.
+ERROR: No data set open to look up variables.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VARS0PCT60 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: The data set WORK.VARSPCT60 has 0 observations and 19 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT60.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+ERROR: Variable WEIGHT_PORT not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VWRET_PCT60 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT60.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.EWRET_PCT60 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: File WORK.VARS.DATA does not exist.
+ERROR: No data set open to look up variables.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VARS0PCT70 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: The data set WORK.VARSPCT70 has 0 observations and 19 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT70.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+ERROR: Variable WEIGHT_PORT not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VWRET_PCT70 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT70.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.EWRET_PCT70 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: File WORK.VARS.DATA does not exist.
+ERROR: No data set open to look up variables.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VARS0PCT80 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: The data set WORK.VARSPCT80 has 0 observations and 19 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT80.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+ERROR: Variable WEIGHT_PORT not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VWRET_PCT80 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT80.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.EWRET_PCT80 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+ERROR: File WORK.VARS.DATA does not exist.
+ERROR: No data set open to look up variables.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VARS0PCT90 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: The data set WORK.VARSPCT90 has 0 observations and 19 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT90.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+ERROR: Variable WEIGHT_PORT not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.VWRET_PCT90 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: Variable weight_port is not on file WORK.VARS0PCT90.
+ERROR: Variable DATE not found.
+ERROR: Variable RETADJ not found.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.EWRET_PCT90 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+319        
+
+
+320        data monthly_vwret;
+321        merge vwret_pct10 vwret_pct20 vwret_pct30 vwret_pct40 vwret_pct50
+322        vwret_pct60 vwret_pct70 vwret_pct80 vwret_pct90;
+323        by date;
+324        run;
+
+NOTE: The data set WORK.MONTHLY_VWRET has 0 observations and 0 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+325        
+326        data monthly_ewret;
+327        merge ewret_pct10 ewret_pct20 ewret_pct30 ewret_pct40 ewret_pct50
+328        ewret_pct60 ewret_pct70 ewret_pct80 ewret_pct90;
+329        by date;
+330        run;
+
+NOTE: The data set WORK.MONTHLY_EWRET has 0 observations and 0 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+331        
+332        
+333        
+334        
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+335        proc export data=monthly_vwret outfile="buypct_annually_vwret.csv"
+336        dbms=csv replace;
+337        run;
+338        
+
+
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+339        proc export data=monthly_ewret outfile="buypct_annually_ewret.csv"
+340        dbms=csv replace;
+341        run;
+
+
+ERROR: Errors printed on page 2.
+
+NOTE: SAS Institute Inc., SAS Campus Drive, Cary, NC USA 27513-2414
+NOTE: The SAS System used:
+      real time           0.80 seconds
+      cpu time            0.36 seconds
+      

@@ -1,0 +1,2280 @@
+1                                                          The SAS System                           09:49 Tuesday, November 26, 2019
+
+NOTE: Copyright (c) 2016 by SAS Institute Inc., Cary, NC, USA. 
+NOTE: SAS (r) Proprietary Software 9.4 (TS1M6) 
+      Licensed to UNIVERSITY OF PENNSYLVANIA - SFA T&R, Site 70055201.
+NOTE: This session is executing on the Linux 3.10.0-1062.el7.x86_64 (LIN X64) platform.
+
+
+
+NOTE: Analytical products:
+      
+      SAS/STAT 15.1
+      SAS/ETS 15.1
+      SAS/OR 15.1
+      SAS/IML 15.1
+      SAS/QC 15.1
+
+NOTE: Additional host information:
+
+ Linux LIN X64 3.10.0-1062.el7.x86_64 #1 SMP Thu Jul 18 20:25:13 UTC 2019 x86_64 Red Hat Enterprise Linux Server release 7.7 
+      (Maipo) 
+
+      *** Welcome to Wharton Research Data Services (WRDS) ***
+
+WRDS is developed and run by the Wharton School at the University of
+Pennsylvania. We provide access to the databases that define empirical,
+seminal research in the fields of accounting, banking, economics,
+finance, insurance, management, marketing, public policy, risk
+management, and statistics.
+
+If you are not an authorized user of this system, disconnect now.
+All activity is strictly monitored. There may be severe criminal and
+civil penalties for unauthorized access or use of computing resources.
+
+Please report any problems to wrds-support@wharton.upenn.edu.
+
+------------------------------------------------------------------------------
+
+             *** Wharton Research Data Services (WRDS) on SSRN ***
+
+Submit to the WRDS Research Paper Series (RPS) on SSRN – a searchable
+repository of all papers submitted to SSRN that cite WRDS in their work.
+This RPS will elevate researchers’ visibility, increase your Eigenfactor®
+score, and build a specialized research base for others to explore easily.
+
+  View Abstracts:            http://bit.ly/2qOrt9f
+  Submit to the WRDS RPS:    http://bit.ly/2rjrENk
+
+------------------------------------------------------------------------------
+
+
+
+
+NOTE: SAS initialization used:
+      real time           0.17 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: AUTOEXEC processing beginning; file is /home/cityuhk/xinhe97/autoexec.sas.
+
+2                                The SAS System 09:49 Tuesday, November 26, 2019
+
+NOTE: Libref AHA was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/aha/sasdata/annual_survey
+      Engine(2):        V9 
+      Physical Name(2): /wrds/aha/sasdata/it_survey
+      Engine(3):        V9 
+      Physical Name(3): /wrds/aha/sasdata/hcris
+      Engine(4):        V9 
+      Physical Name(4): /wrds/aha/sasdata/annual_survey_3years
+      Engine(5):        V9 
+      Physical Name(5): /wrds/aha/sasdata/it_survey_3years
+      Engine(6):        V9 
+      Physical Name(6): /wrds/aha/sasdata/hcris_3years
+      Engine(7):        V9 
+      Physical Name(7): /wrds/aha/sasdata/annual_survey_history
+NOTE: Libref AHASAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/aha
+NOTE: Libref AUDIT was successfully assigned as follows: 
+      Levels:           5
+      Engine(1):        V9 
+      Physical Name(1): /wrds/audit/sasdata/audit_comp
+      Engine(2):        V9 
+      Physical Name(2): /wrds/audit/sasdata/corp_legal
+      Engine(3):        V9 
+      Physical Name(3): /wrds/audit/sasdata/oia
+      Engine(4):        V9 
+      Physical Name(4): /wrds/audit/sasdata/sedar
+      Engine(5):        V9 
+      Physical Name(5): /wrds/audit/sasdata/acct_os
+NOTE: Libref BANK was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/bank/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/bank/sasdata/commercial
+      Engine(3):        V9 
+      Physical Name(3): /wrds/bank/sasdata/holding
+NOTE: Libref BLOCK was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/blockholders/sasdata
+NOTE: Libref BOARDEX was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/boardex/sasdata/na
+      Engine(2):        V9 
+      Physical Name(2): /wrds/boardex/sasdata/eur
+      Engine(3):        V9 
+      Physical Name(3): /wrds/boardex/sasdata/uk
+      Engine(4):        V9 
+      Physical Name(4): /wrds/boardex/sasdata/row
+NOTE: Libref BOARDSMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/boardex
+NOTE: Libref BVD was successfully assigned as follows: 
+      Levels:           10
+      Engine(1):        V9 
+      Physical Name(1): /wrds/bvd/sasdata/ama_v
+      Engine(2):        V9 
+      Physical Name(2): /wrds/bvd/sasdata/ama_l
+      Engine(3):        V9 
+      Physical Name(3): /wrds/bvd/sasdata/ama_m
+      Engine(4):        V9 
+      Physical Name(4): /wrds/bvd/sasdata/ama_s
+      Engine(5):        V9 
+      Physical Name(5): /wrds/bvd/sasdata/bankf
+      Engine(6):        V9 
+      Physical Name(6): /wrds/bvd/sasdata/is
+      Engine(7):        V9 
+      Physical Name(7): /wrds/bvd/sasdata/os
+      Engine(8):        V9 
+      Physical Name(8): /wrds/bvd/sasdata/bvdorbis/ob_l
+      Engine(9):        V9 
+      Physical Name(9): /wrds/bvd/sasdata/bvdorbis/ob_m
+      Engine(10):        V9 
+      Physical Name(10): /wrds/bvd/sasdata/bvdorbis/ob_s
+NOTE: Libref BVDLGCY was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/bvdlegacy/sasdata/bs
+NOTE: Libref BVDSAMP was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/bvd_ama
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/bvd_bs
+      Engine(3):        V9 
+      Physical Name(3): /wrds/samples/sasdata/bvdorbis
+NOTE: Libref CALCBNCH was successfully assigned as follows: 
+      Levels:           16
+      Engine(1):        V9 
+      Physical Name(1): /wrds/calcbench/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/calcbench/sasdata/ap_ar
+      Engine(3):        V9 
+      Physical Name(3): /wrds/calcbench/sasdata/business_combinations
+      Engine(4):        V9 
+      Physical Name(4): /wrds/calcbench/sasdata/commitment_contingency
+      Engine(5):        V9 
+      Physical Name(5): /wrds/calcbench/sasdata/concentration_risk
+      Engine(6):        V9 
+      Physical Name(6): /wrds/calcbench/sasdata/derivatives_hedging
+      Engine(7):        V9 
+      Physical Name(7): /wrds/calcbench/sasdata/discontinued_ops
+      Engine(8):        V9 
+      Physical Name(8): /wrds/calcbench/sasdata/equity_investments
+      Engine(9):        V9 
+      Physical Name(9): /wrds/calcbench/sasdata/equity_compensation
+      Engine(10):        V9 
+      Physical Name(10): /wrds/calcbench/sasdata/fair_value
+      Engine(11):        V9 
+      Physical Name(11): /wrds/calcbench/sasdata/business_segments
+      Engine(12):        V9 
+      Physical Name(12): /wrds/calcbench/sasdata/goodwill
+      Engine(13):        V9 
+      Physical Name(13): /wrds/calcbench/sasdata/income_tax
+      Engine(14):        V9 
+      Physical Name(14): /wrds/calcbench/sasdata/inventory
+      Engine(15):        V9 
+      Physical Name(15): /wrds/calcbench/sasdata/leases
+      Engine(16):        V9 
+      Physical Name(16): /wrds/calcbench/sasdata/equity_repurchases
+NOTE: Libref CALCSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/calcbench
+NOTE: Libref CBOE was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/cboe/sasdata
+NOTE: Libref CENTRIS was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/centris/sasdata
+NOTE: Libref CIQ was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/capitaliq/sasdata/helper
+      Engine(2):        V9 
+      Physical Name(2): /wrds/capitaliq/sasdata/pplintel
+      Engine(3):        V9 
+      Physical Name(3): /wrds/capitaliq/sasdata/keydev
+      Engine(4):        V9 
+      Physical Name(4): /wrds/capitaliq/sasdata/capstructure
+      Engine(5):        V9 
+      Physical Name(5): /wrds/capitaliq/sasdata/ratings
+      Engine(6):        V9 
+      Physical Name(6): /wrds/capitaliq/sasdata/transactions
+      Engine(7):        V9 
+      Physical Name(7): /wrds/capitaliq/sasdata/transcripts
+NOTE: Libref CIQSAMP was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ciqsamp/sasdata/capstructure
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ciqsamp/sasdata/helper
+      Engine(3):        V9 
+      Physical Name(3): /wrds/ciqsamp/sasdata/keydev
+      Engine(4):        V9 
+      Physical Name(4): /wrds/ciqsamp/sasdata/pplintel
+      Engine(5):        V9 
+      Physical Name(5): /wrds/ciqsamp/sasdata/ratings
+      Engine(6):        V9 
+      Physical Name(6): /wrds/ciqsamp/sasdata/transactions
+      Engine(7):        V9 
+      Physical Name(7): /wrds/ciqsamp/sasdata/transcripts
+NOTE: Libref CISDM was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/morningstar/sasdata/cisdm
+NOTE: Libref CISDMSMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/morningstar
+NOTE: Libref CLRVT was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/clrvt/sasdata/drugs
+NOTE: Libref CLRVTSMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/clrvt
+NOTE: Libref COMPB was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/bank
+NOTE: Libref COMPBD was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/d_bank
+NOTE: Libref COMPG was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/global
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/global/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/global/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/global/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/global/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/global/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/global/security
+NOTE: Libref COMPGD was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/d_global
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/d_global/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/d_global/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/d_global/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/d_global/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/d_global/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/d_global/security
+NOTE: Libref COMPA was successfully assigned as follows: 
+      Levels:           14
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/naa
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/naa/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/naa/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/naa/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/naa/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/naa/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/naa/industry
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/naa/insider
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/naa/institution
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/naa/pension
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/naa/rating
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/naa/security
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/naa/segments_current
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/naa/transparency
+NOTE: Libref COMPM was successfully assigned as follows: 
+      Levels:           14
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/nam
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/nam/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/nam/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/nam/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/nam/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/nam/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/nam/industry
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/nam/insider
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/nam/institution
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/nam/pension
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/nam/rating
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/nam/security
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/nam/segments_current
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/nam/transparency
+NOTE: Libref COMPMCUR was successfully assigned as follows: 
+      Levels:           14
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/nam_current
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/nam_current/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/nam_current/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/nam_current/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/nam_current/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/nam_current/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/nam_current/industry
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/nam_current/insider
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/nam_current/institution
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/nam_current/pension
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/nam_current/rating
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/nam_current/security
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/nam_current/segments_current
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/nam_current/transparency
+NOTE: Libref COMPNAD was successfully assigned as follows: 
+      Levels:           14
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/d_na
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/d_na/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/d_na/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/d_na/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/d_na/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/d_na/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/d_na/industry
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/d_na/insider
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/d_na/institution
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/d_na/pension
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/d_na/rating
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/d_na/security
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/d_na/segments_current
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/d_na/transparency
+NOTE: Libref COMPDCUR was successfully assigned as follows: 
+      Levels:           14
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/d_na_current
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/d_na_current/company
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/d_na_current/currency
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/d_na_current/dictionary
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/d_na_current/economy
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/d_na_current/index
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/d_na_current/industry
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/d_na_current/insider
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/d_na_current/institution
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/d_na_current/pension
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/d_na_current/rating
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/d_na_current/security
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/d_na_current/segments_current
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/d_na_current/transparency
+NOTE: Libref COMPSEG was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/seghist
+NOTE: Libref COMPSEGD was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/d_seghist
+NOTE: Libref EXECCOMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/execcomp
+NOTE: Libref COMPD was successfully assigned as follows: 
+      Levels:           23
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/d_seghist
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/d_na
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/d_na/company
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/d_na/currency
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/d_na/dictionary
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/d_na/economy
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/d_na/index
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/d_na/industry
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/d_na/insider
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/d_na/institution
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/d_na/pension
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/d_na/rating
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/d_na/security
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/d_na/segments_current
+      Engine(15):        V9 
+      Physical Name(15): /wrds/comp/sasdata/d_na/transparency
+      Engine(16):        V9 
+      Physical Name(16): /wrds/comp/sasdata/d_bank
+      Engine(17):        V9 
+      Physical Name(17): /wrds/comp/sasdata/d_global
+      Engine(18):        V9 
+      Physical Name(18): /wrds/comp/sasdata/d_global/company
+      Engine(19):        V9 
+      Physical Name(19): /wrds/comp/sasdata/d_global/currency
+      Engine(20):        V9 
+      Physical Name(20): /wrds/comp/sasdata/d_global/dictionary
+      Engine(21):        V9 
+      Physical Name(21): /wrds/comp/sasdata/d_global/economy
+      Engine(22):        V9 
+      Physical Name(22): /wrds/comp/sasdata/d_global/index
+      Engine(23):        V9 
+      Physical Name(23): /wrds/comp/sasdata/d_global/security
+NOTE: Libref COMP was successfully assigned as follows: 
+      Levels:           26
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/d_seghist
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/d_na
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/d_na/company
+      Engine(4):        V9 
+      Physical Name(4): /wrds/comp/sasdata/d_na/currency
+      Engine(5):        V9 
+      Physical Name(5): /wrds/comp/sasdata/d_na/dictionary
+      Engine(6):        V9 
+      Physical Name(6): /wrds/comp/sasdata/d_na/economy
+      Engine(7):        V9 
+      Physical Name(7): /wrds/comp/sasdata/d_na/index
+      Engine(8):        V9 
+      Physical Name(8): /wrds/comp/sasdata/d_na/industry
+      Engine(9):        V9 
+      Physical Name(9): /wrds/comp/sasdata/d_na/insider
+      Engine(10):        V9 
+      Physical Name(10): /wrds/comp/sasdata/d_na/institution
+      Engine(11):        V9 
+      Physical Name(11): /wrds/comp/sasdata/d_na/pension
+      Engine(12):        V9 
+      Physical Name(12): /wrds/comp/sasdata/d_na/rating
+      Engine(13):        V9 
+      Physical Name(13): /wrds/comp/sasdata/d_na/security
+      Engine(14):        V9 
+      Physical Name(14): /wrds/comp/sasdata/d_na/segments_current
+      Engine(15):        V9 
+      Physical Name(15): /wrds/comp/sasdata/d_na/transparency
+      Engine(16):        V9 
+      Physical Name(16): /wrds/comp/sasdata/d_bank
+      Engine(17):        V9 
+      Physical Name(17): /wrds/comp/sasdata/d_global
+      Engine(18):        V9 
+      Physical Name(18): /wrds/comp/sasdata/d_global/company
+      Engine(19):        V9 
+      Physical Name(19): /wrds/comp/sasdata/d_global/currency
+      Engine(20):        V9 
+      Physical Name(20): /wrds/comp/sasdata/d_global/dictionary
+      Engine(21):        V9 
+      Physical Name(21): /wrds/comp/sasdata/d_global/economy
+      Engine(22):        V9 
+      Physical Name(22): /wrds/comp/sasdata/d_global/index
+      Engine(23):        V9 
+      Physical Name(23): /wrds/comp/sasdata/d_global/security
+      Engine(24):        V9 
+      Physical Name(24): /wrds/comp/sasdata/execcomp
+      Engine(25):        V9 
+      Physical Name(25): /wrds/comp/sasdata/filings
+      Engine(26):        V9 
+      Physical Name(26): /wrds/comp/sasdata/marginaltax
+NOTE: Libref COMPH was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/ph
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/pit
+      Engine(3):        V9 
+      Physical Name(3): /wrds/comp/sasdata/urq
+NOTE: Libref COMPSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/compsamp/sasdata
+NOTE: Libref COMPSNAP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/snapshot
+NOTE: Libref COMSCORE was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comscore/sasdata
+NOTE: Libref CONTRIB was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/contributors/sasdata/rq
+      Engine(2):        V9 
+      Physical Name(2): /wrds/contributors/sasdata/shale
+NOTE: Libref CRSPA was successfully assigned as follows: 
+      Levels:           8
+      Engine(1):        V9 
+      Physical Name(1): /wrds/crsp/sasdata/a_stock
+      Engine(2):        V9 
+      Physical Name(2): /wrds/crsp/sasdata/a_stock62
+      Engine(3):        V9 
+      Physical Name(3): /wrds/crsp/sasdata/a_indexes
+      Engine(4):        V9 
+      Physical Name(4): /wrds/crsp/sasdata/a_ccm
+      Engine(5):        V9 
+      Physical Name(5): /wrds/crsp/sasdata/a_treasuries
+      Engine(6):        V9 
+      Physical Name(6): /wrds/crsp/sasdata/a_treas_bd
+      Engine(7):        V9 
+      Physical Name(7): /wrds/crsp/sasdata/a_treas_bm
+      Engine(8):        V9 
+      Physical Name(8): /wrds/crsp/sasdata/a_ziman
+NOTE: Libref CRSPQ was successfully assigned as follows: 
+      Levels:           9
+      Engine(1):        V9 
+      Physical Name(1): /wrds/crsp/sasdata/q_stock
+      Engine(2):        V9 
+      Physical Name(2): /wrds/crsp/sasdata/q_indexes
+      Engine(3):        V9 
+      Physical Name(3): /wrds/crsp/sasdata/q_ccm
+      Engine(4):        V9 
+      Physical Name(4): /wrds/crsp/sasdata/q_mutualfunds
+      Engine(5):        V9 
+      Physical Name(5): /wrds/crsp/sasdata/q_stock62
+      Engine(6):        V9 
+      Physical Name(6): /wrds/crsp/sasdata/q_treasuries
+      Engine(7):        V9 
+      Physical Name(7): /wrds/crsp/sasdata/q_treas_bd
+      Engine(8):        V9 
+      Physical Name(8): /wrds/crsp/sasdata/q_treas_bm
+      Engine(9):        V9 
+      Physical Name(9): /wrds/crsp/sasdata/q_ziman
+NOTE: Libref CRSPM was successfully assigned as follows: 
+      Levels:           8
+      Engine(1):        V9 
+      Physical Name(1): /wrds/crsp/sasdata/m_stock
+      Engine(2):        V9 
+      Physical Name(2): /wrds/crsp/sasdata/m_indexes
+      Engine(3):        V9 
+      Physical Name(3): /wrds/crsp/sasdata/m_ccm
+      Engine(4):        V9 
+      Physical Name(4): /wrds/crsp/sasdata/m_stock62
+      Engine(5):        V9 
+      Physical Name(5): /wrds/crsp/sasdata/m_treasuries
+      Engine(6):        V9 
+      Physical Name(6): /wrds/crsp/sasdata/m_treas_bd
+      Engine(7):        V9 
+      Physical Name(7): /wrds/crsp/sasdata/m_treas_bm
+      Engine(8):        V9 
+      Physical Name(8): /wrds/crsp/sasdata/m_ziman
+NOTE: Libref CRSP was successfully assigned as follows: 
+      Levels:           9
+      Engine(1):        V9 
+      Physical Name(1): /wrds/crsp/sasdata/a_stock
+      Engine(2):        V9 
+      Physical Name(2): /wrds/crsp/sasdata/a_stock62
+      Engine(3):        V9 
+      Physical Name(3): /wrds/crsp/sasdata/a_indexes
+      Engine(4):        V9 
+      Physical Name(4): /wrds/crsp/sasdata/a_ccm
+      Engine(5):        V9 
+      Physical Name(5): /wrds/crsp/sasdata/a_treasuries
+      Engine(6):        V9 
+      Physical Name(6): /wrds/crsp/sasdata/a_treas_bd
+      Engine(7):        V9 
+      Physical Name(7): /wrds/crsp/sasdata/a_treas_bm
+      Engine(8):        V9 
+      Physical Name(8): /wrds/crsp/sasdata/a_ziman
+      Engine(9):        V9 
+      Physical Name(9): /wrds/crsp/sasdata/q_mutualfunds
+NOTE: Libref CRSPSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/crspsamp/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/crsp_mf
+NOTE: Libref CSMAR was successfully assigned as follows: 
+      Levels:           12
+      Engine(1):        V9 
+      Physical Name(1): /wrds/csmar/sasdata/trading
+      Engine(2):        V9 
+      Physical Name(2): /wrds/csmar/sasdata/financial
+      Engine(3):        V9 
+      Physical Name(3): /wrds/csmar/sasdata/funds_mkt_research
+      Engine(4):        V9 
+      Physical Name(4): /wrds/csmar/sasdata/ma
+      Engine(5):        V9 
+      Physical Name(5): /wrds/csmar/sasdata/ipo_a
+      Engine(6):        V9 
+      Physical Name(6): /wrds/csmar/sasdata/af
+      Engine(7):        V9 
+      Physical Name(7): /wrds/csmar/sasdata/cd
+      Engine(8):        V9 
+      Physical Name(8): /wrds/csmar/sasdata/cg
+      Engine(9):        V9 
+      Physical Name(9): /wrds/csmar/sasdata/ini
+      Engine(10):        V9 
+      Physical Name(10): /wrds/csmar/sasdata/colc
+      Engine(11):        V9 
+      Physical Name(11): /wrds/csmar/sasdata/rs
+      Engine(12):        V9 
+      Physical Name(12): /wrds/csmar/sasdata/hld
+NOTE: Libref CUSIPM was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/cusip/sasdata
+NOTE: Libref DEALSCAN was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/tfn/sasdata/dealscan
+NOTE: Libref DJONES was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/djones/sasdata
+NOTE: Libref DMEF was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/dmef/sasdata
+NOTE: Libref DOE was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/doe/sasdata
+NOTE: Libref EMDB was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/comp/sasdata/emdbd
+      Engine(2):        V9 
+      Physical Name(2): /wrds/comp/sasdata/emdbm
+NOTE: Libref ETFG was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/etfg/sasdata/industry
+      Engine(2):        V9 
+      Physical Name(2): /wrds/etfg/sasdata/fund_flow
+      Engine(3):        V9 
+      Physical Name(3): /wrds/etfg/sasdata/analytics
+      Engine(4):        V9 
+      Physical Name(4): /wrds/etfg/sasdata/constituents
+NOTE: Libref ETFGSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/etfg
+NOTE: Libref EUREKA was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/eureka/sasdata
+NOTE: Libref EURSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/eureka
+NOTE: Libref FACTSET was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/factset/sasdata/ff_usc
+      Engine(2):        V9 
+      Physical Name(2): /wrds/factset/sasdata/ff_int
+      Engine(3):        V9 
+      Physical Name(3): /wrds/factset/sasdata/own
+      Engine(4):        V9 
+      Physical Name(4): /wrds/factset/sasdata/common
+      Engine(5):        V9 
+      Physical Name(5): /wrds/factset/sasdata/own_v5
+      Engine(6):        V9 
+      Physical Name(6): /wrds/factset/sasdata/ff_usc_v3
+      Engine(7):        V9 
+      Physical Name(7): /wrds/factset/sasdata/ff_int_v3
+NOTE: Libref FSSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/factset
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/revere
+NOTE: Libref FDIC was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/fdic/sasdata
+NOTE: Libref FF was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/ff/sasdata
+NOTE: Libref FISD was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/mergent/sasdata/fisd
+      Engine(2):        V9 
+      Physical Name(2): /wrds/mergent/sasdata/naic
+NOTE: Libref FISDSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/fisdsamp/sasdata
+NOTE: Libref FTSE was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/ftse/sasdata/russell
+NOTE: Libref FTSESAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/ftse
+NOTE: Libref FRB was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/frb/sasdata
+NOTE: Libref GINSIGHT was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ginsight/sasdata/all
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ginsight/sasdata/basic
+      Engine(3):        V9 
+      Physical Name(3): /wrds/ginsight/sasdata/common
+      Engine(4):        V9 
+      Physical Name(4): /wrds/ginsight/sasdata/econ_analytics
+NOTE: Libref GMI was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/gmiratings/sasdata
+NOTE: Libref GOVPX was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/govpx/sasdata
+NOTE: Libref GOVPXSMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/govpx
+NOTE: Libref HBASEPRM was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/hbase/sasdata/premium
+NOTE: Libref HBASE was successfully assigned as follows: 
+      Levels:           1
+      Engine(1):        V9 
+      Physical Name(1): /wrds/hbase/sasdata/premium
+NOTE: Libref HBASESMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/hbase
+NOTE: Libref HFR was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/hfr/sasdata/hfrdb_academic_dead
+      Engine(2):        V9 
+      Physical Name(2): /wrds/hfr/sasdata/hfrdb_academic_live
+      Engine(3):        V9 
+      Physical Name(3): /wrds/hfr/sasdata/hfrdb_dead
+      Engine(4):        V9 
+      Physical Name(4): /wrds/hfr/sasdata/hfrdb_live
+NOTE: Libref HFRSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/hfrsamp/sasdata/hfrdb
+NOTE: Libref IBES was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ibes/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ibes/sasdata/iga
+      Engine(3):        V9 
+      Physical Name(3): /wrds/ibes/sasdata/guidance
+NOTE: Libref IBESCORP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/ibes/sasdata/corporate
+NOTE: Libref IBESKPI was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/ibes/sasdata/kpi
+NOTE: Libref IFGR was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/infogroup/sasdata/business
+      Engine(2):        V9 
+      Physical Name(2): /wrds/infogroup/sasdata/residential
+NOTE: Libref IFGRSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/infogroup/business
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/infogroup/residential
+NOTE: Libref IMS was successfully assigned as follows: 
+      Levels:           9
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ims/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ims/sasdata/recent_standard_plus
+      Engine(3):        V9 
+      Physical Name(3): /wrds/ims/sasdata/recent_premium
+      Engine(4):        V9 
+      Physical Name(4): /wrds/ims/sasdata/historical_standard_plus
+      Engine(5):        V9 
+      Physical Name(5): /wrds/ims/sasdata/historical_premium
+      Engine(6):        V9 
+      Physical Name(6): /wrds/ims/sasdata/historical_3years_standard_plus
+      Engine(7):        V9 
+      Physical Name(7): /wrds/ims/sasdata/historical_3years_premium
+      Engine(8):        V9 
+      Physical Name(8): /wrds/ims/sasdata/historical_5years_standard_plus
+      Engine(9):        V9 
+      Physical Name(9): /wrds/ims/sasdata/historical_5years_premium
+NOTE: Libref IMSSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/ims
+NOTE: Libref IRI was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/iri/sasdata
+NOTE: Libref ISS was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/riskmetrics/sasdata/incentive_lab
+      Engine(2):        V9 
+      Physical Name(2): /wrds/riskmetrics/sasdata/incentive_lab/europe
+NOTE: Libref ISSM was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/issm/sasdata
+NOTE: Libref KLD was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/kld/sasdata
+NOTE: Libref KPISAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/ibeskpi
+NOTE: Libref KTMINE was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ktmine/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ktmine/sasdata/corptree
+NOTE: Libref KTSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/ktmine
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/ktmine/corptree
+NOTE: Libref LEVIN was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/levin/sasdata
+NOTE: Libref LVNSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/levin
+NOTE: Libref LSPD was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/lspd/sasdata/monthly
+      Engine(2):        V9 
+      Physical Name(2): /wrds/lspd/sasdata/daily
+NOTE: Libref LSPDSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/lspd
+NOTE: Libref MARKIT was successfully assigned as follows: 
+      Levels:           10
+      Engine(1):        V9 
+      Physical Name(1): /wrds/markit/sasdata/cds
+      Engine(2):        V9 
+      Physical Name(2): /wrds/markit/sasdata/red
+      Engine(3):        V9 
+      Physical Name(3): /wrds/markit/sasdata/cdx_composites
+      Engine(4):        V9 
+      Physical Name(4): /wrds/markit/sasdata/cdx_constituents
+      Engine(5):        V9 
+      Physical Name(5): /wrds/markit/sasdata/itraxx_asia_composites
+      Engine(6):        V9 
+      Physical Name(6): /wrds/markit/sasdata/itraxx_europe_composites
+      Engine(7):        V9 
+      Physical Name(7): /wrds/markit/sasdata/itraxx_sovx_composites
+      Engine(8):        V9 
+      Physical Name(8): /wrds/markit/sasdata/itraxx_asia_constituents
+      Engine(9):        V9 
+      Physical Name(9): /wrds/markit/sasdata/itraxx_europe_constituents
+      Engine(10):        V9 
+      Physical Name(10): /wrds/markit/sasdata/itraxx_sovx_constituents
+NOTE: Libref MSFANLY was successfully assigned as follows: 
+      Levels:           5
+      Engine(1):        V9 
+      Physical Name(1): /wrds/markit/sasdata/msf_analytics_bonds
+      Engine(2):        V9 
+      Physical Name(2): /wrds/markit/sasdata/msf_analytics_eqty_amer
+      Engine(3):        V9 
+      Physical Name(3): /wrds/markit/sasdata/msf_analytics_eqty_euro
+      Engine(4):        V9 
+      Physical Name(4): /wrds/markit/sasdata/msf_analytics_eqty_asia
+      Engine(5):        V9 
+      Physical Name(5): /wrds/markit/sasdata/msf_analytics_eqty_other
+NOTE: Libref MSFINST was successfully assigned as follows: 
+      Levels:           5
+      Engine(1):        V9 
+      Physical Name(1): /wrds/markit/sasdata/msf_inst_bonds
+      Engine(2):        V9 
+      Physical Name(2): /wrds/markit/sasdata/msf_inst_eqty_amer
+      Engine(3):        V9 
+      Physical Name(3): /wrds/markit/sasdata/msf_inst_eqty_asia
+      Engine(4):        V9 
+      Physical Name(4): /wrds/markit/sasdata/msf_inst_eqty_euro
+      Engine(5):        V9 
+      Physical Name(5): /wrds/markit/sasdata/msf_inst_eqty_other
+NOTE: Libref MRKTSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/markit/cdsred
+NOTE: Libref MFL was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/mfl/sasdata
+NOTE: Libref MSRB was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/msrb/sasdata
+NOTE: Libref MSRBSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/msrb
+NOTE: Libref NASTRAQ was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/nastraq/sasdata
+NOTE: Libref OMTRIAL was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/optionmetrics
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/optionmetrics/europe
+NOTE: Libref OPTIONM was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/optionm/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/optionm/sasdata/europe
+NOTE: Libref OTC was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/otc/sasdata/endofday
+NOTE: Libref PACAP was successfully assigned as follows: 
+      Levels:           8
+      Engine(1):        V9 
+      Physical Name(1): /wrds/pacap/sasdata/hk
+      Engine(2):        V9 
+      Physical Name(2): /wrds/pacap/sasdata/id
+      Engine(3):        V9 
+      Physical Name(3): /wrds/pacap/sasdata/ja
+      Engine(4):        V9 
+      Physical Name(4): /wrds/pacap/sasdata/ks
+      Engine(5):        V9 
+      Physical Name(5): /wrds/pacap/sasdata/my
+      Engine(6):        V9 
+      Physical Name(6): /wrds/pacap/sasdata/sn
+      Engine(7):        V9 
+      Physical Name(7): /wrds/pacap/sasdata/tw
+      Engine(8):        V9 
+      Physical Name(8): /wrds/pacap/sasdata/th
+NOTE: Libref PHLX was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/phlx/sasdata
+NOTE: Libref PPUBLICA was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ppublica/sasdata/d4d
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ppublica/sasdata/rx_checkup
+NOTE: Libref PPUBSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/ppublica/d4d
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/ppublica/rx_checkup
+WARNING: One or more libraries specified in the concatenated library PREQIN do 
+         not exist.  These libraries were removed from the concatenation.
+NOTE: Libref PREQIN was successfully assigned as follows: 
+      Levels:           1
+      Engine(1):        V9 
+      Physical Name(1): /wrds/preqin/sasdata/private_equity
+NOTE: Libref PREQSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/preqin
+NOTE: Libref PUBLIC was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/public/sasdata/climate/noaa
+      Engine(2):        V9 
+      Physical Name(2): /wrds/public/sasdata/legal/govtrack
+      Engine(3):        V9 
+      Physical Name(3): /wrds/public/sasdata/macroecon/bea
+      Engine(4):        V9 
+      Physical Name(4): /wrds/public/sasdata/macroecon/bls
+      Engine(5):        V9 
+      Physical Name(5): /wrds/public/sasdata/healthcare/hcup
+      Engine(6):        V9 
+      Physical Name(6): /wrds/public/sasdata/healthcare/meps
+      Engine(7):        V9 
+      Physical Name(7): /wrds/public/sasdata/taxis
+NOTE: Libref PWT was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/pwt/sasdata
+NOTE: Libref RENT was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/rent/sasdata
+NOTE: Libref REPRISK was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/reprisk/sasdata/pm
+      Engine(2):        V9 
+      Physical Name(2): /wrds/reprisk/sasdata/std
+      Engine(3):        V9 
+      Physical Name(3): /wrds/reprisk/sasdata
+NOTE: Libref REPSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/reprisk
+NOTE: Libref REVERE was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/factset/sasdata/revere_common
+      Engine(2):        V9 
+      Physical Name(2): /wrds/factset/sasdata/revere_supply_chain
+      Engine(3):        V9 
+      Physical Name(3): /wrds/factset/sasdata/revere_geo_rev
+      Engine(4):        V9 
+      Physical Name(4): /wrds/factset/sasdata/revere_ind_class
+NOTE: Libref RISK was successfully assigned as follows: 
+      Levels:           12
+      Engine(1):        V9 
+      Physical Name(1): /wrds/riskmetrics/sasdata/directors
+      Engine(2):        V9 
+      Physical Name(2): /wrds/riskmetrics/sasdata/governance
+      Engine(3):        V9 
+      Physical Name(3): /wrds/riskmetrics/sasdata/proposals
+      Engine(4):        V9 
+      Physical Name(4): /wrds/riskmetrics/sasdata/incentive_lab
+      Engine(5):        V9 
+      Physical Name(5): /wrds/riskmetrics/sasdata/incentive_lab/europe
+      Engine(6):        V9 
+      Physical Name(6): /wrds/riskmetrics/sasdata/votes
+      Engine(7):        V9 
+      Physical Name(7): /wrds/riskmetrics/sasdata/voting_analytics
+      Engine(8):        V9 
+      Physical Name(8): /wrds/riskmetrics/sasdata/voting_analytics/issrec
+      Engine(9):        V9 
+      Physical Name(9): /wrds/riskmetrics/sasdata/voting_analytics/mf
+      Engine(10):        V9 
+      Physical Name(10): /wrds/riskmetrics/sasdata/voting_analytics/proposals
+      Engine(11):        V9 
+      Physical Name(11): 
+      /wrds/riskmetrics/sasdata/voting_analytics/voteresults_global
+      Engine(12):        V9 
+      Physical Name(12): 
+      /wrds/riskmetrics/sasdata/voting_analytics/voteresults_us
+NOTE: Libref RISKSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/riskmetrics
+NOTE: Libref RPNA was successfully assigned as follows: 
+      Levels:           5
+      Engine(1):        V9 
+      Physical Name(1): /wrds/ravenpack/sasdata/common
+      Engine(2):        V9 
+      Physical Name(2): /wrds/ravenpack/sasdata/dow_jones_edition
+      Engine(3):        V9 
+      Physical Name(3): /wrds/ravenpack/sasdata/full_edition
+      Engine(4):        V9 
+      Physical Name(4): /wrds/ravenpack/sasdata/pr_edition
+      Engine(5):        V9 
+      Physical Name(5): /wrds/ravenpack/sasdata/web_edition
+NOTE: Libref RPNASAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/ravenpack
+NOTE: Libref SDC was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/tfn/sasdata/sdc_ma
+      Engine(2):        V9 
+      Physical Name(2): /wrds/tfn/sasdata/sdc_ni
+NOTE: Libref SDCSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/tfn/sdc_ma
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/tfn/sdc_ni
+NOTE: Libref SECSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/sec
+NOTE: Libref SNAPSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/comp_snap
+NOTE: Libref SNL was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/snl/sasdata
+NOTE: Libref SNLBR was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/snl/sasdata/bank_reg
+NOTE: Libref SNLSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/snl
+NOTE: Libref SPRAT was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/comp/sasdata/sprat
+NOTE: Libref SUSTAIN was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/sustain/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/sustain/sasdata/na_only
+NOTE: Libref SUSTSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/sustain
+NOTE: Libref TAQ was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/taq/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/nyse/sasdata/wrds_taqs_ct
+      Engine(3):        V9 
+      Physical Name(3): /wrds/nyse/sasdata/wrds_taqs_nbbo
+      Engine(4):        V9 
+      Physical Name(4): /wrds/nyse/sasdata/wrds_taqs_iid_v1
+NOTE: Libref TAQMSEC was successfully assigned as follows: 
+      Levels:           7
+      Engine(1):        V9 
+      Physical Name(1): /wrds/nyse/sasdata/taqms/ct
+      Engine(2):        V9 
+      Physical Name(2): /wrds/nyse/sasdata/taqms/cq
+      Engine(3):        V9 
+      Physical Name(3): /wrds/nyse/sasdata/taqms/mast
+      Engine(4):        V9 
+      Physical Name(4): /wrds/nyse/sasdata/taqms/nbbo
+      Engine(5):        V9 
+      Physical Name(5): /wrds/nyse/sasdata/taqms/nbbod2m
+      Engine(6):        V9 
+      Physical Name(6): /wrds/nyse/sasdata/wrds_taqms_wct
+      Engine(7):        V9 
+      Physical Name(7): /wrds/nyse/sasdata/wrds_taqms_iid
+NOTE: Libref TAQSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/taqsamp/sasdata
+NOTE: Libref TAQMSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/taqmssamp/sasdata
+NOTE: Libref TASS was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/tfn/sasdata/tass
+NOTE: Libref TFN was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/tfn/sasdata/s12
+      Engine(2):        V9 
+      Physical Name(2): /wrds/tfn/sasdata/s34
+      Engine(3):        V9 
+      Physical Name(3): /wrds/tfn/sasdata/insiders
+NOTE: Libref TOTALQ was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/contributors/sasdata/total_q
+NOTE: Libref TRACE was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/trace/sasdata/standard
+      Engine(2):        V9 
+      Physical Name(2): /wrds/trace/sasdata/enhanced
+NOTE: Libref TROWN was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/tfn/sasdata/ownership
+NOTE: Libref TRSAMP was successfully assigned as follows: 
+      Levels:           3
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/ibes_guidance
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/tass
+      Engine(3):        V9 
+      Physical Name(3): /wrds/samples/sasdata/worldscope
+NOTE: Libref TRWS was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/tfn/sasdata/worldscope
+NOTE: Libref TWOIQ was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/2iq/sasdata
+NOTE: Libref TWOIQSMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/2iq
+NOTE: Libref WAPPSAMP was successfully assigned as follows: 
+      Levels:           2
+      Engine(1):        V9 
+      Physical Name(1): /wrds/samples/sasdata/ciqevtstudy
+      Engine(2):        V9 
+      Physical Name(2): /wrds/samples/sasdata/ciqintevtstudy
+NOTE: Libref WQA was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/wqa/sasdata
+NOTE: Libref WRDSSEC was successfully assigned as follows: 
+      Levels:           4
+      Engine(1):        V9 
+      Physical Name(1): /wrds/sec/sasdata
+      Engine(2):        V9 
+      Physical Name(2): /wrds/sec/sasdata/common
+      Engine(3):        V9 
+      Physical Name(3): /wrds/sec/sasdata/sa
+      Engine(4):        V9 
+      Physical Name(4): /wrds/sec/sasdata/insiders
+NOTE: Libref WRDSAPPS was successfully assigned as follows: 
+      Levels:           11
+      Engine(1):        V9 
+      Physical Name(1): /wrds/wrdsapps/sasdata/intevtstudy
+      Engine(2):        V9 
+      Physical Name(2): /wrds/wrdsapps/sasdata/ciqintevtstudy
+      Engine(3):        V9 
+      Physical Name(3): /wrds/wrdsapps/sasdata/finratio
+      Engine(4):        V9 
+      Physical Name(4): /wrds/wrdsapps/sasdata/ravtaqevtstudy
+      Engine(5):        V9 
+      Physical Name(5): /wrds/wrdsapps/sasdata/gindices
+      Engine(6):        V9 
+      Physical Name(6): /wrds/wrdsapps/sasdata/bond
+      Engine(7):        V9 
+      Physical Name(7): /wrds/wrdsapps/sasdata/linking/iclink
+      Engine(8):        V9 
+      Physical Name(8): /wrds/wrdsapps/sasdata/linking/oclink
+      Engine(9):        V9 
+      Physical Name(9): /wrds/wrdsapps/sasdata/linking/tclink
+      Engine(10):        V9 
+      Physical Name(10): /wrds/wrdsapps/sasdata/linking/bdxinslink
+      Engine(11):        V9 
+      Physical Name(11): /wrds/wrdsapps/sasdata/longrunevt
+NOTE: Libref ZACKS was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/zacks/sasdata
+NOTE: Libref ZACKSAMP was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /wrds/samples/sasdata/zacks
+
+NOTE: AUTOEXEC processing completed.
+
+1          
+2          /* IBES Unadjusted Summary File  */
+3          proc sql;
+4          create table ibessum as select
+5          TICKER,	CUSIP,	OFTIC,	CNAME,	STATPERS,
+6          MEASURE,	FISCALP,	FPI,	ESTFLAG,	CURCODE,
+7          NUMEST,	NUMUP,	NUMDOWN,	MEDEST,	MEANEST,	STDEV,
+8          HIGHEST,	LOWEST,	USFIRM,	FPEDATS,	ACTUAL,
+9          ANNDATS_ACT,	ANNTIMS_ACT,	CURR_ACT
+10         from ibes.statsum_epsus
+11         where
+12         statpers<ANNDATS_ACT /*only keep summarized forecasts prior to
+12       ! earnings annoucement*/
+13         and measure='EPS'
+14         and not missing(medest) and not missing(fpedats)
+15         and (fpedats-statpers)>=0
+16         and CURCODE='USD'
+17         and CURR_ACT='USD'
+18         and fpi in ('6','7','8')
+19         and ticker in ('AAPL','BABA','GOOG','AMZN')
+20         order by ticker, ANNDATS_ACT, fpedats, statpers;
+NOTE: Table WORK.IBESSUM created, with 2388 rows and 24 columns.
+
+21         quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.05 seconds
+      cpu time            0.02 seconds
+      
+
+22         
+23         proc export data = ibessum
+24         outfile='ibessum.csv' dbms=csv replace;
+24       !                                         run;
+
+25          /*******************************************************************
+25       ! ***
+26          *   PRODUCT:   SAS
+27          *   VERSION:   9.4
+28          *   CREATOR:   External File Interface
+29          *   DATE:      26NOV19
+30          *   DESC:      Generated SAS Datastep Code
+31          *   TEMPLATE SOURCE:  (None Specified.)
+32          ********************************************************************
+32       ! ***/
+33             data _null_;
+34             %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+35             %let _EFIREC_ = 0;     /* clear export record count macro
+35       ! variable */
+36             file 'ibessum.csv' delimiter=',' DSD DROPOVER lrecl=32767;
+37             if _n_ = 1 then        /* write column names or labels */
+38              do;
+39                put
+40                   "TICKER"
+41                ','
+42                   "CUSIP"
+43                ','
+44                   "OFTIC"
+45                ','
+46                   "CNAME"
+47                ','
+48                   "STATPERS"
+49                ','
+50                   "MEASURE"
+51                ','
+52                   "FISCALP"
+53                ','
+54                   "FPI"
+55                ','
+56                   "ESTFLAG"
+57                ','
+58                   "CURCODE"
+59                ','
+60                   "NUMEST"
+61                ','
+62                   "NUMUP"
+63                ','
+64                   "NUMDOWN"
+65                ','
+66                   "MEDEST"
+67                ','
+68                   "MEANEST"
+69                ','
+70                   "STDEV"
+71                ','
+72                   "HIGHEST"
+73                ','
+74                   "LOWEST"
+75                ','
+76                   "USFIRM"
+77                ','
+78                   "FPEDATS"
+79                ','
+80                   "ACTUAL"
+81                ','
+82                   "ANNDATS_ACT"
+83                ','
+84                   "ANNTIMS_ACT"
+85                ','
+86                   "CURR_ACT"
+87                ;
+88              end;
+89            set  IBESSUM   end=EFIEOD;
+90                format TICKER $6. ;
+91                format CUSIP $8. ;
+92                format OFTIC $6. ;
+93                format CNAME $16. ;
+94                format STATPERS date9. ;
+95                format MEASURE $6. ;
+96                format FISCALP $3. ;
+97                format FPI $1. ;
+98                format ESTFLAG $1. ;
+99                format CURCODE $3. ;
+100               format NUMEST best12. ;
+101               format NUMUP best12. ;
+102               format NUMDOWN best12. ;
+103               format MEDEST best12. ;
+104               format MEANEST best12. ;
+105               format STDEV best12. ;
+106               format HIGHEST best12. ;
+107               format LOWEST best12. ;
+108               format USFIRM 1. ;
+109               format FPEDATS date9. ;
+110               format ACTUAL best12. ;
+111               format ANNDATS_ACT date9. ;
+112               format ANNTIMS_ACT time8. ;
+113               format CURR_ACT $3. ;
+114             do;
+115               EFIOUT + 1;
+116               put TICKER $ @;
+117               put CUSIP $ @;
+118               put OFTIC $ @;
+119               put CNAME $ @;
+120               put STATPERS @;
+121               put MEASURE $ @;
+122               put FISCALP $ @;
+123               put FPI $ @;
+124               put ESTFLAG $ @;
+125               put CURCODE $ @;
+126               put NUMEST @;
+127               put NUMUP @;
+128               put NUMDOWN @;
+129               put MEDEST @;
+130               put MEANEST @;
+131               put STDEV @;
+132               put HIGHEST @;
+133               put LOWEST @;
+134               put USFIRM @;
+135               put FPEDATS @;
+136               put ACTUAL @;
+137               put ANNDATS_ACT @;
+138               put ANNTIMS_ACT @;
+139               put CURR_ACT $ ;
+140               ;
+141             end;
+142            if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR
+142      ! detection macro variable */
+143            if EFIEOD then call symputx('_EFIREC_',EFIOUT);
+144            run;
+
+NOTE: The file 'ibessum.csv' is:
+      Filename=/home/cityuhk/xinhe97/CharsNov2019/pead-test/ibessum.csv,
+      Owner Name=xinhe97,Group Name=cityuhk,
+      Access Permission=-rw-------,
+      Last Modified=26Nov2019:09:49:00
+
+NOTE: 2389 records were written to the file 'ibessum.csv'.
+      The minimum record length was 114.
+      The maximum record length was 181.
+NOTE: There were 2388 observations read from the data set WORK.IBESSUM.
+NOTE: DATA statement used (Total process time):
+      real time           0.02 seconds
+      cpu time            0.01 seconds
+      
+
+2388 records created in ibessum.csv from IBESSUM.
+  
+  
+NOTE: "ibessum.csv" file was successfully created.
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.16 seconds
+      cpu time            0.05 seconds
+      
+
+145        
+146        /* Prepare Compustat-IBES translation file; */
+147        proc sort data=crsp.msenames(where=(ncusip ne '')) out=names nodupkey
+147      ! ;
+148        by permno ncusip;
+149        run;
+
+NOTE: There were 93463 observations read from the data set CRSP.MSENAMES.
+      WHERE ncusip not = ' ';
+NOTE: 49299 observations with duplicate key values were deleted.
+NOTE: The data set WORK.NAMES has 44164 observations and 21 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.04 seconds
+      
+
+150        
+151        /* Add current cusip to IBES (IBES cusip is historical); */
+152        proc sql;
+153        create table ibessum2 as select
+154        a.*, substr(compress(b.cusip),1,6) as cusip6
+155        from ibessum a left join names b on
+156        (a.cusip = b.ncusip)
+157        order by ticker, anndats_act, fpedats, statpers
+158        ;
+NOTE: Table WORK.IBESSUM2 created, with 2388 rows and 25 columns.
+
+159        quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.02 seconds
+      cpu time            0.03 seconds
+      
+
+160        
+161        proc export data = ibessum2
+162        outfile='ibessum2.csv' dbms=csv replace;
+162      !                                          run;
+
+163         /*******************************************************************
+163      ! ***
+164         *   PRODUCT:   SAS
+165         *   VERSION:   9.4
+166         *   CREATOR:   External File Interface
+167         *   DATE:      26NOV19
+168         *   DESC:      Generated SAS Datastep Code
+169         *   TEMPLATE SOURCE:  (None Specified.)
+170         ********************************************************************
+170      ! ***/
+171            data _null_;
+172            %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+173            %let _EFIREC_ = 0;     /* clear export record count macro
+173      ! variable */
+174            file 'ibessum2.csv' delimiter=',' DSD DROPOVER lrecl=32767;
+175            if _n_ = 1 then        /* write column names or labels */
+176             do;
+177               put
+178                  "TICKER"
+179               ','
+180                  "CUSIP"
+181               ','
+182                  "OFTIC"
+183               ','
+184                  "CNAME"
+185               ','
+186                  "STATPERS"
+187               ','
+188                  "MEASURE"
+189               ','
+190                  "FISCALP"
+191               ','
+192                  "FPI"
+193               ','
+194                  "ESTFLAG"
+195               ','
+196                  "CURCODE"
+197               ','
+198                  "NUMEST"
+199               ','
+200                  "NUMUP"
+201               ','
+202                  "NUMDOWN"
+203               ','
+204                  "MEDEST"
+205               ','
+206                  "MEANEST"
+207               ','
+208                  "STDEV"
+209               ','
+210                  "HIGHEST"
+211               ','
+212                  "LOWEST"
+213               ','
+214                  "USFIRM"
+215               ','
+216                  "FPEDATS"
+217               ','
+218                  "ACTUAL"
+219               ','
+220                  "ANNDATS_ACT"
+221               ','
+222                  "ANNTIMS_ACT"
+223               ','
+224                  "CURR_ACT"
+225               ','
+226                  "cusip6"
+227               ;
+228             end;
+229           set  IBESSUM2   end=EFIEOD;
+230               format TICKER $6. ;
+231               format CUSIP $8. ;
+232               format OFTIC $6. ;
+233               format CNAME $16. ;
+234               format STATPERS date9. ;
+235               format MEASURE $6. ;
+236               format FISCALP $3. ;
+237               format FPI $1. ;
+238               format ESTFLAG $1. ;
+239               format CURCODE $3. ;
+240               format NUMEST best12. ;
+241               format NUMUP best12. ;
+242               format NUMDOWN best12. ;
+243               format MEDEST best12. ;
+244               format MEANEST best12. ;
+245               format STDEV best12. ;
+246               format HIGHEST best12. ;
+247               format LOWEST best12. ;
+248               format USFIRM 1. ;
+249               format FPEDATS date9. ;
+250               format ACTUAL best12. ;
+251               format ANNDATS_ACT date9. ;
+252               format ANNTIMS_ACT time8. ;
+253               format CURR_ACT $3. ;
+254               format cusip6 $8. ;
+255             do;
+256               EFIOUT + 1;
+257               put TICKER $ @;
+258               put CUSIP $ @;
+259               put OFTIC $ @;
+260               put CNAME $ @;
+261               put STATPERS @;
+262               put MEASURE $ @;
+263               put FISCALP $ @;
+264               put FPI $ @;
+265               put ESTFLAG $ @;
+266               put CURCODE $ @;
+267               put NUMEST @;
+268               put NUMUP @;
+269               put NUMDOWN @;
+270               put MEDEST @;
+271               put MEANEST @;
+272               put STDEV @;
+273               put HIGHEST @;
+274               put LOWEST @;
+275               put USFIRM @;
+276               put FPEDATS @;
+277               put ACTUAL @;
+278               put ANNDATS_ACT @;
+279               put ANNTIMS_ACT @;
+280               put CURR_ACT $ @;
+281               put cusip6 $ ;
+282               ;
+283             end;
+284            if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR
+284      ! detection macro variable */
+285            if EFIEOD then call symputx('_EFIREC_',EFIOUT);
+286            run;
+
+NOTE: The file 'ibessum2.csv' is:
+      Filename=/home/cityuhk/xinhe97/CharsNov2019/pead-test/ibessum2.csv,
+      Owner Name=xinhe97,Group Name=cityuhk,
+      Access Permission=-rw-------,
+      Last Modified=26Nov2019:09:49:01
+
+NOTE: 2389 records were written to the file 'ibessum2.csv'.
+      The minimum record length was 121.
+      The maximum record length was 188.
+NOTE: There were 2388 observations read from the data set WORK.IBESSUM2.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+2388 records created in ibessum2.csv from IBESSUM2.
+  
+  
+NOTE: "ibessum2.csv" file was successfully created.
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.10 seconds
+      cpu time            0.03 seconds
+      
+
+287        
+288        /* merge CRSP price(adjusted) to IBES */
+289        proc sql;
+290        create table ibessum3 as
+291          select a.*,
+292          b.prc,
+293          b.cfacpr,
+294          b.date as crsp_date,
+295          b.cusip as crsp_cusip
+296        from
+297          ibessum2 a left join crsp.msf b
+298        on
+299          a.cusip=b.cusip and
+300          intnx('MONTH',a.statpers,-1,'end') =
+300      ! intnx('MONTH',b.date,0,'end')
+301        order by ticker, anndats_act, fpedats, statpers
+302        ;
+NOTE: Table WORK.IBESSUM3 created, with 2388 rows and 29 columns.
+
+303        quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.53 seconds
+      cpu time            0.52 seconds
+      
+
+304        
+305        data ibessum3;
+306        set ibessum3;
+307        prc_adj = prc/cfacpr;
+308        run;
+
+NOTE: Missing values were generated as a result of performing an operation on 
+      missing values.
+      Each place is given by: (Number of times) at (Line):(Column).
+      411 at 307:14   
+NOTE: There were 2388 observations read from the data set WORK.IBESSUM3.
+NOTE: The data set WORK.IBESSUM3 has 2388 observations and 30 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+309        
+310        /* sort */
+311        proc sort data=ibessum3;
+312        by cusip fpedats statpers;
+313        run;
+
+NOTE: There were 2388 observations read from the data set WORK.IBESSUM3.
+NOTE: The data set WORK.IBESSUM3 has 2388 observations and 30 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+314        
+315        proc export data = ibessum3
+316        outfile='ibessum3.csv' dbms=csv replace;
+316      !                                          run;
+
+317         /*******************************************************************
+317      ! ***
+318         *   PRODUCT:   SAS
+319         *   VERSION:   9.4
+320         *   CREATOR:   External File Interface
+321         *   DATE:      26NOV19
+322         *   DESC:      Generated SAS Datastep Code
+323         *   TEMPLATE SOURCE:  (None Specified.)
+324         ********************************************************************
+324      ! ***/
+325            data _null_;
+326            %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+327            %let _EFIREC_ = 0;     /* clear export record count macro
+327      ! variable */
+328            file 'ibessum3.csv' delimiter=',' DSD DROPOVER lrecl=32767;
+329            if _n_ = 1 then        /* write column names or labels */
+330             do;
+331               put
+332                  "TICKER"
+333               ','
+334                  "CUSIP"
+335               ','
+336                  "OFTIC"
+337               ','
+338                  "CNAME"
+339               ','
+340                  "STATPERS"
+341               ','
+342                  "MEASURE"
+343               ','
+344                  "FISCALP"
+345               ','
+346                  "FPI"
+347               ','
+348                  "ESTFLAG"
+349               ','
+350                  "CURCODE"
+351               ','
+352                  "NUMEST"
+353               ','
+354                  "NUMUP"
+355               ','
+356                  "NUMDOWN"
+357               ','
+358                  "MEDEST"
+359               ','
+360                  "MEANEST"
+361               ','
+362                  "STDEV"
+363               ','
+364                  "HIGHEST"
+365               ','
+366                  "LOWEST"
+367               ','
+368                  "USFIRM"
+369               ','
+370                  "FPEDATS"
+371               ','
+372                  "ACTUAL"
+373               ','
+374                  "ANNDATS_ACT"
+375               ','
+376                  "ANNTIMS_ACT"
+377               ','
+378                  "CURR_ACT"
+379               ','
+380                  "cusip6"
+381               ','
+382                  "PRC"
+383               ','
+384                  "CFACPR"
+385               ','
+386                  "crsp_date"
+387               ','
+388                  "crsp_cusip"
+389               ','
+390                  "prc_adj"
+391               ;
+392             end;
+393           set  IBESSUM3   end=EFIEOD;
+394               format TICKER $6. ;
+395               format CUSIP $8. ;
+396               format OFTIC $6. ;
+397               format CNAME $16. ;
+398               format STATPERS date9. ;
+399               format MEASURE $6. ;
+400               format FISCALP $3. ;
+401               format FPI $1. ;
+402               format ESTFLAG $1. ;
+403               format CURCODE $3. ;
+404               format NUMEST best12. ;
+405               format NUMUP best12. ;
+406               format NUMDOWN best12. ;
+407               format MEDEST best12. ;
+408               format MEANEST best12. ;
+409               format STDEV best12. ;
+410               format HIGHEST best12. ;
+411               format LOWEST best12. ;
+412               format USFIRM 1. ;
+413               format FPEDATS date9. ;
+414               format ACTUAL best12. ;
+415               format ANNDATS_ACT date9. ;
+416               format ANNTIMS_ACT time8. ;
+417               format CURR_ACT $3. ;
+418               format cusip6 $8. ;
+419               format PRC 12.5 ;
+420               format CFACPR best12. ;
+421               format crsp_date yymmddn8. ;
+422               format crsp_cusip $8. ;
+423               format prc_adj best12. ;
+424             do;
+425               EFIOUT + 1;
+426               put TICKER $ @;
+427               put CUSIP $ @;
+428               put OFTIC $ @;
+429               put CNAME $ @;
+430               put STATPERS @;
+431               put MEASURE $ @;
+432               put FISCALP $ @;
+433               put FPI $ @;
+434               put ESTFLAG $ @;
+435               put CURCODE $ @;
+436               put NUMEST @;
+437               put NUMUP @;
+438               put NUMDOWN @;
+439               put MEDEST @;
+440               put MEANEST @;
+441               put STDEV @;
+442               put HIGHEST @;
+443               put LOWEST @;
+444               put USFIRM @;
+445               put FPEDATS @;
+446               put ACTUAL @;
+447               put ANNDATS_ACT @;
+448               put ANNTIMS_ACT @;
+449               put CURR_ACT $ @;
+450               put cusip6 $ @;
+451               put PRC @;
+452               put CFACPR @;
+453               put crsp_date @;
+454               put crsp_cusip $ @;
+455               put prc_adj ;
+456               ;
+457             end;
+458            if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR
+458      ! detection macro variable */
+459            if EFIEOD then call symputx('_EFIREC_',EFIOUT);
+460            run;
+
+NOTE: The file 'ibessum3.csv' is:
+      Filename=/home/cityuhk/xinhe97/CharsNov2019/pead-test/ibessum3.csv,
+      Owner Name=xinhe97,Group Name=cityuhk,
+      Access Permission=-rw-------,
+      Last Modified=26Nov2019:09:49:01
+
+NOTE: 2389 records were written to the file 'ibessum3.csv'.
+      The minimum record length was 126.
+      The maximum record length was 228.
+NOTE: There were 2388 observations read from the data set WORK.IBESSUM3.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+2388 records created in ibessum3.csv from IBESSUM3.
+  
+  
+NOTE: "ibessum3.csv" file was successfully created.
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.10 seconds
+      cpu time            0.03 seconds
+      
+
+461        
+462        data ibessum4; set ibessum3;
+463        group = catx('-', cusip, fpedats);
+464        run;
+
+NOTE: There were 2388 observations read from the data set WORK.IBESSUM3.
+NOTE: The data set WORK.IBESSUM4 has 2388 observations and 31 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+465        
+466        proc sort data=ibessum4;
+467        by group statpers;
+468        run;
+
+NOTE: There were 2388 observations read from the data set WORK.IBESSUM4.
+NOTE: The data set WORK.IBESSUM4 has 2388 observations and 31 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+469        
+470        proc export data = ibessum4
+471        outfile='ibessum4.csv' dbms=csv replace;
+471      !                                          run;
+
+472         /*******************************************************************
+472      ! ***
+473         *   PRODUCT:   SAS
+474         *   VERSION:   9.4
+475         *   CREATOR:   External File Interface
+476         *   DATE:      26NOV19
+477         *   DESC:      Generated SAS Datastep Code
+478         *   TEMPLATE SOURCE:  (None Specified.)
+479         ********************************************************************
+479      ! ***/
+480            data _null_;
+481            %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+482            %let _EFIREC_ = 0;     /* clear export record count macro
+482      ! variable */
+483            file 'ibessum4.csv' delimiter=',' DSD DROPOVER lrecl=32767;
+484            if _n_ = 1 then        /* write column names or labels */
+485             do;
+486               put
+487                  "TICKER"
+488               ','
+489                  "CUSIP"
+490               ','
+491                  "OFTIC"
+492               ','
+493                  "CNAME"
+494               ','
+495                  "STATPERS"
+496               ','
+497                  "MEASURE"
+498               ','
+499                  "FISCALP"
+500               ','
+501                  "FPI"
+502               ','
+503                  "ESTFLAG"
+504               ','
+505                  "CURCODE"
+506               ','
+507                  "NUMEST"
+508               ','
+509                  "NUMUP"
+510               ','
+511                  "NUMDOWN"
+512               ','
+513                  "MEDEST"
+514               ','
+515                  "MEANEST"
+516               ','
+517                  "STDEV"
+518               ','
+519                  "HIGHEST"
+520               ','
+521                  "LOWEST"
+522               ','
+523                  "USFIRM"
+524               ','
+525                  "FPEDATS"
+526               ','
+527                  "ACTUAL"
+528               ','
+529                  "ANNDATS_ACT"
+530               ','
+531                  "ANNTIMS_ACT"
+532               ','
+533                  "CURR_ACT"
+534               ','
+535                  "cusip6"
+536               ','
+537                  "PRC"
+538               ','
+539                  "CFACPR"
+540               ','
+541                  "crsp_date"
+542               ','
+543                  "crsp_cusip"
+544               ','
+545                  "prc_adj"
+546               ','
+547                  "group"
+548               ;
+549             end;
+550           set  IBESSUM4   end=EFIEOD;
+551               format TICKER $6. ;
+552               format CUSIP $8. ;
+553               format OFTIC $6. ;
+554               format CNAME $16. ;
+555               format STATPERS date9. ;
+556               format MEASURE $6. ;
+557               format FISCALP $3. ;
+558               format FPI $1. ;
+559               format ESTFLAG $1. ;
+560               format CURCODE $3. ;
+561               format NUMEST best12. ;
+562               format NUMUP best12. ;
+563               format NUMDOWN best12. ;
+564               format MEDEST best12. ;
+565               format MEANEST best12. ;
+566               format STDEV best12. ;
+567               format HIGHEST best12. ;
+568               format LOWEST best12. ;
+569               format USFIRM 1. ;
+570               format FPEDATS date9. ;
+571               format ACTUAL best12. ;
+572               format ANNDATS_ACT date9. ;
+573               format ANNTIMS_ACT time8. ;
+574               format CURR_ACT $3. ;
+575               format cusip6 $8. ;
+576               format PRC 12.5 ;
+577               format CFACPR best12. ;
+578               format crsp_date yymmddn8. ;
+579               format crsp_cusip $8. ;
+580               format prc_adj best12. ;
+581               format group $200. ;
+582             do;
+583               EFIOUT + 1;
+584               put TICKER $ @;
+585               put CUSIP $ @;
+586               put OFTIC $ @;
+587               put CNAME $ @;
+588               put STATPERS @;
+589               put MEASURE $ @;
+590               put FISCALP $ @;
+591               put FPI $ @;
+592               put ESTFLAG $ @;
+593               put CURCODE $ @;
+594               put NUMEST @;
+595               put NUMUP @;
+596               put NUMDOWN @;
+597               put MEDEST @;
+598               put MEANEST @;
+599               put STDEV @;
+600               put HIGHEST @;
+601               put LOWEST @;
+602               put USFIRM @;
+603               put FPEDATS @;
+604               put ACTUAL @;
+605               put ANNDATS_ACT @;
+606               put ANNTIMS_ACT @;
+607               put CURR_ACT $ @;
+608               put cusip6 $ @;
+609               put PRC @;
+610               put CFACPR @;
+611               put crsp_date @;
+612               put crsp_cusip $ @;
+613               put prc_adj @;
+614               put group $ ;
+615               ;
+616             end;
+617            if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR
+617      ! detection macro variable */
+618            if EFIEOD then call symputx('_EFIREC_',EFIOUT);
+619            run;
+
+NOTE: The file 'ibessum4.csv' is:
+      Filename=/home/cityuhk/xinhe97/CharsNov2019/pead-test/ibessum4.csv,
+      Owner Name=xinhe97,Group Name=cityuhk,
+      Access Permission=-rw-------,
+      Last Modified=26Nov2019:09:49:01
+
+NOTE: 2389 records were written to the file 'ibessum4.csv'.
+      The minimum record length was 141.
+      The maximum record length was 234.
+NOTE: There were 2388 observations read from the data set WORK.IBESSUM4.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.02 seconds
+      
+
+2388 records created in ibessum4.csv from IBESSUM4.
+  
+  
+NOTE: "ibessum4.csv" file was successfully created.
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.10 seconds
+      cpu time            0.04 seconds
+      
+
+620        
+621        /* calculate dif */
+622        data ibessum5;
+623           set ibessum4;
+624           by group;
+625           delta_f = dif(meanest);
+626           if first.group then delta_f=0;
+627        run;
+
+NOTE: There were 2388 observations read from the data set WORK.IBESSUM4.
+NOTE: The data set WORK.IBESSUM5 has 2388 observations and 32 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+628        
+629        proc export data = ibessum5
+630        outfile='ibessum5.csv' dbms=csv replace;
+630      !                                          run;
+
+631         /*******************************************************************
+631      ! ***
+632         *   PRODUCT:   SAS
+633         *   VERSION:   9.4
+634         *   CREATOR:   External File Interface
+635         *   DATE:      26NOV19
+636         *   DESC:      Generated SAS Datastep Code
+637         *   TEMPLATE SOURCE:  (None Specified.)
+638         ********************************************************************
+638      ! ***/
+639            data _null_;
+640            %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+641            %let _EFIREC_ = 0;     /* clear export record count macro
+641      ! variable */
+642            file 'ibessum5.csv' delimiter=',' DSD DROPOVER lrecl=32767;
+643            if _n_ = 1 then        /* write column names or labels */
+644             do;
+645               put
+646                  "TICKER"
+647               ','
+648                  "CUSIP"
+649               ','
+650                  "OFTIC"
+651               ','
+652                  "CNAME"
+653               ','
+654                  "STATPERS"
+655               ','
+656                  "MEASURE"
+657               ','
+658                  "FISCALP"
+659               ','
+660                  "FPI"
+661               ','
+662                  "ESTFLAG"
+663               ','
+664                  "CURCODE"
+665               ','
+666                  "NUMEST"
+667               ','
+668                  "NUMUP"
+669               ','
+670                  "NUMDOWN"
+671               ','
+672                  "MEDEST"
+673               ','
+674                  "MEANEST"
+675               ','
+676                  "STDEV"
+677               ','
+678                  "HIGHEST"
+679               ','
+680                  "LOWEST"
+681               ','
+682                  "USFIRM"
+683               ','
+684                  "FPEDATS"
+685               ','
+686                  "ACTUAL"
+687               ','
+688                  "ANNDATS_ACT"
+689               ','
+690                  "ANNTIMS_ACT"
+691               ','
+692                  "CURR_ACT"
+693               ','
+694                  "cusip6"
+695               ','
+696                  "PRC"
+697               ','
+698                  "CFACPR"
+699               ','
+700                  "crsp_date"
+701               ','
+702                  "crsp_cusip"
+703               ','
+704                  "prc_adj"
+705               ','
+706                  "group"
+707               ','
+708                  "delta_f"
+709               ;
+710             end;
+711           set  IBESSUM5   end=EFIEOD;
+712               format TICKER $6. ;
+713               format CUSIP $8. ;
+714               format OFTIC $6. ;
+715               format CNAME $16. ;
+716               format STATPERS date9. ;
+717               format MEASURE $6. ;
+718               format FISCALP $3. ;
+719               format FPI $1. ;
+720               format ESTFLAG $1. ;
+721               format CURCODE $3. ;
+722               format NUMEST best12. ;
+723               format NUMUP best12. ;
+724               format NUMDOWN best12. ;
+725               format MEDEST best12. ;
+726               format MEANEST best12. ;
+727               format STDEV best12. ;
+728               format HIGHEST best12. ;
+729               format LOWEST best12. ;
+730               format USFIRM 1. ;
+731               format FPEDATS date9. ;
+732               format ACTUAL best12. ;
+733               format ANNDATS_ACT date9. ;
+734               format ANNTIMS_ACT time8. ;
+735               format CURR_ACT $3. ;
+736               format cusip6 $8. ;
+737               format PRC 12.5 ;
+738               format CFACPR best12. ;
+739               format crsp_date yymmddn8. ;
+740               format crsp_cusip $8. ;
+741               format prc_adj best12. ;
+742               format group $200. ;
+743               format delta_f best12. ;
+744             do;
+745               EFIOUT + 1;
+746               put TICKER $ @;
+747               put CUSIP $ @;
+748               put OFTIC $ @;
+749               put CNAME $ @;
+750               put STATPERS @;
+751               put MEASURE $ @;
+752               put FISCALP $ @;
+753               put FPI $ @;
+754               put ESTFLAG $ @;
+755               put CURCODE $ @;
+756               put NUMEST @;
+757               put NUMUP @;
+758               put NUMDOWN @;
+759               put MEDEST @;
+760               put MEANEST @;
+761               put STDEV @;
+762               put HIGHEST @;
+763               put LOWEST @;
+764               put USFIRM @;
+765               put FPEDATS @;
+766               put ACTUAL @;
+767               put ANNDATS_ACT @;
+768               put ANNTIMS_ACT @;
+769               put CURR_ACT $ @;
+770               put cusip6 $ @;
+771               put PRC @;
+772               put CFACPR @;
+773               put crsp_date @;
+774               put crsp_cusip $ @;
+775               put prc_adj @;
+776               put group $ @;
+777               put delta_f ;
+778               ;
+779             end;
+780            if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR
+780      ! detection macro variable */
+781            if EFIEOD then call symputx('_EFIREC_',EFIOUT);
+782            run;
+
+NOTE: The file 'ibessum5.csv' is:
+      Filename=/home/cityuhk/xinhe97/CharsNov2019/pead-test/ibessum5.csv,
+      Owner Name=xinhe97,Group Name=cityuhk,
+      Access Permission=-rw-------,
+      Last Modified=26Nov2019:09:49:01
+
+NOTE: 2389 records were written to the file 'ibessum5.csv'.
+      The minimum record length was 143.
+      The maximum record length was 242.
+NOTE: There were 2388 observations read from the data set WORK.IBESSUM5.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+2388 records created in ibessum5.csv from IBESSUM5.
+  
+  
+NOTE: "ibessum5.csv" file was successfully created.
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.10 seconds
+      cpu time            0.03 seconds
+      
+
+
+NOTE: SAS Institute Inc., SAS Campus Drive, Cary, NC USA 27513-2414
+NOTE: The SAS System used:
+      real time           1.83 seconds
+      cpu time            0.97 seconds
+      

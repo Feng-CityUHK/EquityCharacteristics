@@ -23,13 +23,13 @@
 /* To run the program, a user should have access to CRSP daily and monthly stock,    */
 /* Compustat Annual and Quarterly sets, IBES and CRSP/Compustat Merged database      */
 /* ********************************************************************************* */
-  
+
 %let bdate=01jan1980;        /*start calendar date of fiscal period end*/
 %let edate=30jun2011;        /*end calendar date of fiscal period end  */
-       
+
 /*CRSP-IBES link*/
 %iclink (ibesid=ibes.id, crspid=crspq.stocknames, outset=work.iclink);
-    
+
 /* Step 1. All companies that were ever included in S&P 500 index as an example  */
 /* Linking Compustat GVKEY and IBES Tickers using ICLINK                         */
 /* For unmatched GVKEYs, use header IBTIC link in Compustat Security file        */
@@ -51,7 +51,7 @@ data gvkeys; set gvkeys;
   by gvkey linkdt ticker;
   if last.linkdt;
 run;
-    
+
 /* Extract estimates from IBES Unadjusted file and select    */
 /* the latest estimate for a firm within broker-analyst group*/
 /* "fpi in (6,7)" selects quarterly forecast for the current */
@@ -65,7 +65,7 @@ proc sql;
        from gvkeys group by ticker, permno) b
    where a.ticker=b.ticker and b.mindt<=a.anndats<=b.maxdt
         and "&bdate"d<=fpedats<="&edate"d and fpi in ('6','7');
-    
+
 /*Count number of estimates reported on primary/diluted basis */
   create table ibes
     as select a.*, sum(pdf='P') as p_count, sum(pdf='D') as d_count
@@ -73,7 +73,7 @@ proc sql;
     group by ticker, fpedats
   order by ticker,fpedats,estimator,analys,anndats,revdats,anntims,revtims;
 quit;
-    
+
 /* Determine whether most analysts report estimates on primary/diluted basis*/
 /* following Livnat and Mendenhall (2006)                                   */
 data ibes; set ibes;
@@ -84,7 +84,7 @@ data ibes; set ibes;
   keep ticker value fpedats anndats revdats estimator
        analys revtims anntims permno basis;
 run;
-    
+
 /* Link Unadjusted estimates with Unadjusted actuals and CRSP permnos  */
 /* Keep only the estimates issued within 90 days before the report date*/
 proc sql;
@@ -93,7 +93,7 @@ proc sql;
       as select a.*, b.anndats as repdats, b.value as act
       from ibes as a left join ibes.actu_epsus as b
       on a.ticker=b.ticker and a.fpedats=b.pends and b.pdicity='QTR';
-    
+
 /* select all relevant combinations of Permnos and Date*/
    create table ibes_anndats
       as select distinct permno, anndats
@@ -101,7 +101,7 @@ proc sql;
       union
       select distinct permno, repdats as anndats
       from ibes1;
-    
+
 /* Adjust all estimate and earnings announcement dates to the closest    */
 /* preceding trading date in CRSP to ensure that adjustment factors wont */
 /* be missing after the merge                                            */
@@ -113,7 +113,7 @@ proc sql;
     on 5>=a.anndats-b.date>=0
     group by a.anndats
     having a.anndats-b.date=min(a.anndats-b.date);
-    
+
 /* merge the CRSP adjustment factors for all estimate and report dates   */
     create table ibes_anndats
     as select a.*, c.cfacshr
@@ -121,7 +121,7 @@ proc sql;
     on a.anndats=b.anndats
     left join crspq.dsf (keep=permno date cfacshr) c
     on a.permno=c.permno and b.date=c.date;
-    
+
 /* Put the estimate on the same per share basis as */
 /* company reported EPS using CRSP Adjustment factors. New_value is the       */
 /* estimate adjusted to be on the same basis with reported earnings           */
@@ -131,11 +131,11 @@ proc sql;
     where (a.permno=b.permno and a.anndats=b.anndats)
      and (a.permno=c.permno and a.repdats=c.anndats);
 quit;
-    
+
 /* Sanity check: there should be one most recent estimate for */
 /* a given firm-fiscal period end combination                 */
 proc sort data=ibes1 nodupkey; by ticker fpedats estimator analys;run;
-           
+
 /* Compute the median forecast based on estimates in the 90 days prior to the EAD*/
 proc means data=ibes1 noprint;
    by ticker fpedats; id basis;
@@ -143,7 +143,7 @@ proc means data=ibes1 noprint;
    output out= medest (drop=_type_ _freq_)
    median=medest n=numest;
 run;
-    
+
 /* Extracting Compustat Data and merging it with IBES consensus */
 proc sql;
   create table comp
@@ -162,7 +162,7 @@ from comp.fundq
     left join medest c
     on b.ticker=c.ticker and put(a.datadate,yymmn6.)=put(c.fpedats,yymmn6.);
 quit;
-    
+
 /* Process Compustat Data on a seasonal year-quarter basis*/
 proc sort data=comp nodupkey; by gvkey fqtr fyearq;run;
 data sue/view=sue; set comp;
@@ -212,11 +212,11 @@ proc sql;
      on a.rdq=b.rdq
      order by a.gvkey, a.fyearq desc, a.fqtr desc;
 quit;
-    
+
 /* Sanity Check: there should be no duplicates. Descending sort is intentional  */
 /* to define the consecutive earnings announcement date                         */
 proc sort data=sue_final nodupkey; by gvkey descending fyearq descending fqtr;run;
-    
+
 /* Filter from Livnat & Mendenhall (2006):                                */
 /*- earnings announcement date is reported in Compustat                   */
 /*- the price per share is available from Compustat at fiscal quarter end */
@@ -249,7 +249,7 @@ data sue_final;
       numest='Number of analyst forecasts used in Analyst-based SUE';
    format rdq1 leadrdq1 date9.;
 run;
-    
+
 /* Extract file of raw daily returns around and between EADs and link them */
 /* to Standardized Earnings Surprises for forming SUE-based portfolios     */
 proc sql;
@@ -264,7 +264,7 @@ proc sql;
    on a.date=c.date
    order by a.permno, b.rdq1, a.date;
 quit;
-    
+
 /* To estimate the drift, sum daily returns over the period from  */
 /* 1 day after the earnings announcement through the day of       */
 /* the following quarterly earnings announcement                  */
@@ -277,17 +277,17 @@ data temp/view=temp; set crsprets;
   format date date9. exret percent7.4;
   if rdq1<=date<=leadrdq1;
 run;
-    
+
 proc sort data=temp out=peadrets nodupkey; by count permno rdq1;run;
 proc rank data=peadrets out=peadrets groups=5;
   by count; var sue1 sue2 sue3;
   ranks sue1r sue2r sue3r;
 run;
-    
+
 /*form portfolios on Compustat-based SUEs (=sue1 or =sue2) or IBES-based SUE (=sue3)*/
 %let sue=sue3;
 proc sort data=peadrets (where=(not missing(&sue))) out=pead&sue; by count &sue.r;run;
-    
+
 proc means data=pead&sue noprint;
   by count &sue.r;
   var exret; weight lagmcap;
@@ -297,7 +297,7 @@ proc transpose data=pead&sue.port out=pead&sue.port;
   by count; id &sue.r;
   var exret_mean;
 run;
-    
+
 data pead&sue.port; set pead&sue.port ;
    if count=0 then do;
   _0=0;_1=0;_2=0;_3=0;_4=0;end;
@@ -316,7 +316,7 @@ proc expand data=pead&sue.port out=pead&sue.port;
   convert _3=sueport4/transformout=(sum);
   convert _4=sueport5/transformout=(sum);
 quit;
-    
+
 options nodate orientation=landscape;
 ods pdf file="PEAD_&sue..pdf";
 goptions device=pdfc; /* Plot Saved in Home Directory */
@@ -330,13 +330,13 @@ proc gplot data =pead&sue.port;
   /overlay legend vaxis=axis1 haxis=axis2;
 run;quit;
 ods pdf close;
-        
+
 /*house cleaning*/
 proc sql;
    drop view crsprets, ibes_temp, temp, tradedates, sue, eads1;
    drop table iclink, medest, ibes, ibes1, comp, ibes_anndats, pead&sue.;
 quit;
-  
+
 /* ********************************************************************************* */
 /* *************  Material Copyright Wharton Research Data Services  *************** */
 /* ****************************** All Rights Reserved ****************************** */
