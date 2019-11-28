@@ -49,7 +49,7 @@ data crspm2; set crspm2;
 	end;
 run;
 
-libname chars '/scratch/cityuhk/xinhe/tmp';
+libname chars '/scratch/cityuhk/xinchars/';
 data chars.crspm2_prc; set crspm2; run;
 proc export data = crspm2(where=(year(date)=2018))
 outfile='/scratch/cityuhk/xintempv6/crspm2_prc.csv' dbms=csv replace; run;
@@ -72,7 +72,7 @@ data crspm2; set crspm2;
 	end;
 run;
 
-libname chars '/scratch/cityuhk/xinhe/tmp';
+libname chars '/scratch/cityuhk/xinchars/';
 data chars.crspm2_me; set crspm2; run;
 proc export data = crspm2(where=(year(date)=2018))
 outfile='/scratch/cityuhk/xintempv6/crspm2_me.csv' dbms=csv replace; run;
@@ -103,7 +103,7 @@ proc sort data=crspm2a nodupkey; by permno date;run;
 /* crspm2a is a monthly table:  */
 /* DATE	NCUSIP	TICKER	PERMNO	PERMCO	SHRCD	EXCHCD	PRC	RET	SHROUT	CFACPR	CFACSHR	RETX	DLRET	retadj	ME */
 
-libname chars '/scratch/cityuhk/xinhe/tmp';
+libname chars '/scratch/cityuhk/xinchars/';
 data chars.crspm2a; set crspm2a; run;
 proc export data = crspm2a(where=(year(date)=2018))
 outfile='/scratch/cityuhk/xintempv6/crspm2a.csv' dbms=csv replace; run;
@@ -180,7 +180,7 @@ create table data
 							else xsga0=0;
 						run;
 
-libname chars '/scratch/cityuhk/xinhe/tmp';
+libname chars '/scratch/cityuhk/xinchars/';
 data chars.funda; set data; run;
 proc export data = data(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/funda.csv' dbms=csv replace; run;
@@ -252,7 +252,7 @@ data temp; set temp;
   if last.year;
 run;
 
-libname chars '/scratch/cityuhk/xinhe/tmp';
+libname chars '/scratch/cityuhk/xinchars/';
 data chars.temp; set temp; run;
 proc export data = temp(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/temp.csv' dbms=csv replace; run;
@@ -268,7 +268,7 @@ intnx('month',a.datadate,0,'End')=intnx('month',b.date,0,'End')
 ;
 quit;
 
-libname chars '/scratch/cityuhk/xinhe/tmp';
+libname chars '/scratch/cityuhk/xinchars/';
 data chars.temp1; set temp1; run;
 proc export data = temp1(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/temp1.csv' dbms=csv replace; run;
@@ -514,7 +514,7 @@ data data2;
 	end;
 	run;
 
-libname chars '/scratch/cityuhk/xinhe/tmp';
+libname chars '/scratch/cityuhk/xinchars/';
 data chars.data2; set data2; run;
 proc export data = data2(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/data2.csv' dbms=csv replace; run;
@@ -685,7 +685,7 @@ orgcap=orgcap_1/avgat;
 if count=1 then orgcap=.;
 run;
 
-libname chars '/scratch/cityuhk/xinhe/tmp';
+libname chars '/scratch/cityuhk/xinchars/';
 data chars.data2_plus; set data2; run;
 proc export data = data2(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/data2_plus.csv' dbms=csv replace; run;
@@ -751,12 +751,12 @@ data temp; set temp;
 za_dy=dy;
 run;
 
-libname chars '/scratch/cityuhk/xinhe/tmp';
+libname chars '/scratch/cityuhk/xinchars/';
 data chars.temp_real; set temp; run;
 proc export data = temp(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/temp_real2018.csv' dbms=csv replace; run;
 
-libname chars '/scratch/cityuhk/xinhe/tmp';
+libname chars '/scratch/cityuhk/xinchars/';
 data chars.temp_real; set temp; run;
 proc export data = temp(where=(year(datadate)=2017))
 outfile='/scratch/cityuhk/xintempv6/temp_real2017.csv' dbms=csv replace; run;
@@ -796,7 +796,7 @@ z_dy = %ttm12(mdivpay)/mcap_crsp;
 if permno ne lag11(permno) then z_dy=.;
 run;
 
-libname chars '/scratch/cityuhk/xinhe/tmp';
+libname chars '/scratch/cityuhk/xinchars/';
 data chars.temp2; set temp2; run;
 proc export data = temp2(where=(year(date)=2018))
 outfile='/scratch/cityuhk/xintempv6/temp2.csv' dbms=csv replace; run;
@@ -839,7 +839,7 @@ proc sort data=data ;
 	by gvkey datadate;
 run;
 
-libname chars '/scratch/cityuhk/xinhe/tmp';
+libname chars '/scratch/cityuhk/xinchars/';
 data chars.data_q; set data; run;
 proc export data = data(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/data_q.csv' dbms=csv replace; run;
@@ -873,7 +873,7 @@ intnx('month',a.datadate,0,'End')=intnx('month',b.datadate,0,'End')
 ;
 quit;
 
-libname chars '/scratch/cityuhk/xinhe/tmp';
+libname chars '/scratch/cityuhk/xinchars/';
 data chars.data_q_real; set data; run;
 proc export data = data(where=(year(datadate)=2018))
 outfile='/scratch/cityuhk/xintempv6/data_q_real.csv' dbms=csv replace; run;
@@ -1146,5 +1146,541 @@ set data5;
 where not missing(rdq);  *seems like a reasonable screen at this point to make sure have at least some of this information;
 run;
 
-proc export data = data5
-outfile='data5.csv' dbms=csv replace; run;
+
+/* Some of the RPS require daily CRSP data in conjunction with Compustat quarterly, */
+/* so add daily CRSP info to create these RPS   */
+
+proc sql;
+	create table data5
+	as select a.*,b.vol
+	from data5 a left join crsp.dsf b
+	on a.permno=b.permno and
+		 intnx('WEEKDAY',rdq,-30)<=b.date<=intnx('WEEKDAY',rdq,-10);
+quit;
+
+proc sql;
+	create table data5
+	as select *,mean(vol) as avgvol
+	from data5
+group by permno,datadate,rdq;
+quit;
+proc sort data=data5(drop=vol) nodupkey;
+where not missing(rdq);
+by permno datadate rdq;
+run;
+proc sql;
+create table data6
+as select a.*,b.vol,b.ret
+from data5 a left join crsp.dsf b
+on a.permno=b.permno and
+		intnx('WEEKDAY',rdq,-1)<=b.date<=intnx('WEEKDAY',rdq,1);
+quit;
+proc sql;
+create table data6
+as select *,(mean(vol)-avgvol)/avgvol as aeavol,sum(ret) as ear
+from data6
+group by permno,datadate,rdq;
+quit;
+proc sort data=data6(drop=vol avgvol ret) nodupkey;
+by permno datadate rdq;
+run;
+
+data data6;
+	set data6;
+	keep gvkey permno datadate rdq cusip6                                         /* Xin He add cusip6 */
+	chtx roaq rsup stdacc stdcf sgrvol roavol cash cinvest nincr
+	sue
+	z_sue z_rsup
+	aeavol ear	m7 m8 prccq roeq
+	z_ac z_bm z_cfp z_ep /* v3 Xin He add variables */
+	z_inv z_ni z_op
+	z_cash
+			 z_chcsho
+			 z_rd
+			 z_cashdebt
+			 z_pctacc
+			 z_gma
+			 z_lev
+			 z_rd_mve
+			 z_sgr
+			 z_sp
+				z_invest
+				z_rd_sale
+				z_ps
+				z_lgr
+				z_roa
+				z_depr
+				z_egr
+				z_grltnoa
+				z_chato
+				z_chpm
+				z_chtx
+				z_ala
+				z_alm
+				z_noa
+				z_rna
+				z_pm
+				z_ato
+;
+run;
+
+libname chars '/scratch/cityuhk/xinchars/';
+data chars.data6; set data6; run;
+proc export data = data6(where=(year(datadate)=2018))
+outfile='/scratch/cityuhk/xintempv6/data6.csv' dbms=csv replace; run;
+
+
+/* add quarterly compustat data to monthly returns and annual compustat data */
+
+proc sql;
+	alter table temp2
+	drop datadate;
+
+create table temp3
+as select *
+from temp2 a left join data6 b
+on a.permno=b.permno and
+	 intnx('MONTH',a.date,-12)<=b.datadate<=intnx('MONTH',a.date,-3,'E');
+quit;
+
+proc sort data=temp3;
+	by permno date descending datadate;
+	run;
+proc sort data=temp3 nodupkey;
+	by permno date;
+	run;
+*----------------add eamonth--------------------------;
+proc sort data=data6 out=lst(keep=permno rdq) nodupkey;
+	where not missing(permno) and not missing(rdq);
+	by permno rdq;
+	run;
+proc sql;
+	alter table lst
+	add eamonth integer;
+	update  lst
+	set eamonth=1;
+
+	create table temp3
+	as select a.*,b.eamonth
+	from temp3 a left join lst b
+	on a.permno=b.permno and year(a.date)=year(b.rdq) and month(a.date)=month(b.rdq);
+
+	update  temp3
+	set eamonth=0 where eamonth=.;
+	quit;
+*finally finish Mohanram score;
+data temp3;
+set temp3;
+	ms=m1+m2+m3+m4+m5+m6+m7+m8;
+drop m1-m8;
+run;
+
+run;
+
+
+/* 				now add RPS that come straight from IBES data:                 							*/
+/*				set these up in monthly intervals where the IBES variables have the monthly statistical summary */
+
+proc sql;
+	create table ibessum
+		as select ticker,cusip,fpedats,statpers,ANNDATS_ACT,numest,ANNTIMS_ACT,
+			medest,meanest,actual,stdev
+		from ibes.statsum_epsus
+		where fpi='1'  /*1 is for annual forecasts, 6 is for quarterly*/
+		and statpers<ANNDATS_ACT /*only keep summarized forecasts prior to earnings annoucement*/
+		and measure='EPS'
+		and not missing(medest) and not missing(fpedats)
+		and (fpedats-statpers)>=0;
+	quit;
+				proc sort data=ibessum;
+				by ticker cusip statpers descending fpedats;   *doing this places all of the missing fpedats at the beginning of the file if not there....;
+				run;
+				proc sort data=ibessum nodupkey;
+				by ticker cusip statpers;
+				run;
+				data ibessum;
+				set ibessum;
+				by ticker cusip statpers;
+				disp=stdev/abs(meanest);
+				if meanest=0 then disp=stdev/.01;
+				chfeps=meanest-lag(meanest);
+				if first.cusip then chfeps=.;
+				run;
+				*add long term forecasts;
+				proc sql;
+				create table ibessum2
+				as select ticker,cusip,fpedats,statpers,ANNDATS_ACT,numest,ANNTIMS_ACT,
+				medest,meanest,actual,stdev
+				from ibes.statsum_epsus
+				where fpi='0'  /*1 is for annual forecasts, 6 is for quarterly,0 LTG*/
+				/*and statpers<ANNDATS_ACT
+				and measure='EPS'
+				and not missing(medest)
+				and (fpedats-statpers)>=0*/
+				and not missing(meanest);
+				quit;
+				proc sort data=ibessum2 nodupkey;
+				by ticker cusip statpers;
+				run;
+				proc sql;
+				create table ibessum2b
+				as select a.*,b.meanest as fgr5yr
+				from ibessum a left join ibessum2 b
+				on a.ticker=b.ticker and a.cusip=b.cusip
+				and a.statpers=b.statpers;
+				quit;
+				data rec;
+					set ibes.recdsum;
+					where not missing(statpers) and not missing(meanrec);
+					run;
+				proc sql;
+				create table ibessum2b
+				as select a.*,b.meanrec
+				from ibessum2b a left join rec b
+				on a.ticker=b.ticker and a.cusip=b.cusip
+				and a.statpers=b.statpers;
+				quit;
+				proc sort data=ibessum2b;
+				by ticker statpers;
+				run;
+				data ibessum2c;
+					set ibessum2b;
+					by ticker statpers;
+					retain count;
+					chrec=meanrec-mean(lag(meanrec),lag2(meanrec))-mean(lag3(meanrec),lag4(meanrec),lag5(meanrec));
+					if first.ticker then count=1;
+					else count+1;
+					if count<6 then chrec=.;
+				run;
+				*prepare for merge;
+				proc sort data=crsp.msenames(where=(ncusip ne '')) out=names nodupkey;
+					by permno ncusip;
+					run;
+				proc sql;
+				create table ibessum2b as select
+				a.*, b.permno
+				from ibessum2c a left join names b on
+				(a.cusip = b.ncusip);
+quit;
+
+proc sql;
+	create table temp4
+	as select a.*,b.disp,b.chfeps,b.fgr5yr,b.statpers,b.meanrec,b.chrec,b.numest as nanalyst,b.meanest/abs(a.prccq) as sfe,b.meanest
+	from temp3 a left join ibessum2b b
+	on a.permno=b.permno and
+		 intnx('MONTH',a.date,-4,'beg')<=b.statpers<=intnx('MONTH',a.date,-1,'end');
+	quit;
+				proc sort data=temp4;
+					by permno date descending statpers;
+					run;
+				proc sort data=temp4(drop=statpers) nodupkey;
+					by permno date;
+				run;
+				*--------a little clean up for IBES variables------------;
+				data temp4;
+					set temp4;
+					if year(date)>=1989 and missing(nanalyst) then nanalyst=0;
+					if year(date)>=1989 and missing(fgr5yr) then ltg=0;
+					if year(date)>=1989 and not missing(fgr5yr) then ltg=1;
+				array f{*} disp chfeps meanest nanalyst sfe ltg fgr5yr ;
+				array s{*} meanrec chrec;
+				do i=1 to dim(f);
+					if year(date)<1989 then f(i)=.;
+				end;
+				do j=1 to dim(s);
+					if year(date)<1994 then s(j)=.;
+				end;
+run;
+
+data temp4;
+	set temp4;
+*count to make sure we have enough time series for each firm to create variables;
+	where not missing(ret);
+	by permno date;
+	retain count;
+		if first.permno then count=1;
+		else count+1;
+	run;
+proc sql;
+	create table temp4
+	as select *,mean(ret) as ewret  /*we have used this before, doesn't seem to make a big difference in the variables*/
+	from temp4
+	group by date;
+	quit;
+
+proc sort data=temp4;
+	by permno date;
+	run;
+
+	data temp5;
+		set temp4;
+		where not missing(ret);
+		by permno date;
+		retain count;
+			if first.permno then count=1;
+			else count+1;
+		run;
+	data temp6;
+		set temp5;
+			chnanalyst=nanalyst-lag3(nanalyst);
+			mom6m=  (  (1+lag2(ret))*(1+lag3(ret))*(1+lag4(ret))*(1+lag5(ret))*(1+lag6(ret)) ) - 1;
+			mom12m=  (   (1+lag2(ret))*(1+lag3(ret))*(1+lag4(ret))*(1+lag5(ret))*(1+lag6(ret))*
+				(1+lag7(ret))*(1+lag8(ret))*(1+lag9(ret))*(1+lag10(ret))*(1+lag11(ret))*(1+lag12(ret))   ) - 1;
+			mom36m=(   (1+lag13(ret))*(1+lag14(ret))*(1+lag15(ret))*(1+lag16(ret))*(1+lag17(ret))*(1+lag18(ret))   *
+				(1+lag19(ret))*(1+lag20(ret))*(1+lag21(ret))*(1+lag22(ret))*(1+lag23(ret))*(1+lag24(ret))*
+				(1+lag25(ret))*(1+lag26(ret))*(1+lag27(ret))*(1+lag28(ret))*(1+lag29(ret))*(1+lag30(ret))     *
+				(1+lag31(ret))*(1+lag32(ret))*(1+lag33(ret))*(1+lag34(ret))*(1+lag35(ret))*(1+lag36(ret))  ) - 1;
+			mom1m=	lag(ret);
+			mom60m=(   (1+lag13(ret))*(1+lag14(ret))*(1+lag15(ret))*(1+lag16(ret))*(1+lag17(ret))*(1+lag18(ret))   *
+					(1+lag19(ret))*(1+lag20(ret))*(1+lag21(ret))*(1+lag22(ret))*(1+lag23(ret))*(1+lag24(ret))*
+					(1+lag25(ret))*(1+lag26(ret))*(1+lag27(ret))*(1+lag28(ret))*(1+lag29(ret))*(1+lag30(ret))     *
+					(1+lag31(ret))*(1+lag32(ret))*(1+lag33(ret))*(1+lag34(ret))*(1+lag35(ret))*(1+lag36(ret))     *
+					(1+lag37(ret))*(1+lag38(ret))*(1+lag39(ret))*(1+lag40(ret))     *
+					(1+lag41(ret))*(1+lag42(ret))*(1+lag43(ret))*(1+lag44(ret))*(1+lag45(ret))*(1+lag46(ret))     *
+					(1+lag47(ret))*(1+lag48(ret))*(1+lag49(ret))*(1+lag50(ret))     *
+					(1+lag51(ret))*(1+lag52(ret))*(1+lag53(ret))*(1+lag54(ret))*(1+lag55(ret))*(1+lag56(ret))     *
+					(1+lag57(ret))*(1+lag58(ret))*(1+lag59(ret))*(1+lag60(ret))
+					) - 1;                                                                  /* v4 */
+			dolvol=log(lag2(vol)*lag2(prc));
+			chmom =(   (1+lag(ret))*(1+lag2(ret))*(1+lag3(ret))*(1+lag4(ret))*(1+lag5(ret))*(1+lag6(ret))   ) - 1
+				- ((  (1+lag7(ret))*(1+lag8(ret))*(1+lag9(ret))*(1+lag10(ret))*(1+lag11(ret))*(1+lag12(ret))   ) - 1);
+			turn=mean(lag(vol),lag2(vol),lag3(vol))/shrout;
+
+			if lag(ret)>0 and lag2(ret)>0 and lag3(ret)>0 and lag4(ret)>0 and lag5(ret)>0 and lag6(ret)>0 then retcons_pos=1; else retcons_pos=0;
+			if lag(ret)<0 and lag2(ret)<0 and lag3(ret)<0 and lag4(ret)<0 and lag5(ret)<0 and lag6(ret)<0 then retcons_neg=1; else retcons_neg=0;
+
+		if count=1 then mom1m=.;
+		if count<13 then do;
+				mom12m=.;
+				chmom=.;
+		end;
+		if count<60 then mom60m=.;                                                    /* v4 we may drop many firms here*/
+		if count<7 then mom6m=.;
+		if count<37 then mom36m=.;
+		if count<3 then dolvol=.;
+		if count<4 then turn=.;
+		if count<4 then chnanalyst=.;
+		if count<7 then retcons_pos=.;
+		if count<7 then retcons_neg=.;
+
+		if count<=12 then IPO=1; else IPO=0;
+		run;
+
+	/**************************/
+	/* momentum from another table */
+		data momcrsp;
+		set crsp.msf(keep=permno date ret);
+		by permno date;
+		run;
+
+		proc sort data=momcrsp nodupkey; by permno date; run;
+
+        data momcrsp;
+        set momcrsp;
+        z_mom60m = (   (1+lag13(ret))*(1+lag14(ret))*(1+lag15(ret))*(1+lag16(ret))*(1+lag17(ret))*(1+lag18(ret))   *
+                        (1+lag19(ret))*(1+lag20(ret))*(1+lag21(ret))*(1+lag22(ret))*(1+lag23(ret))*(1+lag24(ret))*
+                        (1+lag25(ret))*(1+lag26(ret))*(1+lag27(ret))*(1+lag28(ret))*(1+lag29(ret))*(1+lag30(ret))     *
+                        (1+lag31(ret))*(1+lag32(ret))*(1+lag33(ret))*(1+lag34(ret))*(1+lag35(ret))*(1+lag36(ret))     *
+                        (1+lag37(ret))*(1+lag38(ret))*(1+lag39(ret))*(1+lag40(ret))     *
+                        (1+lag41(ret))*(1+lag42(ret))*(1+lag43(ret))*(1+lag44(ret))*(1+lag45(ret))*(1+lag46(ret))     *
+                        (1+lag47(ret))*(1+lag48(ret))*(1+lag49(ret))*(1+lag50(ret))     *
+                        (1+lag51(ret))*(1+lag52(ret))*(1+lag53(ret))*(1+lag54(ret))*(1+lag55(ret))*(1+lag56(ret))     *
+                        (1+lag57(ret))*(1+lag58(ret))*(1+lag59(ret))*(1+lag60(ret))
+                        ) - 1;                                                                  /* v4 */
+        z_mom12m =  (   (1+lag2(ret))*(1+lag3(ret))*(1+lag4(ret))*(1+lag5(ret))*(1+lag6(ret))*
+                    (1+lag7(ret))*(1+lag8(ret))*(1+lag9(ret))*(1+lag10(ret))*(1+lag11(ret))*(1+lag12(ret))   ) - 1;
+        z_mom1m =	lag(ret);
+        z_mom6m=  (  (1+lag2(ret))*(1+lag3(ret))*(1+lag4(ret))*(1+lag5(ret))*(1+lag6(ret)) ) - 1;
+        z_mom36m=(   (1+lag13(ret))*(1+lag14(ret))*(1+lag15(ret))*(1+lag16(ret))*(1+lag17(ret))*(1+lag18(ret))   *
+            (1+lag19(ret))*(1+lag20(ret))*(1+lag21(ret))*(1+lag22(ret))*(1+lag23(ret))*(1+lag24(ret))*
+            (1+lag25(ret))*(1+lag26(ret))*(1+lag27(ret))*(1+lag28(ret))*(1+lag29(ret))*(1+lag30(ret))     *
+            (1+lag31(ret))*(1+lag32(ret))*(1+lag33(ret))*(1+lag34(ret))*(1+lag35(ret))*(1+lag36(ret))  ) - 1;
+        z_moms12m=(lag(ret)+lag2(ret)+lag3(ret)+lag4(ret)+lag5(ret)+lag6(ret)+lag7(ret)+lag8(ret)+lag9(ret)+lag10(ret)+lag11(ret))/11.0;
+
+        if permno ne lag60(permno) then z_mom60m=.;
+        if permno ne lag12(permno) then z_mom12m=.;
+        if first.permno then z_mom1m=.;
+        if permno ne lag36(permno) then z_mom36m=.;
+        if permno ne lag6(permno) then z_mom6m=.;
+        if permno ne lag12(permno) then z_moms12m=.;
+        run;
+
+		proc sql;
+		create table mytemp6 as
+		select a.*, b.z_mom1m, b.z_mom12m, b.z_mom60m, b.z_mom6m, b.z_mom36m, b.z_moms12m
+		from
+		temp6 a left join momcrsp b
+		on
+		a.permno = b.permno
+		and
+		intnx('month',a.date,0,'E') = intnx('month',b.date,0,'E')
+		order by a.permno, a.date;
+		run;
+
+		proc sql;
+		drop table temp6;
+		quit;
+
+		data temp6;
+		set mytemp6;
+		run;
+
+/**************************/
+proc sql;
+	create table temp5
+	as select *,mean(mom12m) as indmom
+	from temp6
+	group by sic2,date;
+quit;
+
+*=====================================================================================================================
+
+			crsp vars
+
+======================================================================================================================;
+
+proc sql;
+	create table dcrsp
+	as select permno,year(date) as yr,month(date) as month,max(ret) as maxret,std(ret) as retvol,
+			mean((askhi-bidlo)/((askhi+bidlo)/2)) as baspread,
+			std(log(abs(prc*vol))) as std_dolvol,std(vol/shrout) as std_turn,
+			mean(abs(ret)/(abs(prc)*vol)) as ill,
+			sum(vol=0) as countzero,n(permno) as ndays,sum(vol/shrout) as turn
+	from crsp.dsf
+	group by permno,year(date),month(date)
+	having year(date)>=1950;                                                      /* v5 4 */
+	quit;
+					proc sort data=dcrsp nodupkey;
+						by permno yr month;
+					run;
+					data dcrsp;
+						set dcrsp;
+						zerotrade=(countzero+((1/turn)/480000))*21/ndays;
+						run;
+					*match to prior month to use lagged variables to predict returns;
+					proc sql;
+						create table temp6
+						as select a.*,b.maxret,b.retvol,baspread,std_dolvol,std_turn,ill,zerotrade
+						from temp5 a left join dcrsp b
+						on a.permno=b.permno and year(intnx('MONTH',date,-1))=b.yr
+						and month(intnx('MONTH',date,-1))=b.month;
+					quit;
+					proc sort data=temp6 nodupkey;
+						by permno date;
+						run;
+
+
+
+*=====================================================================================================================
+
+				create beta from weekly returns
+
+======================================================================================================================;
+proc sql;
+	create table dcrsp
+	as select permno,intnx('WEEK',date,0,'end') as wkdt,
+	exp(sum(log(1+(ret))))-1 as wkret
+from crsp.dsf
+group by permno,calculated wkdt;
+quit;
+proc sort data=dcrsp nodupkey;
+where wkdt>='01JAN1950'd;
+by permno wkdt;
+run;
+proc sql;
+	create table dcrsp
+	as select *,mean(wkret) as ewret
+	from dcrsp
+	group by wkdt;
+quit;
+data dcrsp;
+	set dcrsp;
+	where not missing(wkret) and not missing(ewret);
+	run;
+proc sort data=temp6 out=lst(keep=permno date) nodupkey;
+	where not missing(permno) and not missing(date);
+	by permno date;
+run;
+proc sql;
+create table betaest
+	as select a.*,b.wkret,b.ewret as ewmkt,b.wkdt
+from lst a left join dcrsp b
+on a.permno=b.permno and intnx('MONTH',date,-36)<=wkdt<=intnx('MONTH',date,-1);
+quit;					*3 years of weekly returns;
+proc sql;
+create table betaest
+as select *
+from betaest
+group by permno,date
+having n(wkret)>=52;
+quit;				*require at least 1 year of weekly returns;
+proc sort data=betaest;
+	by permno date wkdt;
+run;
+data betaest;
+	set betaest;
+	by permno date wkdt;
+	retain count;
+	ewmkt_l1=lag(ewmkt);
+	ewmkt_l2=lag2(ewmkt);
+	ewmkt_l3=lag3(ewmkt);
+	ewmkt_l4=lag4(ewmkt);
+	if first.date then count=1;
+		else count+1;
+	if count<5 then do;
+	ewmkt_l1=.;
+	ewmkt_l2=.;
+	ewmkt_l3=.;
+	ewmkt_l4=.;
+	end;
+	run;
+proc reg data=betaest outest=est noprint;
+	by permno date;
+	model wkret=ewmkt/adjrsq;
+output out=idiovolest residual=idioret;
+run;			*two different approaches, one typical, the other including lagged market values to use as price delay measure;
+proc reg data=betaest outest=est2 noprint;
+	by permno date;
+	model wkret=ewmkt ewmkt_l1 ewmkt_l2 ewmkt_l3 ewmkt_l4/adjrsq;
+output out=idiovolest residual=idioret;
+run;
+proc sql;
+	create table idiovolest
+	as select permno,date,std(idioret) as idiovol
+	from idiovolest
+	group by permno,date;
+	quit;
+proc sort data=idiovolest nodupkey;
+	where not missing(idiovol);
+	by permno date;
+	run;
+data est;
+	set est;
+	where not missing(permno) and not missing(date);
+	beta=ewmkt;
+run;
+
+proc sql;                                                             /* merge beta with main table */
+create table temp7
+as select a.*,b.beta,b.beta*b.beta as betasq,_adjrsq_ as rsq1
+from temp6 a left join est b
+on a.permno=b.permno and a.date=b.date;
+quit;
+proc sql;
+create table temp7
+as select a.*,	1-(	rsq1 / _adjrsq_) as pricedelay
+from temp7 a left join est2 b
+on a.permno=b.permno and a.date=b.date;
+quit;
+proc sql;                                                             /* merge idiovol with main table */
+create table temp7
+as select a.*,b.idiovol
+from temp7 a left join idiovolest b
+on a.permno=b.permno and a.date=b.date;
+quit;
+
+
+libname chars '/scratch/cityuhk/xinchars/';
+data chars.temp7; set temp7; run;
+proc export data = temp7(where=(year(date)=2018))
+outfile='/scratch/cityuhk/xintempv6/temp7.csv' dbms=csv replace; run;

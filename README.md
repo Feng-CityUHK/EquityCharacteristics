@@ -3,6 +3,8 @@
 
 For financial researches, we need equity characteristics. This repository is a toolkit to calculate asset characteristics in individual equity level and portfolio level.
 
+# Reference
+
 Many papers contribute a lot to this repository. I am very sorry for only listing the following papers.
 -  **Measuring Mutual Fund Performance with Characteristic‐Based Benchmarks** by [DANIEL, GRINBLATT, TITMAN, WERMERS 1997 JF](https://doi.org/10.1111/j.1540-6261.1997.tb02724.x)
   - [Benchmarks on Wermer's website](http://terpconnect.umd.edu/~wermers/ftpsite/Dgtw/coverpage.htm)
@@ -42,7 +44,7 @@ The portfolios includes and not limited to:
 ## Codes
 
 - Calculate equity characteristics with SAS code, mainly refering to [SAS code by Green Hand Zhang](https://drive.google.com/file/d/0BwwEXkCgXEdRQWZreUpKOHBXOUU/view).
-- Portfolio characteristics, mainly refering to [WRDS Financial Ratios Suite](https://wrds-www.wharton.upenn.edu/pages/support/research-wrds/sample-programs/wrds-sample-programs/wrds-financial-ratios-suite/).
+- Portfolio characteristics, mainly refering to [WRDS Financial Ratios Suite](https://wrds-www.wharton.upenn.edu/pages/support/research-wrds/sample-programs/wrds-sample-programs/wrds-financial-ratios-suite/) and [Variable Definition](https://wrds-www.wharton.upenn.edu/documents/793/WRDS_Industry_Financial_Ratio_Manual.pdf)
 - DGTW code refers to [this python code](https://wrds-www.wharton.upenn.edu/pages/support/applications/python-replications/characteristic-based-benchmarks-daniel-grinblatt-titman-and-wermers-1997-python-version/) or [this SAS code](https://wrds-www.wharton.upenn.edu/pages/support/applications/portfolio-construction-and-market-anomalies/characteristic-based-benchmarks-daniel-grinblatt-titman-and-wermers-1997/)
 
 **All comments are welcome.**

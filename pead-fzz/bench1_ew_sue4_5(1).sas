@@ -1,18 +1,18 @@
 
- 
+
 
 	/*PEAD part*/
 
 	/* PART1 data*/
 %let bdate=01jan2002;        /*start calendar date of fiscal period end*/
 %let edate=31dec2006;        /*end calendar date of fiscal period end  */
-       
+
 /*CRSP-IBES link*/
 %iclink  (ibesid=ibes.id, crspid=crspq.stocknames, outset=work.iclink);
-    
+
 /* Step 1. All companies that were ever included in S&P 500 index as an example  */
 /* Linking Compustat GVKEY and IBES Tickers using ICLINK                         */
-/* For unmatched GVKEYs, use header IBTIC link in Compustat Security file        */ 
+/* For unmatched GVKEYs, use header IBTIC link in Compustat Security file        */
 proc sql; create table gvkeys
   as select distinct a.gvkey, b.lpermco as permco, b.lpermno as permno,
   coalesce (b.linkenddt,'31dec9999'd) as linkenddt format date9.,
@@ -31,7 +31,7 @@ data gvkeys; set gvkeys;
   by gvkey linkdt ticker;
   if last.linkdt ;
 run;
-    
+
 /* Extract estimates from IBES Unadjusted file and select    */
 /* the latest estimate for a firm within broker-analyst group*/
 /* "fpi in (6,7)" selects quarterly forecast for the current */
@@ -45,15 +45,15 @@ proc sql;
        from gvkeys group by ticker, permno) b
    where a.ticker=b.ticker and b.mindt<=a.anndats<=b.maxdt
         and "&bdate"d<=fpedats <="&edate"d and fpi in ('6','7');
-    
+
 /*Count number of estimates reported on primary/diluted basis */
   create table ibes
     as select a.*, sum(pdf='P') as p_count, sum(pdf='D') as d_count
     from ibes_temp a
     group by ticker, fpedats
-  order by ticker,fpedats,estimator,analys,anndats,revdats,anntims,revtims; 
+  order by ticker,fpedats,estimator,analys,anndats,revdats,anntims,revtims;
 quit;
-    
+
 /* Determine whether most analysts report estimates on primary/diluted basis*/
 /* following Livnat and Mendenhall (2006)                                   */       
 data ibes; set ibes;
@@ -64,14 +64,14 @@ data ibes; set ibes;
   keep ticker value fpedats anndats revdats estimator
        analys revtims anntims permno basis;
 run;
-    
+
 /* Link Unadjusted estimates with Unadjusted actuals and CRSP permnos  */
 /* Keep only the estimates issued within 90 days before the report date*/
 proc sql;
   create table ibes1
   /*(where=(nmiss(repdats, anndats)=0 and 0<=repdats-anndats<=90))*/
   (where=(nmiss(repdats, anndats)=0 and 90>=repdats-anndats>=3))
-      as select a.*, b.anndats as repdats, b.value as act 
+      as select a.*, b.anndats as repdats, b.value as act
       from ibes as a left join ibes.actu_epsus as b
       on a.ticker=b.ticker and a.fpedats=b.pends and b.pdicity='QTR';quit;
 data ibes1;set ibes1;
@@ -80,16 +80,16 @@ proc sort data=ibes1;by repdats act permno;run;
 proc means data=ibes1 noprint;
 by repdats act permno;
 var dif;
-output out=min_dif (drop=_type_ _freq_)  
+output out=min_dif (drop=_type_ _freq_)
 min=min_dif;
 run;
 
 proc sql;
-create table ibes1 as select a.*,b.min_dif from ibes1 a inner join 
+create table ibes1 as select a.*,b.min_dif from ibes1 a inner join
 min_dif b
 on a.repdats=b.repdats and  a.act=b.act and  a.permno=b.permno and a.dif=b.min_dif;
 
-    
+
 /* select all relevant combinations of Permnos and Date*/
    create table ibes_anndats
       as select distinct permno, anndats
@@ -97,7 +97,7 @@ on a.repdats=b.repdats and  a.act=b.act and  a.permno=b.permno and a.dif=b.min_d
       union
       select distinct permno, repdats as anndats
       from ibes1;
-    
+
 /* Adjust all estimate and earnings announcement dates to the closest    */
 /* preceding trading date in CRSP to ensure that adjustment factors wont */
 /* be missing after the merge                                            */
@@ -109,7 +109,7 @@ on a.repdats=b.repdats and  a.act=b.act and  a.permno=b.permno and a.dif=b.min_d
     on 5>=a.anndats-b.date>=0
     group by a.anndats
     having a.anndats-b.date=min(a.anndats-b.date);
-    
+
 /* merge the CRSP adjustment factors for all estimate and report dates   */
     create table ibes_anndats
     as select a.*, c.cfacshr
@@ -117,39 +117,39 @@ on a.repdats=b.repdats and  a.act=b.act and  a.permno=b.permno and a.dif=b.min_d
     on a.anndats=b.anndats
     left join crspq.dsf  (keep=permno date cfacshr) c
     on a.permno=c.permno and b.date=c.date;
-    
+
 /* Put the estimate on the same per share basis as */
 /* company reported EPS using CRSP Adjustment factors. New_value is the       */
 /* estimate adjusted to be on the same basis with reported earnings           */
-    create table ibes1  
+    create table ibes1
     as select a.*, (c.cfacshr/b.cfacshr)*a.value as new_value
     from ibes1 a, ibes_anndats b, ibes_anndats c
     where (a.permno=b.permno and a.anndats=b.anndats)
      and (a.permno=c.permno and a.repdats=c.anndats);
 quit;
-    
+
 /* Sanity check: there should be one most recent estimate for */
 /* a given firm-fiscal period end combination                 */
-proc sort data=ibes1 nodupkey; by ticker fpedats estimator analys;run; 
-           
+proc sort data=ibes1 nodupkey; by ticker fpedats estimator analys;run;
+
 /* Compute the median forecast based on estimates in the 90 days prior to the EAD*/
 proc means data=ibes1 noprint;
    by ticker fpedats; id basis;
    var new_value; id repdats act permno;
-   output out= medest (drop=_type_ _freq_)        
+   output out= medest (drop=_type_ _freq_)
    median=medest n=numest mean=mean_sue;
 run;
-    
+
 /* Extracting Compustat Data and merging it with IBES consensus */
 proc sql;
   create table comp
   (keep=gvkey fyearq fqtr conm datadate rdq epsfxq epspxq
         prccq ajexq spiq cshoq prccq ajexq spiq cshoq mcap /*Compustat variables*/
-        cshprq cshfdq rdq saleq atq fyr datafqtr          
+        cshprq cshfdq rdq saleq atq fyr datafqtr
         permno ticker medest numest repdats act basis mean_sue)     /*CRSP and IBES vars */
 as select *, abs((a.cshoq*a.prccq)) as mcap
 from comp.fundq
-     (where=((not missing(saleq) or atq>0) and nmiss(epsfxq)<10 and nmiss(epspxq)<10 
+     (where=((not missing(saleq) or atq>0) and nmiss(epsfxq)<10 and nmiss(epspxq)<10
     and nmiss(rdq)<10 and consol='C' and
     popsrc='D' and indfmt='INDL' and datafmt='STD' and not missing(datafqtr))) a
     inner join
@@ -159,7 +159,7 @@ from comp.fundq
     left join medest c
     on b.ticker=c.ticker and put(a.datadate,yymmn6.)=put(c.fpedats,yymmn6.);
 quit;
-    
+
 /* PART2 SUE */
 /* Process Compustat Data on a seasonal year-quarter basis*/
 proc sort data=comp nodupkey; by gvkey fqtr fyearq;run;
@@ -212,7 +212,7 @@ proc sql;
 quit;
 /* Sanity Check: there should be no duplicates. Descending sort is intentional  */
 /* to define the consecutive earnings announcement date                         */
-                             
+
 proc sort data=sue_final nodupkey; by gvkey descending fyearq descending fqtr;run;
 
 
@@ -223,7 +223,7 @@ run;
 
 /* Filter from Livnat & Mendenhall (2006):                                */
 /*- earnings announcement date is reported in Compustat                   */
-/*- the price per share is available from Compustat at fiscal quarter end */ 
+/*- the price per share is available from Compustat at fiscal quarter end */
 /*- price is greater than $1                                              */
 /*- the market (book) equity at fiscal quarter end is available and is    */
 /* EADs in Compustat and in IBES (if available)should not differ by more  */
@@ -232,14 +232,14 @@ run;
 data sue_final1;
    retain gvkey ticker permno conm fyearq fqtr datadate fyr rdq rdq1 lagrdq1 leadrdq1
           repdats mcap medest act numest basis sue1 sue2 sue3 mean_sue;
-   set sue_final1; 
+   set sue_final1;
    by gvkey descending fyearq descending fqtr;
-   if last.gvkey then lagrdq1=intnx('month',rdq1,-3,'sameday'); 
-   if lagrdq1=rdq1 then delete;   
-   if first.gvkey then leadrdq1=intnx('month',rdq1,3,'sameday'); 
-   if leadrdq1=rdq1 then delete;  
-   if ((nmiss(sue1,sue2)=0 and missing(repdats)) 
-   or (not missing(repdats) and abs(intck('day',repdats,rdq))<=1)); 
+   if last.gvkey then lagrdq1=intnx('month',rdq1,-3,'sameday');
+   if lagrdq1=rdq1 then delete;
+   if first.gvkey then leadrdq1=intnx('month',rdq1,3,'sameday');
+   if leadrdq1=rdq1 then delete;
+   if ((nmiss(sue1,sue2)=0 and missing(repdats))
+   or (not missing(repdats) and abs(intck('day',repdats,rdq))<=1));
    if (not missing(rdq) and prccq>1 and mcap>5.0);
    keep gvkey ticker permno conm fyearq fqtr datadate fyr rdq rdq1 lagrdq1 leadrdq1
           repdats mcap medest act numest basis sue1 sue2 sue3 mean_sue;
@@ -254,8 +254,8 @@ data sue_final1;
       sue2='Earnings Surprise (Excluding Special items)'
       sue3='Earnings Surprise (Analyst Forecast-based)'
       numest='Number of analyst forecasts used in Analyst-based SUE';
-   format rdq1 lagrdq1 leadrdq1 date9.; 
-run; 
+   format rdq1 lagrdq1 leadrdq1 date9.;
+run;
 
 
 
@@ -535,7 +535,7 @@ run;
 
 /* 1982 condition */
 /*data mydaily_cond1982;
-set mydaily(where=(base_year=1)); 
+set mydaily(where=(base_year=1));
 if nmiss(ret)=0;
 run;*/
 
@@ -568,16 +568,16 @@ create table abret
     left join ewret1_daily b
     on a.date=b.date;
 	quit;
- 
+
 /*4*/
 /*merge*/
 
-proc sql; 
-   create view crsprets 
+proc sql;
+   create view crsprets
    as select a.*,
              b.rdq1, b.leadrdq1, b.sue1, b.sue2, b.sue3, b.lagrdq1,b.mean_sue,b.act
    from abret a inner join
-   sue_final1 (where=(nmiss(rdq, leadrdq1, permno)=0 and leadrdq1-lagrdq1>110)) b 
+   sue_final1 (where=(nmiss(rdq, leadrdq1, permno)=0 and leadrdq1-lagrdq1>110)) b
    on a.permno=b.permno and b.lagrdq1-5<=a.date<=b.leadrdq1+5
       order by a.permno, b.rdq1, a.date;
 quit;
@@ -672,17 +672,17 @@ run;
 /*form portfolios on Compustat-based SUEs (=sue1 or =sue2) or IBES-based SUE (=sue3)*/
 %let sue=sue4;
 proc sort data=peadrets (where=(not missing(&sue))) out=pead&sue; by count &sue.r;run;
-    
+
 proc means data=pead&sue noprint;
   by count &sue.r;
-  var abret; 
+  var abret;
   output out=pead&sue.port mean=abret_mean;
 run;
 proc transpose data=pead&sue.port out=pead&sue.port;
   by count; id &sue.r;
   var abret_mean;
 run;
-    
+
 data pead&sue.port; set pead&sue.port ;
    if count=-60 then do;
   _0=0;_1=0;_2=0;_3=0;_4=0;end;
@@ -716,12 +716,12 @@ proc gplot data =pead&sue.port;
   /overlay legend vaxis=axis1 haxis=axis2 href=0;
 run;quit;
 ods pdf close;
-    
 
 
- 
+
+
 /*house cleaning*/
-proc sql; 
+proc sql;
    drop view crsprets, ibes_temp, temp, tradedates, sue, eads1;
    drop table iclink, medest, ibes, ibes1, comp, ibes_anndats, pead&sue.;
 quit;
