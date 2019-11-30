@@ -8,3 +8,4 @@ db.create_pgpass_file()
 db.close()
 # check again
 db = wrds.Connection(wrds_username='xinhe97')
+db.close()

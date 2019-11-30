@@ -1,6 +1,7 @@
 # Xin He - Nov 28, 2019
 import wrds
-db = wrds.Connection(wrds_username='xinhe97')
+# db = wrds.Connection(wrds_username='xinhe97')
+db = wrds.Connection()
 
 import pandas as pd
 import numpy as np
@@ -22,4 +23,8 @@ start_date = dt.datetime(2010,1,1)
 #end_date = datetime.datetime(2019,11,30)
 end_date = dt.datetime.now()
 
-from bm import *
+from bm import bm
+ccmq = bm(db,start_date,end_date)
+
+
+db.close()
