@@ -9,6 +9,7 @@ import psycopg2
 from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 import datetime
+import pickle as pkl
 
 ###################
 # Connect to WRDS #
@@ -21,7 +22,7 @@ crsp = conn.raw_sql("""
                       from crsp.dsf as a
                       left join ff.factors_daily as b
                       on a.date=b.date
-                      where a.date > '01/01/1959'
+                      where a.date >= '01/01/1959'
                       """)
 
 crsp = crsp.sort_values(by=['permno', 'date'])
@@ -49,11 +50,26 @@ df['beta'] = df['cov']/df['var']
 ################################
 #    Calculate the residual    #
 ################################
-
 crsp['beta'] = df['beta']
-crsp['rvar_capm'] = crsp['exret'] - crsp['beta']*crsp['mktrf']
-crsp = crsp[['permno', 'date', 'rvar_capm']]
-crsp = crsp.dropna()
+crsp['monthend'] = crsp['date'] + MonthEnd(0)
+crsp['date_diff'] = crsp['monthend'] - crsp['date']
+date_temp = crsp.groupby(['permno', 'monthend'])['date_diff'].min()  # find the closest trading day to the end of the month
+date_temp = pd.DataFrame(date_temp)  # convert Series to DataFrame
+date_temp.reset_index(inplace=True)
+date_temp.rename(columns={'date_diff': 'min_diff'}, inplace=True)
 
+crsp = pd.merge(crsp, date_temp, how='left', on=['permno', 'monthend'])
+crsp['sig'] = np.where(crsp['date_diff']==crsp['min_diff'], 1, np.nan)
+crsp = crsp.dropna(subset=['beta'])
+crsp['beta'] = np.where(crsp['sig'].notna(), crsp['beta'], np.nan)
+crsp['beta'] = crsp['beta'].bfill()
 
+crsp['residual'] = crsp['exret'] - crsp['beta']*crsp['mktrf']
+crsp = crsp[['permno', 'date', 'monthend', 'residual']]
 
+df = crsp.groupby(['permno', 'monthend'])['residual'].var()
+df = df.reset_index()
+df.columns = ['permno', 'date', 'rvar_capm']
+
+with open('rvar_capm.pkl', 'wb') as f:
+    pkl.dump(df, f)

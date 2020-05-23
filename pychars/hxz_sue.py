@@ -9,6 +9,7 @@ import psycopg2
 from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 from pandasql import *
+import pickle as pkl
 
 ###################
 # Connect to WRDS #
@@ -102,7 +103,5 @@ df = df.drop_duplicates(['permno', 'date'])
 df['datadate'] = pd.to_datetime(df['datadate'])
 df = df[['gvkey', 'permno', 'datadate', 'date', 'sue']]
 
-####### test ######
-df['date'] = pd.to_datetime(df['date'])
-df['yearend'] = df['date'] + YearEnd(0)
-df1 = df[df['yearend']>='2017-12-31']
+with open('sue.pkl', 'wb') as f:
+    pkl.dump(df, f)

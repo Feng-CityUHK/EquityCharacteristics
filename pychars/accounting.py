@@ -5,6 +5,7 @@ import wrds
 import psycopg2
 from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
+import pickle as pkl
 
 ###################
 # Connect to WRDS #
@@ -94,12 +95,12 @@ comp = conn.raw_sql("""
 comp['cnum'] = comp['cusip'].str.strip().str[0:6]
 
 # sort and clean up
-comp=comp.sort_values(by=['gvkey','datadate']).drop_duplicates()
+comp = comp.sort_values(by=['gvkey','datadate']).drop_duplicates()
 
 # prep for clean-up and using time series of variables
-comp['count']=comp.groupby(['gvkey']).cumcount() # number of years in Compustat
+comp['count'] = comp.groupby(['gvkey']).cumcount()  # number of years in Compustat
 
-# do some clean up. several of these variables have lots of missing values
+# do some clean up. several variables have lots of missing values
 condlist = [comp['drc'].notna() & comp['drlt'].notna(),
             comp['drc'].notna() & comp['drlt'].isnull(),
             comp['drlt'].notna() & comp['drc'].isnull()]
@@ -135,7 +136,7 @@ crsp_m = conn.raw_sql("""
                       on a.permno=b.permno
                       and b.namedt<=a.date
                       and a.date<=b.nameendt
-                      where a.date between '01/01/1959' and '12/31/2018'
+                      where a.date >= '01/01/1959'
                       and b.exchcd between 1 and 3
                       """)
 
@@ -182,7 +183,6 @@ crsp = crsp.sort_values(by=['permno', 'date']).drop_duplicates()
 crsp['prc'] = np.where(crsp['permno'] == crsp['permno'].shift(1), crsp['prc'].fillna(method='ffill'), crsp['prc'])
 crsp['me'] = np.where(crsp['permno'] == crsp['permno'].shift(1), crsp['me'].fillna(method='ffill'), crsp['me'])
 
-
 ### Aggregate Market Cap ###
 # There are cases when the same firm (permco) has two or more securities (permno) at same date.
 # For the purpose of ME for the firm, we aggregated all ME for a given permco, date.
@@ -227,7 +227,7 @@ ccm['linkenddt'] = pd.to_datetime(ccm['linkenddt'])
 # if linkenddt is missing then set to today date
 ccm['linkenddt'] = ccm['linkenddt'].fillna(pd.to_datetime('today'))
 
-ccm1=pd.merge(comp, ccm, how='left', on=['gvkey'])
+ccm1 = pd.merge(comp, ccm, how='left', on=['gvkey'])
 # we can only get the accounting data after the firm public their report
 ccm1['yearend'] = ccm1['datadate']+YearEnd(0)
 ccm1['jdate'] = ccm1['yearend']+MonthEnd(6)
@@ -480,7 +480,7 @@ chars_a = chars_a[['cusip', 'ncusip', 'cnum', 'gvkey', 'permno', 'exchcd', 'data
                   'rd', 'cashdebt', 'pctacc', 'gma', 'lev', 'rd_mve', 'rdm', 'rdm_n', 'adm', 'adm_n', 'sgr', 'sp', 'sp_n',
                   'invest', 'rd_sale', 'lgr', 'roa', 'depr', 'egr', 'chpm', 'chato', 'chtx',
                   'ala', 'alm', 'noa', 'rna', 'pm', 'ato', 'dy']]
-
+chars_a.reset_index(drop=True, inplace=True)
 #######################################################################################################################
 #                                              Compustat Quarterly Raw Infor                                          #
 #######################################################################################################################
@@ -520,7 +520,7 @@ comp = comp[comp['ibq'].notna()]
 comp = comp.sort_values(by=['gvkey','datadate']).drop_duplicates()
 
 # prep for clean-up and using time series of variables
-comp['count'] = comp.groupby(['gvkey']).cumcount() # number of years in Compustat
+comp['count'] = comp.groupby(['gvkey']).cumcount()  # number of years in Compustat
 
 # convert datadate to date fmt
 comp['datadate'] = pd.to_datetime(comp['datadate'])
@@ -767,7 +767,7 @@ chars_q = chars_q[['gvkey', 'permno', 'datadate', 'jdate', 'cusip6', 'sue',
                    'sp_n', 'cash', 'chcsho', 'rd', 'cashdebt', 'pctacc', 'gma', 'lev',
                    'rd_mve', 'sgr', 'sp', 'invest', 'rd_sale', 'lgr', 'roa', 'depr', 'egr',
                    'chato', 'chpm', 'chtx', 'ala', 'alm', 'noa', 'rna', 'pm', 'ato']]
-
+chars_q.reset_index(drop=True, inplace=True)
 
 #######################################################################################################################
 #                                                       Momentum                                                      #
@@ -804,8 +804,36 @@ def moms(start, end):
     result = 1
     for i in range(start, end):
         lag['moms%s' % i] = np.where(data_rawq['gvkey'] == data_rawq['gvkey'].shift(i), data_rawq['ret'].shift(i), np.nan)
-        result = np.sum([result, lag['moms%s' % i]])
+        result = result + lag['moms%s' % i]
     result = result/11
     return result
 
 chars_q['moms12m'] = moms(1, 12)
+
+# populate the quarterly sue to monthly
+chars_a['yearend'] = chars_a['jdate'] + YearEnd(0)
+chars_q['quaterend'] = chars_q['jdate'] + QuarterEnd(0)
+
+# read crsp monthly date
+crsp = conn.raw_sql("""
+                      select permno, date
+                      from crsp.msf
+                      where date >= '01/01/1963'
+                      """)
+crsp['permno'] = crsp['permno'].astype(int)
+
+# Line up date to be end of month
+crsp['date'] = pd.to_datetime(crsp['date'])
+crsp['yearend'] = crsp['date'] + YearEnd(0)  # set all the date to the standard end date of year
+
+chars_a = pd.merge(crsp, chars_a, how='left', on=['permno', 'yearend'])
+
+crsp = crsp.drop(['yearend'], axis=1)
+crsp['quaterend'] = crsp['date'] + QuarterEnd(0)
+chars_q = pd.merge(crsp, chars_q, how='left', on=['permno', 'quaterend'])
+
+with open('chars_a.pkl', 'wb') as f:
+    pkl.dump(chars_a, f)
+
+with open('chars_q.pkl', 'wb') as f:
+    pkl.dump(chars_q, f)

@@ -9,7 +9,6 @@ import psycopg2
 from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 from pandasql import *
-from fuzzywuzzy import fuzz
 import pickle as pkl
 
 ###################
@@ -117,3 +116,6 @@ ibes_crsp = ibes_crsp.drop_duplicates(['ticker', 'statpers'])
 
 ibes_crsp = ibes_crsp[['ticker', 'statpers', 'fpedats', 'anndats_act', 'curr_act', 'permno', 're']]
 ibes_crsp.rename(columns={'statpers': 'date'}, inplace=True)
+
+with open('re.pkl', 'wb') as f:
+    pkl.dump(ibes_crsp, f)

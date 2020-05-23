@@ -9,6 +9,7 @@ import psycopg2
 from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 from pandasql import *
+import pickle as pkl
 
 ###################
 # Connect to WRDS #
@@ -61,7 +62,7 @@ ccm2 = ccm2[['gvkey', 'datadate', 'rdq', 'fyearq', 'fqtr', 'permno']]
 crsp_dsi = conn.raw_sql("""
                         select distinct date
                         from crsp.dsi
-                        where date between '01/01/2018' and '12/31/2018'
+                        where date >= '01/01/1959'
                         """)
 
 crsp_dsi['date'] = pd.to_datetime(crsp_dsi['date'])
@@ -107,7 +108,7 @@ crsp_d['date'] = pd.to_datetime(crsp_d['date'])
 dlret = conn.raw_sql("""
                      select permno, dlret, dlstdt 
                      from crsp.dsedelist
-                     where dlstdt between '01/01/2018' and '12/31/2018'
+                     where dlstdt >= '01/01/1959'
                      """)
 
 dlret.permno = dlret.permno.astype(int)
@@ -182,7 +183,7 @@ df = df[['gvkey', 'permno', 'datadate', 'rdq', 'rdq_plus_1d', 'abr']]
 crsp_msf = conn.raw_sql("""
                         select distinct date
                         from crsp.msf
-                        where date >= '01/01/2000'
+                        where date >= '01/01/1959'
                         """)
 
 df['datadate'] = pd.to_datetime(df['datadate'])
@@ -200,3 +201,6 @@ df['datadate'] = pd.to_datetime(df['datadate'])
 df['rdq'] = pd.to_datetime(df['rdq'])
 df['rdq_plus_1d'] = pd.to_datetime(df['rdq_plus_1d'])
 df = df[['gvkey', 'permno', 'datadate', 'rdq', 'rdq_plus_1d', 'abr', 'date']]
+
+with open('abr.pkl', 'wb') as f:
+    pkl.dump(df, f)

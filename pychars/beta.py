@@ -9,6 +9,7 @@ import psycopg2
 from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 import datetime
+import pickle as pkl
 
 ###################
 # Connect to WRDS #
@@ -49,3 +50,5 @@ crsp['beta'] = crsp['cov']/crsp['var']
 crsp = crsp[['permno', 'date', 'beta']]
 crsp = crsp.dropna()
 
+with open('beta.pkl', 'wb') as f:
+    pkl.dump(crsp, f)

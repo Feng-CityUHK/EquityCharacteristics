@@ -241,5 +241,5 @@ iclink = _link1_2.append(_link2_3)
 # Storing iclink for other program usage
 import pickle as pkl
 
-with open('/home/gufeng/jianxinma/chars/re/iclink.pkl', 'wb') as f:
+with open('iclink.pkl', 'wb') as f:
     pkl.dump(iclink, f)
