@@ -75,5 +75,5 @@ crsp['sig'] = np.where(crsp['date_diff'] == crsp['min_diff'], 1, np.nan)
 crsp = crsp[crsp['sig'] == 1]
 crsp = crsp[['permno', 'date', 'rvar_capm']]
 
-with open('rvar_ff3.pkl', 'wb') as f:
+with open('rvar_capm.pkl', 'wb') as f:
     pkl.dump(crsp, f)

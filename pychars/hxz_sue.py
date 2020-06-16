@@ -60,14 +60,14 @@ ccm2 = ccm2[ccm2['eps'].notna()]
 ccm2['count'] = ccm2.groupby('permno').cumcount() + 1
 ccm2.sort_values(by=['permno', 'datadate'], inplace=True)
 
-ccm2['e1'] = np.where(ccm2['permno'] == ccm2['permno'].shift(1), ccm2['eps'].shift(1), np.nan)
-ccm2['e2'] = np.where(ccm2['permno'] == ccm2['permno'].shift(2), ccm2['eps'].shift(2), np.nan)
-ccm2['e3'] = np.where(ccm2['permno'] == ccm2['permno'].shift(3), ccm2['eps'].shift(3), np.nan)
-ccm2['e4'] = np.where(ccm2['permno'] == ccm2['permno'].shift(4), ccm2['eps'].shift(4), np.nan)
-ccm2['e5'] = np.where(ccm2['permno'] == ccm2['permno'].shift(5), ccm2['eps'].shift(5), np.nan)
-ccm2['e6'] = np.where(ccm2['permno'] == ccm2['permno'].shift(6), ccm2['eps'].shift(6), np.nan)
-ccm2['e7'] = np.where(ccm2['permno'] == ccm2['permno'].shift(7), ccm2['eps'].shift(7), np.nan)
-ccm2['e8'] = np.where(ccm2['permno'] == ccm2['permno'].shift(8), ccm2['eps'].shift(8), np.nan)
+ccm2['e1'] = ccm2.groupby(['permno'])['eps'].shift(1)
+ccm2['e2'] = ccm2.groupby(['permno'])['eps'].shift(2)
+ccm2['e3'] = ccm2.groupby(['permno'])['eps'].shift(3)
+ccm2['e4'] = ccm2.groupby(['permno'])['eps'].shift(4)
+ccm2['e5'] = ccm2.groupby(['permno'])['eps'].shift(5)
+ccm2['e6'] = ccm2.groupby(['permno'])['eps'].shift(6)
+ccm2['e7'] = ccm2.groupby(['permno'])['eps'].shift(7)
+ccm2['e8'] = ccm2.groupby(['permno'])['eps'].shift(8)
 
 condlist = [ccm2['count']<=6,
             ccm2['count']==7,

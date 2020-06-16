@@ -13,7 +13,7 @@ import pickle as pkl
 ###################
 # Connect to WRDS #
 ###################
-conn=wrds.Connection()
+conn = wrds.Connection()
 
 ###################
 # Compustat Block #
@@ -42,10 +42,11 @@ ccm = conn.raw_sql("""
 
 ccm['linkdt'] = pd.to_datetime(ccm['linkdt'])
 ccm['linkenddt'] = pd.to_datetime(ccm['linkenddt'])
+
 # if linkenddt is missing then set to today date
 ccm['linkenddt'] = ccm['linkenddt'].fillna(pd.to_datetime('today'))
 
-ccm1=pd.merge(comp, ccm, how='left', on=['gvkey'])
+ccm1 = pd.merge(comp, ccm, how='left', on=['gvkey'])
 # extract month and year of rdq
 ccm1['rdq'] = pd.to_datetime(ccm1['rdq'])
 
@@ -57,7 +58,7 @@ ccm2 = ccm2[['gvkey', 'datadate', 'rdq', 'fyearq', 'fqtr', 'permno']]
 #    CRSP Block   #
 ###################
 
-# Report Date of Quarterly Earnings (rdq) may not trading day, we need to get the first trading day on or after rdq
+# Report Date of Quarterly Earnings (rdq) may not be trading day, we need to get the first trading day on or after rdq
 crsp_dsi = conn.raw_sql("""
                         select distinct date
                         from crsp.dsi
@@ -76,7 +77,8 @@ for i in range(6):  # we only consider the condition that the day after rdq is n
 # fill NA from rdq + 5 days to rdq + 0 days, then get trading day version of rdq
 for i in range(5, 0, -1):
     count = i-1
-    comp_temp['trad_%s' % count] = np.where(comp_temp['trad_%s' % count].isnull(), comp_temp['trad_%s' % i], comp_temp['trad_%s' % count])
+    comp_temp['trad_%s' % count] = np.where(comp_temp['trad_%s' % count].isnull(),
+                                            comp_temp['trad_%s' % i], comp_temp['trad_%s' % count])
     comp_temp['rdq_trad'] = comp_temp['trad_%s' % count]
 
 comp_temp = comp_temp[['gvkey', 'permno', 'datadate', 'fyearq', 'fqtr', 'rdq', 'rdq_trad']]

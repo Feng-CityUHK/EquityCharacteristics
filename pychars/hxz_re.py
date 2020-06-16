@@ -19,7 +19,7 @@ conn = wrds.Connection()
 # Merging IBES and CRSP by using ICLINK table. Merging last month price #
 #########################################################################
 
-with open('/home/gufeng/jianxinma/chars/re/iclink.pkl', 'rb')as f:
+with open('iclink.pkl', 'rb')as f:
     iclink = pkl.load(f)
 
 ibes = conn.raw_sql("""
@@ -92,21 +92,21 @@ ibes_crsp['count'] = ibes_crsp.groupby('permno_fpedats').cumcount() + 1
 # Calculate RE (CJL)   #
 ########################
 
-ibes_crsp['monthly_revision_1'] = np.where(ibes_crsp['permno']==ibes_crsp['permno'].shift(1), ibes_crsp['monthly_revision'].shift(1), np.nan)
-ibes_crsp['monthly_revision_2'] = np.where(ibes_crsp['permno']==ibes_crsp['permno'].shift(2), ibes_crsp['monthly_revision'].shift(2), np.nan)
-ibes_crsp['monthly_revision_3'] = np.where(ibes_crsp['permno']==ibes_crsp['permno'].shift(3), ibes_crsp['monthly_revision'].shift(3), np.nan)
-ibes_crsp['monthly_revision_4'] = np.where(ibes_crsp['permno']==ibes_crsp['permno'].shift(4), ibes_crsp['monthly_revision'].shift(4), np.nan)
-ibes_crsp['monthly_revision_5'] = np.where(ibes_crsp['permno']==ibes_crsp['permno'].shift(5), ibes_crsp['monthly_revision'].shift(5), np.nan)
-ibes_crsp['monthly_revision_6'] = np.where(ibes_crsp['permno']==ibes_crsp['permno'].shift(6), ibes_crsp['monthly_revision'].shift(6), np.nan)
+ibes_crsp['monthly_revision_l1'] = ibes_crsp.groupby(['permno'])['monthly_revision'].shift(1)
+ibes_crsp['monthly_revision_l2'] = ibes_crsp.groupby(['permno'])['monthly_revision'].shift(2)
+ibes_crsp['monthly_revision_l3'] = ibes_crsp.groupby(['permno'])['monthly_revision'].shift(3)
+ibes_crsp['monthly_revision_l4'] = ibes_crsp.groupby(['permno'])['monthly_revision'].shift(4)
+ibes_crsp['monthly_revision_l5'] = ibes_crsp.groupby(['permno'])['monthly_revision'].shift(5)
+ibes_crsp['monthly_revision_l6'] = ibes_crsp.groupby(['permno'])['monthly_revision'].shift(6)
 
 condlist = [ibes_crsp['count']==4,
             ibes_crsp['count']==5,
             ibes_crsp['count']==6,
             ibes_crsp['count']>=7]
-choicelist = [(ibes_crsp['monthly_revision_1'] + ibes_crsp['monthly_revision_2'] + ibes_crsp['monthly_revision_3'])/3,
-              (ibes_crsp['monthly_revision_1'] + ibes_crsp['monthly_revision_2'] + ibes_crsp['monthly_revision_3'] + ibes_crsp['monthly_revision_4'])/4,
-              (ibes_crsp['monthly_revision_1'] + ibes_crsp['monthly_revision_2'] + ibes_crsp['monthly_revision_3'] + ibes_crsp['monthly_revision_4'] + ibes_crsp['monthly_revision_5'])/5,
-              (ibes_crsp['monthly_revision_1'] + ibes_crsp['monthly_revision_2'] + ibes_crsp['monthly_revision_3'] + ibes_crsp['monthly_revision_4'] + ibes_crsp['monthly_revision_5'] + ibes_crsp['monthly_revision_6'])/6]
+choicelist = [(ibes_crsp['monthly_revision_l1'] + ibes_crsp['monthly_revision_l2'] + ibes_crsp['monthly_revision_l3'])/3,
+              (ibes_crsp['monthly_revision_l1'] + ibes_crsp['monthly_revision_l2'] + ibes_crsp['monthly_revision_l3'] + ibes_crsp['monthly_revision_l4'])/4,
+              (ibes_crsp['monthly_revision_l1'] + ibes_crsp['monthly_revision_l2'] + ibes_crsp['monthly_revision_l3'] + ibes_crsp['monthly_revision_l4'] + ibes_crsp['monthly_revision_l5'])/5,
+              (ibes_crsp['monthly_revision_l1'] + ibes_crsp['monthly_revision_l2'] + ibes_crsp['monthly_revision_l3'] + ibes_crsp['monthly_revision_l4'] + ibes_crsp['monthly_revision_l5'] + ibes_crsp['monthly_revision_l6'])/6]
 ibes_crsp['re'] = np.select(condlist, choicelist, default=np.nan)
 
 ibes_crsp = ibes_crsp[ibes_crsp['count']>=4]
@@ -118,6 +118,3 @@ ibes_crsp.rename(columns={'statpers': 'date'}, inplace=True)
 
 with open('re.pkl', 'wb') as f:
     pkl.dump(ibes_crsp, f)
-
-with open('/home/uchicago/gfeng1/jianxinma/beta.pkl', 'rb')as f:
-    beta = pkl.load(f)

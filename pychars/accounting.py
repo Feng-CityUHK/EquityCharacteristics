@@ -513,7 +513,7 @@ comp['datadate'] = pd.to_datetime(comp['datadate'])
 # merge ccm and comp
 ccm1 = pd.merge(comp, ccm, how='left', on=['gvkey'])
 ccm1['yearend'] = ccm1['datadate'] + YearEnd(0)
-ccm1['jdate'] = ccm1['datadate'] + MonthEnd(3)  # we change quaterly lag here
+ccm1['jdate'] = ccm1['datadate'] + MonthEnd(3)  # we change quarterly lag here
 # ccm1['jdate'] = ccm1['datadate']+MonthEnd(4)
 
 # set link date bounds
@@ -743,7 +743,7 @@ data_rawq['pm'] = data_rawq['oiadpq']/data_rawq['saleq']
 data_rawq['ato'] = data_rawq['saleq']/data_rawq['noa_l4']
 
 # Quarterly Accounting Variables
-chars_q = data_rawq[['gvkey', 'permno', 'datadate', 'jdate', 'ret', 'sue',
+chars_q = data_rawq[['gvkey', 'permno', 'datadate', 'jdate', 'sue',
                    'ac', 'bm', 'cfp', 'ep', 'inv', 'ni', 'op', 'bm_n', 'ep_n', 'cfp_n',
                    'sp_n', 'cash', 'chcsho', 'rd', 'cashdebt', 'pctacc', 'gma', 'lev',
                    'rd_mve', 'sgr', 'sp', 'invest', 'rd_sale', 'lgr', 'roa', 'depr', 'egr',
@@ -762,14 +762,15 @@ crsp_mom = conn.raw_sql("""
 crsp_mom['permno'] = crsp_mom['permno'].astype(int)
 crsp_mom['date'] = pd.to_datetime(crsp_mom['date'])
 
+
 def mom(start, end, df):
-    '''
+    """
 
     :param start: Order of starting lag
     :param end: Order of ending lag
     :param df: Dataframe
     :return: Momentum factor
-    '''
+    """
     lag = pd.DataFrame()
     result = 1
     for i in range(start, end):
@@ -785,38 +786,40 @@ crsp_mom['mom1m'] = crsp_mom['ret']
 crsp_mom['mom6m'] = mom(1, 6, crsp_mom)
 crsp_mom['mom36m'] = mom(1, 36, crsp_mom)
 
-def moms(start, end, df):
-    '''
 
-    :param start: Order of starting lag
-    :param end: Order of ending lag
-    :param df: Dataframe
-    :return: Momentum factor
-    '''
-    lag = pd.DataFrame()
-    result = 1
-    for i in range(start, end):
-        lag['moms%s' % i] = df.groupby['permno']['ret'].shift(i)
-        result = result + lag['moms%s' % i]
-    result = result/11
-    return result
-
-crsp_mom['moms12m'] = moms(1, 12, crsp_mom)
+# def moms(start, end, df):
+#     """
+#
+#     :param start: Order of starting lag
+#     :param end: Order of ending lag
+#     :param df: Dataframe
+#     :return: Momentum factor
+#     """
+#     lag = pd.DataFrame()
+#     result = 1
+#     for i in range(start, end):
+#         lag['moms%s' % i] = df.groupby['permno']['ret'].shift(i)
+#         result = result + lag['moms%s' % i]
+#     result = result/11
+#     return result
+#
+#
+# crsp_mom['moms12m'] = moms(1, 12, crsp_mom)
 
 # populate the quarterly sue to monthly
-chars_a['yearend'] = chars_a['jdate'] + YearEnd(0)
-chars_q['quaterend'] = chars_q['jdate'] + QuarterEnd(0)
+crsp_mom['jdate'] = crsp_mom['date'] + MonthEnd(0)
 
-# Line up date to be end of year
-crsp_mom['yearend'] = crsp_mom['date'] + YearEnd(0)  # set all the date to the standard end date of year
+# chars_a
+chars_a = pd.merge(crsp_mom, chars_a, how='left', on=['permno', 'jdate'])
+chars_a['datadate'] = chars_a.groupby(['permno'])['datadate'].fillna(method='ffill')
+chars_a = chars_a.groupby(['permno', 'datadate'], as_index=False).fillna(method='ffill')
 
-chars_a = pd.merge(crsp, chars_a, how='left', on=['permno', 'yearend'])
+# chars_q
+chars_q = pd.merge(crsp_mom, chars_q, how='left', on=['permno', 'jdate'])
+chars_q['datadate'] = chars_q.groupby(['permno'])['datadate'].fillna(method='ffill')
+chars_q = chars_q.groupby(['permno', 'datadate'], as_index=False).fillna(method='ffill')
 
-crsp_mom = crsp_mom.drop(['yearend'], axis=1)
-crsp_mom['quaterend'] = crsp_mom['date'] + QuarterEnd(0)
-chars_q = pd.merge(crsp_mom, chars_q, how='left', on=['permno', 'quaterend'])
-
-with open('data_rawa.pkl', 'wb') as f:
+with open('chars_a.pkl', 'wb') as f:
     pkl.dump(chars_a, f)
 
 with open('chars_q.pkl', 'wb') as f:
