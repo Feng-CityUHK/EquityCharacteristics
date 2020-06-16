@@ -1,3 +1,14 @@
+import pandas as pd
+import numpy as np
+import datetime as dt
+import wrds
+import psycopg2
+from dateutil.relativedelta import *
+from pandas.tseries.offsets import *
+from pandasql import *
+from fuzzywuzzy import fuzz
+
+# reference: https://wrds-www.wharton.upenn.edu/pages/support/applications/python-replications/linking-ibes-and-crsp-data-python/
 #####################################
 # ICLINK: Link CRSP and IBES        #
 # June 2019                         #
@@ -19,15 +30,10 @@
 # - 5: tickers and company names match but 6-digit cusips do not match
 # - 6: tickers match but company names and 6-digit cusips do not match
 
-import wrds
-import pandas as pd
-import numpy as np
-from fuzzywuzzy import fuzz
-
 ###################
 # Connect to WRDS #
 ###################
-conn=wrds.Connection()
+conn = wrds.Connection()
 
 #########################
 # Step 1: Link by CUSIP #
@@ -225,6 +231,7 @@ _link2_3 = _link2_3[['ticker','permno','cname','comnam','score']].drop_duplicate
 #####################################
 # Step 3: Finalize LInks and Scores #
 #####################################
+# Combine the output from both linking procedures. Store the output data for future usage
 
 iclink = _link1_2.append(_link2_3)
 
@@ -233,4 +240,3 @@ import pickle as pkl
 
 with open('iclink.pkl', 'wb') as f:
     pkl.dump(iclink, f)
-    

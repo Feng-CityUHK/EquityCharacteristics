@@ -1,6 +1,3 @@
-# Calculate HSZ Replicating Anomalies
-# RE: Revisions in analysts’ earnings forecasts
-
 import pandas as pd
 import numpy as np
 import datetime as dt

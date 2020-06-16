@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 import wrds
-import psycopg2
 from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 from pandasql import *
@@ -119,3 +118,6 @@ ibes_crsp.rename(columns={'statpers': 'date'}, inplace=True)
 
 with open('re.pkl', 'wb') as f:
     pkl.dump(ibes_crsp, f)
+
+with open('/home/uchicago/gfeng1/jianxinma/beta.pkl', 'rb')as f:
+    beta = pkl.load(f)
