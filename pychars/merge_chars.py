@@ -78,24 +78,22 @@ chars_q = pd.merge(chars_q, abr, how='left', on=['permno', 'jdate'])
 ###################
 conn = wrds.Connection()
 
-# prepare S&P 1500 version, gvkeyx for sp600: 030824，gvkeyx for sp400: 024248，gvkeyx for sp500: 000003
-sp1500_index = conn.raw_sql("""
-                            select a.datadate, a.at, a.fyear, b.gvkey, b.gvkeyx, b.iid , b.from, b.thru
-                            from comp.funda as a
-                            left join comp.idxcst_his as b
-                            on a.gvkey=b.gvkey
-                            and a.datadate >=b.from
-
-                            where a.DATAFMT='STD' 
-                            and a.INDFMT='INDL' 
-                            and a.CONSOL='C' 
-                            and a.POPSRC='D'
-                            and b.gvkeyx = '000003' or b.gvkeyx = '024248' or b.gvkeyx = '030824'
-                            """)
+# prepare S&P 1500 version, gvkeyx for sp600: 030824，for sp400: 024248，for sp500: 000003
+sp1500_index = conn.raw_sql('select * from comp.idxcst_his')
+sp1500_index = sp1500_index[(sp1500_index['gvkeyx']=='000003') | (sp1500_index['gvkeyx']=='024248') | (sp1500_index['gvkeyx']=='030824')]
 
 sp1500_index = sp1500_index[['gvkey', 'from', 'thru']]
 sp1500_index['gvkey'] = sp1500_index['gvkey'].astype(int)
+sp1500_index['from'] = pd.to_datetime(sp1500_index['from'])
+sp1500_index['thru'] = pd.to_datetime(sp1500_index['thru'])
+sp1500_index['thru'] = sp1500_index['thru'].fillna(pd.to_datetime('today'))
 
 chars_q = pd.merge(chars_q, sp1500_index, how='left', on=['gvkey'])
-sp1500 = chars_q.dropna(subset=['from'])
-sp1500 = sp1500[(sp1500['datadate'] >= sp1500['from']) & (sp1500['datadate'] <= sp1500['thru']) | (sp1500['thru'].isnull())]
+sp1500 = chars_q.dropna(subset=['from'], axis=0)
+sp1500 = sp1500[(sp1500['jdate'] >= sp1500['from']) & (sp1500['jdate'] <= sp1500['thru'])]
+
+# for test
+# c = sp1500.groupby(['jdate'])['gvkey'].nunique()
+
+with open('sp1500.pkl', 'wb') as f:
+    pkl.dump(sp1500, f, protocol=4)
