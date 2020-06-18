@@ -91,6 +91,7 @@ sp1500_index['thru'] = sp1500_index['thru'].fillna(pd.to_datetime('today'))
 chars_q = pd.merge(chars_q, sp1500_index, how='left', on=['gvkey'])
 sp1500 = chars_q.dropna(subset=['from'], axis=0)
 sp1500 = sp1500[(sp1500['jdate'] >= sp1500['from']) & (sp1500['jdate'] <= sp1500['thru'])]
+sp1500 = sp1500.drop(['from', 'thru'], axis=1)
 
 # for test
 # c = sp1500.groupby(['jdate'])['gvkey'].nunique()

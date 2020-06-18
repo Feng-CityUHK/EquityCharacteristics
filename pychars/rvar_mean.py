@@ -35,7 +35,7 @@ crsp['monthend'] = crsp['date'] + MonthEnd(0)
 ##########################
 # calculate the variance #
 ##########################
-df = crsp.groupby(['permno'])['ret'].rolling(60).var()  # variance of retunr in rolling trading days
+df = crsp.groupby(['permno'])['ret'].rolling(60).var()  # variance of return in rolling trading days
 df = df.reset_index()  # extract permno from index
 df = df[['permno', 'ret']]
 df[['date', 'monthend']] = crsp[['date', 'monthend']]

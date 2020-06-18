@@ -317,8 +317,8 @@ data_rawa['sale_l1'] = data_rawa.groupby(['permno'])['sale'].shift(1)
 data_rawa['rsup'] = (data_rawa['sale']-data_rawa['sale_l1'])/data_rawa['me']
 
 # sue
-data_rawa['ib_l1'] = data_rawa.groupby(['permno'])['ib'].shift(1)
-data_rawa['sue'] = (data_rawa['ib']-data_rawa['ib_l1'])/data_rawa['me']
+# data_rawa['ib_l1'] = data_rawa.groupby(['permno'])['ib'].shift(1)
+# data_rawa['sue'] = (data_rawa['ib']-data_rawa['ib_l1'])/data_rawa['me']
 
 # cash
 data_rawa['cash'] = data_rawa['che']/data_rawa['at']
@@ -470,7 +470,7 @@ chars_a.reset_index(drop=True, inplace=True)
 #######################################################################################################################
 comp = conn.raw_sql("""
                     /*header info*/
-                    select c.gvkey, f.cusip, f.datadate, f.fyearq,  substr(c.sic,1,2) as sic2, f.fqtr, f.rdq,
+                    select c.gvkey, f.cusip, f.datadate, f.fyearq,  substr(c.sic,1,2) as sic2, c.sic, f.fqtr, f.rdq,
 
                     /*income statement*/
                     f.ibq, f.saleq, f.txtq, f.revtq, f.cogsq, f.xsgaq, f.revty, f.cogsy, f.saley,
@@ -520,6 +520,7 @@ ccm1['jdate'] = ccm1['datadate'] + MonthEnd(3)  # we change quarterly lag here
 ccm2 = ccm1[(ccm1['jdate'] >= ccm1['linkdt']) & (ccm1['jdate'] <= ccm1['linkenddt'])]
 
 # merge ccm2 and crsp2
+crsp2['jdate'] = crsp2['monthend']
 data_rawq = pd.merge(crsp2, ccm2, how='inner', on=['permno', 'jdate'])
 
 # filter exchcd & shrcd
@@ -621,8 +622,8 @@ data_rawq['beq_l4'] = data_rawq.groupby(['permno'])['beq'].shift(4)
 data_rawq['op'] = (ttm4('revtq', data_rawq)-ttm4('cogsq', data_rawq)-ttm4('xsgaq0', data_rawq)-ttm4('xintq0', data_rawq))/data_rawq['beq_l4']
 
 # sue
-data_rawq['ibq_l4'] = data_rawq.groupby(['permno'])['ibq'].shift(4)
-data_rawq['sue'] = (data_rawq['ibq']-data_rawq['ibq_l4'])/data_rawq['me'].abs()
+# data_rawq['ibq_l4'] = data_rawq.groupby(['permno'])['ibq'].shift(4)
+# data_rawq['sue'] = (data_rawq['ibq']-data_rawq['ibq_l4'])/data_rawq['me'].abs()
 
 # csho
 data_rawq['chcsho'] = (data_rawq['cshoq']/data_rawq['cshoq_l4'])-1
@@ -743,7 +744,7 @@ data_rawq['pm'] = data_rawq['oiadpq']/data_rawq['saleq']
 data_rawq['ato'] = data_rawq['saleq']/data_rawq['noa_l4']
 
 # Quarterly Accounting Variables
-chars_q = data_rawq[['gvkey', 'permno', 'datadate', 'jdate', 'sue',
+chars_q = data_rawq[['gvkey', 'permno', 'datadate', 'jdate', 'sic',
                    'ac', 'bm', 'cfp', 'ep', 'inv', 'ni', 'op', 'bm_n', 'ep_n', 'cfp_n',
                    'sp_n', 'cash', 'chcsho', 'rd', 'cashdebt', 'pctacc', 'gma', 'lev',
                    'rd_mve', 'sgr', 'sp', 'invest', 'rd_sale', 'lgr', 'roa', 'depr', 'egr',
@@ -806,7 +807,7 @@ crsp_mom['mom36m'] = mom(1, 36, crsp_mom)
 #
 # crsp_mom['moms12m'] = moms(1, 12, crsp_mom)
 
-# populate the quarterly sue to monthly
+# populate the chars to monthly
 crsp_mom['jdate'] = crsp_mom['date'] + MonthEnd(0)
 
 # chars_a
