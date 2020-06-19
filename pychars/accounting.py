@@ -462,7 +462,7 @@ data_rawa['dy'] = data_rawa['dvt']/data_rawa['me']
 chars_a = data_rawa[['cusip', 'ncusip', 'gvkey', 'permno', 'exchcd', 'date', 'datadate', 'jdate', 'fyear', 'sic2', 'sic',
                   'ac', 'inv', 'bm', 'bm_n', 'cfp', 'cfp_n', 'ep', 'ep_n', 'ni', 'op', 'rsup', 'cash', 'chcsho',
                   'rd', 'cashdebt', 'pctacc', 'gma', 'lev', 'rd_mve', 'rdm', 'rdm_n', 'adm', 'adm_n', 'sgr', 'sp', 'sp_n',
-                  'invest', 'rd_sale', 'lgr', 'roa', 'depr', 'egr', 'chpm', 'chato', 'chtx',
+                  'invest', 'rd_sale', 'lgr', 'roa', 'depr', 'egr', 'chato', 'chtx',
                   'ala', 'alm', 'noa', 'rna', 'pm', 'ato', 'dy']]
 chars_a.reset_index(drop=True, inplace=True)
 #######################################################################################################################
@@ -520,7 +520,7 @@ ccm1['jdate'] = ccm1['datadate'] + MonthEnd(3)  # we change quarterly lag here
 ccm2 = ccm1[(ccm1['jdate'] >= ccm1['linkdt']) & (ccm1['jdate'] <= ccm1['linkenddt'])]
 
 # merge ccm2 and crsp2
-crsp2['jdate'] = crsp2['monthend']
+# crsp2['jdate'] = crsp2['monthend']
 data_rawq = pd.merge(crsp2, ccm2, how='inner', on=['permno', 'jdate'])
 
 # filter exchcd & shrcd
