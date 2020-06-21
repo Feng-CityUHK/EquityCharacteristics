@@ -7,8 +7,8 @@ import datetime as dt
 import wrds
 from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
-from pandasql import *
 import pickle as pkl
+import sqlite3
 
 ###################
 # Connect to WRDS #
@@ -30,6 +30,7 @@ comp = conn.raw_sql("""
 
 comp['datadate'] = pd.to_datetime(comp['datadate'])
 
+print('='*10, 'comp data is ready', '='*10)
 ###################
 #    CCM Block    #
 ###################
@@ -83,6 +84,7 @@ for i in range(5, 0, -1):
 
 comp_temp = comp_temp[['gvkey', 'permno', 'datadate', 'fyearq', 'fqtr', 'rdq', 'rdq_trad']]
 
+print('='*10, 'crsp block is ready', '='*10)
 #############################
 #    CRSP abnormal return   #
 #############################
@@ -101,6 +103,8 @@ crsp_d = conn.raw_sql("""
 
 # change variable format to int
 crsp_d[['permco', 'permno', 'shrcd', 'exchcd']] = crsp_d[['permco', 'permno', 'shrcd', 'exchcd']].astype(int)
+
+print('='*10, 'crsp abnormal return is ready', '='*10)
 
 # convert the date format
 crsp_d['date'] = pd.to_datetime(crsp_d['date'])
@@ -139,12 +143,24 @@ crsp_d = crsp_d[['date', 'permno', 'ret', 'retadj', 'sprtrn', 'abrd']]
 comp_temp['minus10d'] = comp_temp['rdq_trad'] - pd.Timedelta(days=10)
 comp_temp['plus5d'] = comp_temp['rdq_trad'] + pd.Timedelta(days=5)
 
-df = sqldf("""select a.*, b.date, b.abrd 
+# df = sqldf("""select a.*, b.date, b.abrd
+#               from comp_temp a left join crsp_d b
+#               on a.permno=b.permno
+#               and a.minus10d<=b.date
+#               and b.date<=a.plus5d
+#               order by a.permno, a.rdq_trad, b.date;""", globals())
+
+sql = sqlite3.connect(':memory:')
+comp_temp.to_sql('comp_temp', sql, index=False)
+crsp_d.to_sql('crsp_d', sql, index=False)
+
+qry = """select a.*, b.date, b.abrd 
               from comp_temp a left join crsp_d b 
               on a.permno=b.permno 
               and a.minus10d<=b.date 
               and b.date<=a.plus5d 
-              order by a.permno, a.rdq_trad, b.date;""", globals())
+              order by a.permno, a.rdq_trad, b.date;"""
+df = pd.read_sql_query(qry, sql)
 df.drop(['plus5d', 'minus10d'], axis=1, inplace=True)
 
 # delete missing return
@@ -180,6 +196,8 @@ df = df[df['count']==1]
 df.rename(columns={'date': 'rdq_plus_1d'}, inplace=True)
 df = df[['gvkey', 'permno', 'datadate', 'rdq', 'rdq_plus_1d', 'abr']]
 
+print('='*10, 'start populate', '='*10)
+
 # populate the quarterly abr to monthly
 crsp_msf = conn.raw_sql("""
                         select distinct date
@@ -191,11 +209,22 @@ df['datadate'] = pd.to_datetime(df['datadate'])
 df['plus12m'] = df['datadate'] + np.timedelta64(12, 'M')
 df['plus12m'] = df['plus12m'] + MonthEnd(0)
 
-df = sqldf("""select a.*, b.date
+# df = sqldf("""select a.*, b.date
+#               from df a left join crsp_msf b
+#               on a.rdq_plus_1d < b.date
+#               and a.plus12m >= b.date
+#               order by a.permno, b.date, a.datadate desc;""", globals())
+
+df.to_sql('df', sql, index=False)
+crsp_msf.to_sql('crsp_msf', sql, index=False)
+
+qry = """select a.*, b.date
               from df a left join crsp_msf b 
               on a.rdq_plus_1d < b.date
               and a.plus12m >= b.date
-              order by a.permno, b.date, a.datadate desc;""", globals())
+              order by a.permno, b.date, a.datadate desc;"""
+
+df = pd.read_sql_query(qry, sql)
 
 df = df.drop_duplicates(['permno', 'date'])
 df['datadate'] = pd.to_datetime(df['datadate'])
