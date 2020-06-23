@@ -13,7 +13,7 @@ import pickle as pkl
 ###################
 # Connect to WRDS #
 ###################
-conn=wrds.Connection()
+conn = wrds.Connection()
 
 # CRSP Block
 crsp = conn.raw_sql("""
