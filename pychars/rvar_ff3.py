@@ -124,7 +124,7 @@ def get_res_var(df, firm_list):
                 X = pd.DataFrame()
                 X[['mktrf', 'smb', 'hml']] = temp[['mktrf', 'smb', 'hml']]
                 X['intercept'] = 1
-                X = X[['intercept', 'mktrf']]
+                X = X[['intercept', 'mktrf', 'smb', 'hml']]
                 X = np.mat(X)
                 Y = np.mat(temp[['exret']])
                 res = (np.identity(rolling_window) - X.dot(X.T.dot(X).I).dot(X.T)).dot(Y)
