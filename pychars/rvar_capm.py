@@ -1,5 +1,8 @@
 # CAPM residual variance
 # Note: Please use the latest version of pandas, this version should support returning to pd.Series after rolling
+# To get a faster speed, we split the big dataframe into small ones
+# Then using different process to calculate the variance
+# We use 20 process to calculate variance, you can change the number of process according to your CPU situation
 
 import pandas as pd
 import numpy as np
@@ -9,6 +12,7 @@ from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 import datetime
 import pickle as pkl
+import multiprocessing as mp
 
 ###################
 # Connect to WRDS #
@@ -49,14 +53,16 @@ crsp['month_count'] = crsp[crsp['sig'] == 1].groupby(['permno']).cumcount()
 month_num = crsp[crsp['sig'] == 1].groupby(['permno'])['month_count'].tail(1)
 month_num = month_num.astype(int)
 
+# mark the number of each month to each day of this month
+crsp['month_count'] = crsp.groupby(['permno'])['month_count'].fillna(method='bfill')
+
 # crate a firm list
 df_firm = crsp.drop_duplicates(['permno'])
 df_firm = df_firm[['permno']]
 df_firm['permno'] = df_firm['permno'].astype(int)
 df_firm = df_firm.reset_index(drop=True)
-
-# mark the number of each month to each day of this month
-crsp['month_count'] = crsp.groupby(['permno'])['month_count'].fillna(method='bfill')
+df_firm = df_firm.reset_index()
+df_firm = df_firm.rename(columns={'index': 'count'})
 
 ######################
 # Calculate residual #
@@ -64,6 +70,12 @@ crsp['month_count'] = crsp.groupby(['permno'])['month_count'].fillna(method='bfi
 
 
 def get_res_var(df, firm_list):
+    """
+
+    :param df: stock dataframe
+    :param firm_list: list of firms matching stock dataframe
+    :return: dataframe with variance of residual
+    """
     for firm, count, prog in zip(firm_list['permno'], month_num, range(firm_list['permno'].count()+1)):
         prog = prog + 1
         print('processing permno %s' % firm, '/', 'finished', '%.2f%%' % ((prog/firm_list['permno'].count())*100))
@@ -83,17 +95,64 @@ def get_res_var(df, firm_list):
                 Y = np.mat(temp[['exret']])
                 res = (np.identity(rolling_window) - X.dot(X.T.dot(X).I).dot(X.T)).dot(Y)
                 res_var = res.var(ddof=1)
-                crsp.loc[index, 'rvar'] = res_var
-    return crsp
+                df.loc[index, 'rvar'] = res_var
+    return df
+
+
+def sub_df(start, end, step):
+    """
+
+    :param start: the quantile to start cutting, usually it should be 0
+    :param end: the quantile to end cutting, usually it should be 1
+    :param step: quantile step
+    :return: a dictionary including all the 'firm_list' dataframe and 'stock data' dataframe
+    """
+    # we use dict to store different sub dataframe
+    temp = {}
+    for i, h in zip(np.arange(start, end, step), range(int((end-start)/step))):
+        print('processing splitting dataframe:', round(i, 2), 'to', round(i + step, 2))
+        if i == 0:  # to get the left point
+            temp['firm' + str(h)] = df_firm[df_firm['count'] <= df_firm['count'].quantile(i + step)]
+            temp['crsp' + str(h)] = pd.merge(crsp, temp['firm' + str(h)], how='left',
+                                             on='permno').dropna(subset=['count'])
+        else:
+            temp['firm' + str(h)] = df_firm[(df_firm['count'].quantile(i) < df_firm['count']) & (
+                    df_firm['count'] <= df_firm['count'].quantile(i + step))]
+            temp['crsp' + str(h)] = pd.merge(crsp, temp['firm' + str(h)], how='left',
+                                             on='permno').dropna(subset=['count'])
+    return temp
+
+
+def main(start, end, step):
+    """
+
+    :param start: the quantile to start cutting, usually it should be 0
+    :param end: the quantile to end cutting, usually it should be 1
+    :param step: quantile step
+    :return: a dataframe with calculated variance of residual
+    """
+    df = sub_df(start, end, step)
+    pool = mp.Pool()
+    p_dict = {}
+    for i in range(int((end-start)/step)):
+        p_dict['p' + str(i)] = pool.apply_async(get_res_var, (df['crsp%s' % i], df['firm%s' % i],))
+    pool.close()
+    pool.join()
+    result = pd.DataFrame()
+    print('processing pd.concat')
+    for h in range(int((end-start)/step)):
+        result = pd.concat([result, p_dict['p%s' % h].get()])
+    return result
+
 
 
 # calculate beta through rolling window
-crsp = get_res_var(crsp, firm_list=df_firm)
+if __name__ == '__main__':
+    crsp = main(0, 1, 0.05)
 
 # process dataframe
 crsp = crsp.dropna(subset=['rvar'])  # drop NA due to rolling
 crsp = crsp.rename(columns={'rvar': 'rvar_capm'})
-crsp = crsp[crsp['sig'] == 1]
 crsp = crsp.reset_index(drop=True)
 crsp = crsp[['permno', 'date', 'rvar_capm']]
 
