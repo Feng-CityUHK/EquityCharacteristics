@@ -3,6 +3,9 @@
 # To get a faster speed, we split the big dataframe into small ones
 # Then using different process to calculate the variance
 # We use 20 process to calculate variance, you can change the number of process according to your CPU situation
+# You can use the following code to check your CPU situation
+# import multiprocessing
+# multiprocessing.cpu_count()
 
 import pandas as pd
 import numpy as np
@@ -82,7 +85,8 @@ def get_res_var(df, firm_list):
         for i in range(count + 1):
             # if you want to change the rolling window, please change here: i - 2 means 3 months is a window.
             temp = df[(df['permno'] == firm) & (i - 2 <= df['month_count']) & (df['month_count'] <= i)]
-            if temp['permno'].count() < 60:
+            # if observations in last 3 months are less 21, we drop the rvar of this month
+            if temp['permno'].count() < 21:
                 pass
             else:
                 rolling_window = temp['permno'].count()
@@ -146,7 +150,9 @@ def main(start, end, step):
 
 
 
-# calculate beta through rolling window
+# calculate variance of residual through rolling window
+# Note: please split dataframe according to your CPU situation. For example, we split dataframe to (1-0)/0.05 = 20 sub
+# dataframes here, so the function will use 20 cores to calculate variance of residual.
 if __name__ == '__main__':
     crsp = main(0, 1, 0.05)
 
