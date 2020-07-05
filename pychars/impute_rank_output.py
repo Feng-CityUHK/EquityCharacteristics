@@ -72,7 +72,6 @@ sp1500_index['gvkey'] = sp1500_index['gvkey'].astype(int)
 sp1500_index['from'] = pd.to_datetime(sp1500_index['from'])
 sp1500_index['thru'] = pd.to_datetime(sp1500_index['thru'])
 sp1500_index['thru'] = sp1500_index['thru'].fillna(pd.to_datetime('today'))
-sp1500_index = sp1500_index.drop_duplicates('gvkey')
 
 chars_q = pd.merge(chars_q, sp1500_index, how='left', on=['gvkey'])
 sp1500 = chars_q.dropna(subset=['from'], axis=0)
