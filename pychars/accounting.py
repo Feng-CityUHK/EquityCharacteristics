@@ -114,16 +114,13 @@ comp['dc'] = np.where(comp['dc'].isnull(), comp['dcvt'], comp['dc'])
 comp['xint0'] = np.where(comp['xint'].isnull(), 0, comp['xint'])
 comp['xsga0'] = np.where(comp['xsga'].isnull, 0, 0)
 
-# # prep for clean-up and using time series of variables
-# comp['count'] = comp.groupby(['gvkey']).cumcount()  # number of years in Compustat
-
 #######################################################################################################################
 #                                                       CRSP Block                                                    #
 #######################################################################################################################
 # Create a CRSP Subsample with Monthly Stock and Event Variables
 # Restrictions will be applied later
 # Select variables from the CRSP monthly stock and event datasets
-crsp_m = conn.raw_sql("""
+crsp = conn.raw_sql("""
                       select a.prc, a.ret, a.retx, a.shrout, a.vol, a.cfacpr, a.cfacshr, a.date, a.permno, a.permco,
                       b.ticker, b.ncusip, b.shrcd, b.exchcd
                       from crsp.msf as a
@@ -136,36 +133,20 @@ crsp_m = conn.raw_sql("""
                       """)
 
 # change variable format to int
-crsp_m[['permco', 'permno', 'shrcd', 'exchcd']] = crsp_m[['permco', 'permno', 'shrcd', 'exchcd']].astype(int)
+crsp[['permco', 'permno', 'shrcd', 'exchcd']] = crsp[['permco', 'permno', 'shrcd', 'exchcd']].astype(int)
 
 # Line up date to be end of month
-crsp_m['date'] = pd.to_datetime(crsp_m['date'])
-crsp_m['monthend'] = crsp_m['date'] + MonthEnd(0)  # set all the date to the standard end date of month
+crsp['date'] = pd.to_datetime(crsp['date'])
+crsp['monthend'] = crsp['date'] + MonthEnd(0)  # set all the date to the standard end date of month
 
-# add delisting return
-dlret = conn.raw_sql("""
-                     select permno, dlret, dlstdt 
-                     from crsp.msedelist
-                     """)
-
-dlret.permno = dlret.permno.astype(int)
-dlret['dlstdt'] = pd.to_datetime(dlret['dlstdt'])
-dlret['monthend'] = dlret['dlstdt'] + MonthEnd(0)
-
-# merge delisting return to crsp return
-crsp = pd.merge(crsp_m, dlret, how='left', on=['permno', 'monthend'])
-crsp['dlret'] = crsp['dlret'].fillna(0)
-crsp['ret'] = crsp['ret'].fillna(0)
-crsp['retadj'] = (1 + crsp['ret']) * (1 + crsp['dlret']) - 1
 crsp['me'] = crsp['prc'].abs() * crsp['shrout']  # calculate market equity
 
 # if Market Equity is Nan then let return equals to 0
 crsp['ret'] = np.where(crsp['me'].isnull(), 0, crsp['ret'])
 crsp['retx'] = np.where(crsp['me'].isnull(), 0, crsp['retx'])
 
-# impute prc and me
+# impute me
 crsp = crsp.sort_values(by=['permno', 'date']).drop_duplicates()
-crsp['prc'] = np.where(crsp['permno'] == crsp['permno'].shift(1), crsp['prc'].fillna(method='ffill'), crsp['prc'])
 crsp['me'] = np.where(crsp['permno'] == crsp['permno'].shift(1), crsp['me'].fillna(method='ffill'), crsp['me'])
 
 # Aggregate Market Cap
@@ -232,8 +213,8 @@ Note: me is CRSP market equity, mve_f is Compustat market equity. Please choose 
 # data_rawa['me'] = data_rawa['me']/1000  # CRSP ME
 data_rawa['me'] = data_rawa['mve_f']  # Compustat ME
 
-# update count after merging
-# data_rawa['count'] = data_rawa.groupby(['gvkey']).cumcount() + 1
+# count single stock years
+data_rawa['count'] = data_rawa.groupby(['gvkey']).cumcount()
 
 # deal with the duplicates
 data_rawa.loc[data_rawa.groupby(['datadate', 'permno', 'linkprim'], as_index=False).nth([0]).index, 'temp'] = 1
@@ -453,7 +434,7 @@ data_rawa['roa'] = data_rawa['ni']/((data_rawa['at']+data_rawa['at_l1'])/2)
 data_rawa['dy'] = data_rawa['dvt']/data_rawa['me']
 
 # Annual Accounting Variables
-chars_a = data_rawa[['cusip', 'ncusip', 'gvkey', 'permno', 'exchcd', 'datadate', 'jdate',
+chars_a = data_rawa[['cusip', 'ncusip', 'gvkey', 'permno', 'exchcd', 'shrcd', 'datadate', 'jdate', 'count',
                      'sic', 'acc', 'agr', 'bm', 'cfp', 'ep', 'ni', 'op', 'rsup', 'cash', 'chcsho',
                      'rd', 'cashdebt', 'pctacc', 'gma', 'lev', 'rdm', 'adm', 'sgr', 'sp', 'invest',
                      'rd_sale', 'lgr', 'roa', 'depr', 'egr', 'chato', 'chtx', 'noa', 'rna', 'pm', 'ato', 'dy']]
@@ -497,9 +478,6 @@ comp = comp.dropna(subset=['ibq'])
 # sort and clean up
 comp = comp.sort_values(by=['gvkey', 'datadate']).drop_duplicates()
 
-# prep for clean-up and using time series of variables
-# comp['count'] = comp.groupby(['gvkey']).cumcount()  # number of years in Compustat
-
 # convert datadate to date fmt
 comp['datadate'] = pd.to_datetime(comp['datadate'])
 
@@ -527,8 +505,8 @@ Note: me is CRSP market equity, mveq_f is Compustat market equity. Please choose
 # data_rawq['me'] = data_rawq['me']/1000  # CRSP ME
 data_rawq['me'] = data_rawq['mveq_f']  # Compustat ME
 
-# update count after merging
-# data_rawq['count'] = data_rawq.groupby(['gvkey']).cumcount() + 1
+# count single stock years
+data_rawq['count'] = data_rawq.groupby(['gvkey']).cumcount()
 
 # deal with the duplicates
 data_rawq.loc[data_rawq.groupby(['datadate', 'permno', 'linkprim'], as_index=False).nth([0]).index, 'temp'] = 1
@@ -737,17 +715,17 @@ data_rawq['pm'] = data_rawq['oiadpq']/data_rawq['saleq']
 data_rawq['ato'] = data_rawq['saleq']/data_rawq['noa_l4']
 
 # Quarterly Accounting Variables
-chars_q = data_rawq[['gvkey', 'permno', 'datadate', 'jdate', 'sic', 'acc', 'bm', 'cfp',
+chars_q = data_rawq[['gvkey', 'permno', 'datadate', 'jdate', 'sic', 'exchcd', 'shrcd', 'acc', 'bm', 'cfp',
                      'ep', 'agr', 'ni', 'op', 'cash', 'chcsho', 'rd', 'cashdebt', 'pctacc', 'gma', 'lev',
                      'rdm', 'sgr', 'sp', 'invest', 'rd_sale', 'lgr', 'roa', 'depr', 'egr',
-                     'chato', 'chpm', 'chtx', 'noa', 'rna', 'pm', 'ato']]
+                     'chato', 'chpm', 'chtx', 'noa', 'rna', 'pm', 'ato', 'count']]
 chars_q.reset_index(drop=True, inplace=True)
 
 #######################################################################################################################
 #                                                       Momentum                                                      #
 #######################################################################################################################
 crsp_mom = conn.raw_sql("""
-                        select permno, date, ret
+                        select permno, date, ret, prc, shrout
                         from crsp.msf
                         where date >= '01/01/1959'
                         """)
@@ -755,6 +733,25 @@ crsp_mom = conn.raw_sql("""
 crsp_mom['permno'] = crsp_mom['permno'].astype(int)
 crsp_mom['date'] = pd.to_datetime(crsp_mom['date'])
 crsp_mom = crsp_mom.dropna()
+crsp_mom['jdate'] = crsp_mom['date'] + MonthEnd(0)
+
+# add delisting return
+dlret = conn.raw_sql("""
+                     select permno, dlret, dlstdt 
+                     from crsp.msedelist
+                     """)
+
+dlret.permno = dlret.permno.astype(int)
+dlret['dlstdt'] = pd.to_datetime(dlret['dlstdt'])
+dlret['jdate'] = dlret['dlstdt'] + MonthEnd(0)
+
+# merge delisting return to crsp return
+crsp_mom = pd.merge(crsp_mom, dlret, how='left', on=['permno', 'jdate'])
+crsp_mom['dlret'] = crsp_mom['dlret'].fillna(0)
+crsp_mom['ret'] = crsp_mom['ret'].fillna(0)
+crsp_mom['retadj'] = (1 + crsp_mom['ret']) * (1 + crsp_mom['dlret']) - 1
+crsp_mom['me'] = crsp_mom['prc'].abs() * crsp_mom['shrout']  # calculate market equity
+crsp_mom = crsp_mom.drop(['dlret', 'dlstdt', 'prc', 'shrout'], axis=1)
 
 
 def mom(start, end, df):
@@ -802,17 +799,20 @@ crsp_mom['seas1a'] = crsp_mom.groupby(['permno'])['ret'].shift(11)
 # crsp_mom['moms12m'] = moms(1, 12, crsp_mom)
 
 # populate the chars to monthly
-crsp_mom['jdate'] = crsp_mom['date'] + MonthEnd(0)
 
 # chars_a
 chars_a = pd.merge(crsp_mom, chars_a, how='left', on=['permno', 'jdate'])
 chars_a['datadate'] = chars_a.groupby(['permno'])['datadate'].fillna(method='ffill')
 chars_a = chars_a.groupby(['permno', 'datadate'], as_index=False).fillna(method='ffill')
+chars_a = chars_a[((chars_a['exchcd'] == 1) | (chars_a['exchcd'] == 2) | (chars_a['exchcd'] == 3)) &
+                      ((chars_a['shrcd'] == 10) | (chars_a['shrcd'] == 11))]
 
 # chars_q
 chars_q = pd.merge(crsp_mom, chars_q, how='left', on=['permno', 'jdate'])
 chars_q['datadate'] = chars_q.groupby(['permno'])['datadate'].fillna(method='ffill')
 chars_q = chars_q.groupby(['permno', 'datadate'], as_index=False).fillna(method='ffill')
+chars_q = chars_q[((chars_q['exchcd'] == 1) | (chars_q['exchcd'] == 2) | (chars_q['exchcd'] == 3)) &
+                      ((chars_q['shrcd'] == 10) | (chars_q['shrcd'] == 11))]
 
 with open('chars_a.pkl', 'wb') as f:
     pkl.dump(chars_a, f)
