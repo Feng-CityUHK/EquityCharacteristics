@@ -725,15 +725,14 @@ chars_q.reset_index(drop=True, inplace=True)
 #                                                       Momentum                                                      #
 #######################################################################################################################
 crsp_mom = conn.raw_sql("""
-                        select permno, date, ret, prc, shrout
+                        select permno, date, ret, retx, prc, shrout
                         from crsp.msf
                         where date >= '01/01/1959'
                         """)
 
 crsp_mom['permno'] = crsp_mom['permno'].astype(int)
-crsp_mom['date'] = pd.to_datetime(crsp_mom['date'])
+crsp_mom['jdate'] = pd.to_datetime(crsp_mom['date']) + MonthEnd(0)
 crsp_mom = crsp_mom.dropna()
-crsp_mom['jdate'] = crsp_mom['date'] + MonthEnd(0)
 
 # add delisting return
 dlret = conn.raw_sql("""
