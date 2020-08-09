@@ -56,6 +56,7 @@ crsp['month_count'] = crsp[crsp['sig'] == 1].groupby(['permno']).cumcount()
 # label numbers of months for a firm
 month_num = crsp[crsp['sig'] == 1].groupby(['permno'])['month_count'].tail(1)
 month_num = month_num.astype(int)
+month_num = month_num.reset_index(drop=True)
 
 # mark the number of each month to each day of this month
 crsp['month_count'] = crsp.groupby(['permno'])['month_count'].fillna(method='bfill')
@@ -67,6 +68,7 @@ df_firm['permno'] = df_firm['permno'].astype(int)
 df_firm = df_firm.reset_index(drop=True)
 df_firm = df_firm.reset_index()
 df_firm = df_firm.rename(columns={'index': 'count'})
+df_firm['month_num'] = month_num
 
 ######################
 # Calculate the beta #
