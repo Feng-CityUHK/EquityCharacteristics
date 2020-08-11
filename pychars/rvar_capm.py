@@ -82,7 +82,7 @@ def get_res_var(df, firm_list):
     :param firm_list: list of firms matching stock dataframe
     :return: dataframe with variance of residual
     """
-    for firm, count, prog in zip(firm_list['permno'], month_num, range(firm_list['permno'].count()+1)):
+    for firm, count, prog in zip(firm_list['permno'], firm_list['month_num'], range(firm_list['permno'].count()+1)):
         prog = prog + 1
         print('processing permno %s' % firm, '/', 'finished', '%.2f%%' % ((prog/firm_list['permno'].count())*100))
         for i in range(count + 1):
@@ -150,7 +150,6 @@ def main(start, end, step):
     for h in range(int((end-start)/step)):
         result = pd.concat([result, p_dict['p%s' % h].get()])
     return result
-
 
 
 # calculate variance of residual through rolling window
