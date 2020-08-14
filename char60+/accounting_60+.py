@@ -1050,6 +1050,12 @@ crsp_mom['prc_l2'] = crsp_mom.groupby(['permno'])['prc'].shift(2)
 crsp_mom['dolvol'] = np.log(crsp_mom['vol_l2']*crsp_mom['prc_l2']).replace([np.inf, -np.inf], np.nan)
 crsp_mom['turn'] = ((crsp_mom['vol_l1']+crsp_mom['vol_l2']+crsp_mom['vol_l3'])/3)/crsp_mom['shrout']
 
+# dy
+crsp_mom['me_l1'] = crsp_mom.groupby(['permno'])['me'].shift(1)
+crsp_mom['retdy'] = crsp_mom['ret'] - crsp_mom['retx']
+crsp_mom['mdivpay'] = crsp_mom['retdy']*crsp_mom['me_l1']
+
+crsp_mom['dy'] = ttm12(series='mdivpay', df=crsp_mom)/crsp_mom['me']
 
 # def moms(start, end, df):
 #     """
@@ -1156,14 +1162,6 @@ chars_a.reset_index(drop=True, inplace=True)
 ########################################
 #               Quarterly              #
 ########################################
-
-# dy
-data_rawq['me_l1'] = data_rawq.groupby(['permno'])['me'].shift(1)
-data_rawq['retdy'] = data_rawq['ret'] - data_rawq['retx']
-data_rawq['mdivpay'] = data_rawq['retdy']*data_rawq['me_l1']
-
-data_rawq['dy'] = ttm12(series='mdivpay', df=data_rawq)/data_rawq['me']
-
 # bm
 data_rawq['bm'] = data_rawq['beq']/data_rawq['me']
 
