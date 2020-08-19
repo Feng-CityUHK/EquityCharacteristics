@@ -1,0 +1,70 @@
+﻿Num,Acronym,Description,Author,Pub Year,Category
+A.2.1,Bm,Book-to-market equity,"Rosenberg, Reid, and Lanstein ",1985,Value-versus-growth
+A.2.2,Bmj,Book-to-June-end market equity, Asness and Frazzini ,2013,Value-versus-growth
+A.2.3,Bmq12,Quarterly Book-to-market Equity (12-month holding period),"Rosenberg, Reid, and Lanstein ",1985,Value-versus-growth
+A.2.9,Ep,Earnings-to-price,Basu,1983,Value-versus-growth
+A.2.10,"Ep q 1, Ep q 6, and Ep q 12","Q Quarterly Earnings-to-price(1-month holding period), uarterly Earnings-to-price(6-month holding period), Quarterly Earnings-to-price(12-month holding period), ",Basu,1983,Value-versus-growth
+A.2.12,Cp,Cash ﬂow-to-price,"Lakonishok, Shleifer, and Vishny ",1994,Value-versus-growth
+A.2.13,"Cpq1, Cpq6, Cpq12","Quarterly Cash Flow-to-price (1-month holding period), Quarterly Cash Flow-to-price (6-month holding period), Quarterly Cash Flow-to-price (12-month holding period)","Lakonishok, Shleifer, and Vishny",1994,Value-versus-growth
+A.2.14,Dp,Dividend yield,Litzenberger and Ramaswamy,1979,Value-versus-growth
+A.2.16,Op and Nop, (Net) Payout Yield,"Richardson, and Roberts",2007,Value-versus-growth
+A.2.20,Em,Enterprise multiple,Loughran and Wellman,2011,Value-versus-growth
+A.2.21,"Emq1, Emq6","Quarterly Enterprise multiple (1-month holding period), Quarterly Enterprise multiple (6-month holding period)",Loughran and Wellman,2011,Value-versus-growth
+A.2.22,Sp,Sales-to-price,"Barbee, Mukherji, and Raines",1996,Value-versus-growth
+A.2.23,"Sp q 1, Sp q 6, and Sp q 12",Quarterly Sales-to-price,"Barbee, Mukherji, and Raines",1996,Value-versus-growth
+A.2.24,Ocp,Operating Cash Flow-to-price,"Desai, Rajgopal, and Venkatachalam",2004,Value-versus-growth
+A.2.26,Ir,Intangible Return,Daniel and Titman,2006,Value-versus-growth
+A.2.28,Ebp,Enterprise Book-to-price,"Penman, Richardson, and Tuna",2007,Value-versus-growth
+A.3.1,Aci,Abnormal Corporate Investment,"Titman, Wei, and Xie",2004,Investment
+A.3.2,I/A, Investment-to-assets,"Cooper, Gulen, and Schill",2008,Investment
+A.3.3,"Ia q 6, and Ia q 12",Quarterly Investment-to-assets,"Cooper, Gulen, and Schill",2008,Investment
+A.3.4,dPia,Changes in PPE and Inventory-to-assets,"Lyandres, Sun, and Zhang",2008,Investment
+A.3.5,Noa and dNoa,(Changes in) Net Operating Assets,"Hirshleifer, Hou, Teoh, and Zhang",2004,Investment
+A.3.6,dLno,Changes in Long-term Net Operating Assets,"Fairﬁeld, Whisenant, and Yohn",2003,Investment
+A.3.7,Ig,Investment Growth,Xing,2008,Investment
+A.3.8,2Ig,2-year Investment Growth,Anderson and Garcia-Feijoo,2006,Investment
+A.3.10,Nsi,Net Stock Issues,Pontiﬀ and Woodgate,2008,Investment
+A.3.11,dIi,% Change in Investment - % Change in Industry Investment,Abarbanell and Bushee,1998,Investment
+A.3.14,Ivg,Inventory Growth,Belo and Lin,2011,Investment
+A.3.15,Ivc,Inventory Changes,Thomas and Zhang,2002,Investment
+A.3.16,Oa,Operating Accruals,Sloan,1996,Investment
+A.3.17,Ta,Total Accruals,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.18,dCoa,changes in Current Operating Assets,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.19,dNca,changes in Non-current Operating Assets,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.19,dNco,Changes in Net Non-current Operating Assets,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.20,dFin,Changes in Net Financial Assets,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.20,dFnl,changes in Financial Liabilities,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.20,dBe,changes in Book Equity,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.22,Poa,Percent operating accruals,"Hafzalla, Lundholm, and Van Winkle",2011,Investment
+A.3.23,Pta,Percent total accruals,"Hafzalla, Lundholm, and Van Winkle",2011,Investment
+A.3.24,Pda,Percent discretionary accruals,,,Investment
+A.3.25,Ndf,Net debt ﬁnance,"Bradshaw, Richardson, and Sloan",2006,Investment
+A.4.1,"Roe1, Roe6",Return on Equity,"Hou, Xue, and Zhang",2015,Profitability
+A.4.2,"dRoe1, dRoe6, and dRoe12",Changes in Return on Equity,"Hou, Xue, and Zhang",2015,Profitability
+A.4.3,Roa1,Return on Assets,"Balakrishnan, Bartov, and Faurel",2010,Profitability
+A.4.4,"dRoa1, dRoa6",Changes in Return on Assets,"Balakrishnan, Bartov, and Faurel",2010,Profitability
+A.4.5,Ato,Asset Turnover,Soliman,2008,Profitability
+A.4.6,Cto,Capital Turnover,Haugen and Baker,1996,Profitability
+A.4.7,"Rna q 1, Rna q 6, Atoq1","Quarterly Return on Net Operating Assets, Quarterly Asset Turnover",Soliman,2008,Profitability
+A.4.8,"Cto q1, Cto q6,",Quarterly Capital Turnover,Haugen and Baker,1996,Profitability
+A.4.9,Gpa,Gross Proﬁts-to-assets,Novy-Marx,2013,Profitability
+A.4.11,"Gla q 1, Gla q 6, and Gla q 12",Quarterly Gross Proﬁts-to-lagged Assets,,,Profitability
+A.4.12,Ope,Operating Proﬁts to Equity,Fama and French,2015,Profitability
+A.4.14,"Ole q 1, Ole q 6 ",Quarterly Operating Proﬁts-to-lagged Equity,,,Profitability
+A.4.15,Opa,Operating Proﬁts-to-assets,"Linnainmaa, and Nikolaev",2015,Profitability
+A.4.17,"Ola q 1, Ola q 6, and Ola q 12",Quarterly Operating Proﬁts-to-lagged Assets,,,Profitability
+A.4.18,Cop,Cash-based Operating Proﬁtability,"Gerakos, Linnainmaa, and Nikolaev",2016,Profitability
+A.4.19,Cla,Cash-based Operating Proﬁts-to-lagged Assets,,,Profitability
+A.4.20,Claq,Quarterly Cash-based Operating Proﬁts-to-lagged Assets,,,Profitability
+A.4.29,Tbi q 12,Quarterly Taxable Income-to-book Income,"Green, Hand, and Zhang",2013,Profitability
+A5.1,Oca and Ioca,(Industry-adjusted) Organizational Capital-to-assets,Eisfeldt and Papanikolaou,2013,Intangibles
+A.5.2,Adm,Advertising Expense-to-market,"Chan, Lakonishok, and Sougiannis",2001,Intangibles
+A.5.4,Rdm,R&D Expense-to-market,"Chan, Lakonishok, and Sougiannis",2001,Intangibles
+A.5.5,"Rdm q 1, Rdm q 6, and Rdm q 12",Quarterly R&D Expense-to-market,"Chan, Lakonishok, and Sougiannis",2001,Intangibles
+A.5.6,Rds q 6 and Rds q 12,Quarterly R&D Expense-to-sales,"Chan, Lakonishok, and Sougiannis",2001,Intangibles
+A.5.8,Ol,Operating Leverage,Novy-Marx,2011,Intangibles
+A.5.9,"Ol q 1, Ol q 6, and Ol q 12",Quarterly Operating Leverage,Novy-Marx,2011,Intangibles
+A.5.11,Rca,R&D Capital-to-assets,Li,2011,Intangibles
+A.5.24,Etr,Eﬀective Tax Rate,Abarbanell and Bushee,1998,Intangibles
+A.5.46,"Alm q 1, Alm q 6, and Alm q 12",Quarterly Asset Liquidity,Ortiz-Molina and Phillips,2014,Intangibles
+A.5.50,"R a 1 , R n 1 , R a [2,5] , R n[2,5] , R a[6,10] , R n[6,10] , R a[11,15] , and R a[16,20]",Seasonality,Heston and Sadka,2008,Intangibles
