@@ -68,3 +68,14 @@ A.5.11,Rca,R&D Capital-to-assets,Li,2011,Intangibles
 A.5.24,Etr,Eﬀective Tax Rate,Abarbanell and Bushee,1998,Intangibles
 A.5.46,"Alm q 1, Alm q 6, and Alm q 12",Quarterly Asset Liquidity,Ortiz-Molina and Phillips,2014,Intangibles
 A.5.50,"R a 1 , R n 1 , R a [2,5] , R n[2,5] , R a[6,10] , R n[6,10] , R a[11,15] , and R a[16,20]",Seasonality,Heston and Sadka,2008,Intangibles
+A.6.8,Beta1,Market Beta,Fama and MacBeth,1973,Frictions
+A.6.13,Dtv12,"dollar trading volume, 12-month holding period","Brennan, Chordia, and Subrahmanyam",1998,Frictions
+A.6.21,Isff1,"idiosyncratic skewness estimated from the Fama-French 3-factor model, 1-month holding period",Harvey and Siddique,2000,Frictions
+A.6.8,Beta1,Market Beta,Fama and MacBeth,1973,Frictions
+A.6.13,Dtv12,"dollar trading volume, 12-month holding period","Brennan, Chordia, and Subrahmanyam",1998,Frictions
+A.6.21,Isff1,"idiosyncratic skewness estimated from the Fama-French 3-factor model, 1-month holding period",Harvey and Siddique,2000,Frictions
+A.6.22,Isq1,"idiosyncratic skewness estimated from the q-factor model, 1-month holding period",Harvey and Siddique,2000,Frictions
+A.6.3,Ivff1,"idiosyncratic volatility estimated from the Fama-French 3-factor model, 1-month holding period","Ang, Hodrick, Xing, and Zhang",2006,Frictions
+A.6.1,Me,the market equity,Banz,1981,Frictions
+A.6.24,Srev,short-term reversal,Jegadeesh,1990,Frictions
+A.6.6,Tv1,"total volatility, 1-month holding period","Ang, Hodrick, Xing, and Zhang",2006,Frictions
