@@ -73,12 +73,16 @@ A.6.13,Dtv12,"dollar trading volume, 12-month holding period","Brennan, Chordia,
 A.6.21,Isff1,"idiosyncratic skewness estimated from the Fama-French 3-factor model, 1-month holding period",Harvey and Siddique,2000,Frictions
 A.6.22,Isq1,"idiosyncratic skewness estimated from the q-factor model, 1-month holding period",Harvey and Siddique,2000,Frictions
 A.6.3,Ivff1,"idiosyncratic volatility estimated from the Fama-French 3-factor model, 1-month holding period","Ang, Hodrick, Xing, and Zhang",2006,Frictions
+A.6.5,Ivq1,"idiosyncratic volatility estimated from the q-factor model, 1-month holding period","Ang, Hodrick, Xing, and Zhang",2006,Frictions
 A.6.1,Me,the market equity,Banz,1981,Frictions
 A.6.24,Srev,short-term reversal,Jegadeesh,1990,Frictions
+A.6.7,Sv1,"systematic volatility, 1-month holding period","Ang, Hodrick, Xing, and Zhang",2006,Frictions
 A.6.6,Tv1,"total volatility, 1-month holding period","Ang, Hodrick, Xing, and Zhang",2006,Frictions
+A.1.2,Abr1,"cumulative abnormal returns around earnings announcement dates, 1-month holding period","Chan, Jegadeesh, and Lakonishok",1996,Momentum
+A.1.2,Abr6,"cumulative abnormal returns around earnings announcement dates, 6-month holding period","Chan, Jegadeesh, and Lakonishok",1996,Momentum
+A.1.2,Abr12,"cumulative abnormal returns around earnings announcement dates, 12-month holding period","Chan, Jegadeesh, and Lakonishok",1996,Momentum
 ,abr,Cumulative Abnormal Returns Around Earnings Announcement Dates,"We calculate cumulative abnormal stock return (Abr) around the latest quarterly earnings announcement date (Compustat quarterly item RDQ) (Chan, Jegadeesh, and Lakonishok 1996)): Abr_i = \sum_{d=-2}^{+1}r_{id}-r{md}, in which r id is stock i’s return on day d (with the earnings announced on day 0) and r md is the market index return. We cumulate returns until one (trading) day after the announcement date to account for the one-day-delayed reaction to earnings news. r md is the value-weighted market return for the Abr deciles with NYSE breakpoints and value-weighted returns, but is the equal-weighted market return with all-but-micro breakpoints and equal-weighted returns.",,
 ,agr,Asset growth,Annual percent change in total assets (at),,
-,alm,Asset liquidity (scaled by market assets),"Following Ortiz-Molina and Phillips (2014), we measure asset liquidity as cash + 0.75 × noncash current assets + 0.50 × tangible ﬁxed assets. Cash is cash and short-term investments (Compustat annual item CHE). Noncash current assets is current assets (item ACT) minus cash. Tangible ﬁxed assets is total assets (item AT) minus current assets (item ACT), minus goodwill (item GDWL, zero if missing), and minus intangibles (item INTAN, zero if missing).  Alm is asset liquidity scaled by one-year-lagged market value of assets. Market value of assets is total assets plus market equity (item PRCC F times item CSHO) minus book equity (item CEQ).",,
 ,baspread,Bid-ask spread rolling 3m,Monthly average of daily bid-ask spread divided by average of daily spread,,
 ,beta,Beta rolling 3m,Estimated market beta from daily returns,,
 ,bm_ia,Industry-adjusted book to market,Industry adjusted book-to-market ratio,,
