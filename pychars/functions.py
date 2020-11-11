@@ -437,9 +437,9 @@ def standardize(df):
     col_names = df.columns.values.tolist()
     list_to_remove = ['permno', 'date', 'jdate', 'datadate', 'gvkey', 'sic', 'count', 'exchcd', 'shrcd']
     col_names = list(set(col_names).difference(set(list_to_remove)))
+    df = df.fillna(0)
     for col_name in col_names:
         df['%s_rank' % col_name] = df.groupby(['jdate'])['%s' % col_name].rank()
         df['rank_%s' % col_name] = (df['%s_rank' % col_name]-1)/(df['count']-1)*2 - 1
         df = df.drop(['%s_rank' % col_name, '%s' % col_name], axis=1)
-    df = df.fillna(0)
     return df
