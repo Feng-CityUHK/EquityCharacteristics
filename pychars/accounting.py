@@ -92,6 +92,9 @@ comp['datadate'] = pd.to_datetime(comp['datadate'])
 # sort and clean up
 comp = comp.sort_values(by=['gvkey', 'datadate']).drop_duplicates()
 
+# clean up csho
+comp['csho'] = np.where(comp['csho'] == 0, np.nan, comp['csho'])
+
 # calculate Compustat market equity
 comp['mve_f'] = comp['csho'] * comp['prcc_f']
 
@@ -113,6 +116,10 @@ comp['dc'] = np.where(comp['dc'].isnull(), comp['dcvt'], comp['dc'])
 
 comp['xint0'] = np.where(comp['xint'].isnull(), 0, comp['xint'])
 comp['xsga0'] = np.where(comp['xsga'].isnull, 0, 0)
+
+comp['ceq'] = np.where(comp['ceq'] == 0, np.nan, comp['ceq'])
+comp['at'] = np.where(comp['at'] == 0, np.nan, comp['at'])
+comp = comp.dropna(subset=['at'])
 
 #######################################################################################################################
 #                                                       CRSP Block                                                    #
@@ -139,6 +146,7 @@ crsp[['permco', 'permno', 'shrcd', 'exchcd']] = crsp[['permco', 'permno', 'shrcd
 crsp['date'] = pd.to_datetime(crsp['date'])
 crsp['monthend'] = crsp['date'] + MonthEnd(0)  # set all the date to the standard end date of month
 
+crsp = crsp.dropna(subset=['prc'])
 crsp['me'] = crsp['prc'].abs() * crsp['shrout']  # calculate market equity
 
 # if Market Equity is Nan then let return equals to 0
@@ -210,17 +218,23 @@ data_rawa = data_rawa[((data_rawa['exchcd'] == 1) | (data_rawa['exchcd'] == 2) |
 '''
 Note: me is CRSP market equity, mve_f is Compustat market equity. Please choose the me below.
 '''
-# data_rawa['me'] = data_rawa['me']/1000  # CRSP ME
-data_rawa['me'] = data_rawa['mve_f']  # Compustat ME
+data_rawa['me'] = data_rawa['me']/1000  # CRSP ME
+# data_rawa['me'] = data_rawa['mve_f']  # Compustat ME
+
+# there are some ME equal to zero since this company do not have price or shares data, we drop these observations
+data_rawa['me'] = np.where(data_rawa['me'] == 0, np.nan, data_rawa['me'])
+data_rawa = data_rawa.dropna(subset=['me'])
 
 # count single stock years
-data_rawa['count'] = data_rawa.groupby(['gvkey']).cumcount()
+# data_rawa['count'] = data_rawa.groupby(['gvkey']).cumcount()
 
 # deal with the duplicates
 data_rawa.loc[data_rawa.groupby(['datadate', 'permno', 'linkprim'], as_index=False).nth([0]).index, 'temp'] = 1
 data_rawa = data_rawa[data_rawa['temp'].notna()]
 data_rawa.loc[data_rawa.groupby(['permno', 'yearend', 'datadate'], as_index=False).nth([-1]).index, 'temp'] = 1
 data_rawa = data_rawa[data_rawa['temp'].notna()]
+
+data_rawa = data_rawa.sort_values(by=['permno', 'jdate'])
 
 #######################################################################################################################
 #                                                  Annual Variables                                                   #
@@ -430,13 +444,16 @@ data_rawa['rd'] = np.where(((data_rawa['xrd']/data_rawa['at'])-
 # roa
 data_rawa['roa'] = data_rawa['ni']/((data_rawa['at']+data_rawa['at_l1'])/2)
 
+# roe
+data_rawa['roe'] = data_rawa['ib']/data_rawa['ceq_l1']
+
 # dy
 data_rawa['dy'] = data_rawa['dvt']/data_rawa['me']
 
 # Annual Accounting Variables
-chars_a = data_rawa[['cusip', 'ncusip', 'gvkey', 'permno', 'exchcd', 'shrcd', 'datadate', 'jdate', 'count',
+chars_a = data_rawa[['cusip', 'ncusip', 'gvkey', 'permno', 'exchcd', 'shrcd', 'datadate', 'jdate',
                      'sic', 'acc', 'agr', 'bm', 'cfp', 'ep', 'ni', 'op', 'rsup', 'cash', 'chcsho',
-                     'rd', 'cashdebt', 'pctacc', 'gma', 'lev', 'rdm', 'adm', 'sgr', 'sp', 'invest',
+                     'rd', 'cashdebt', 'pctacc', 'gma', 'lev', 'rdm', 'adm', 'sgr', 'sp', 'invest', 'roe',
                      'rd_sale', 'lgr', 'roa', 'depr', 'egr', 'chato', 'chtx', 'noa', 'rna', 'pm', 'ato', 'dy']]
 chars_a.reset_index(drop=True, inplace=True)
 #######################################################################################################################
@@ -477,6 +494,10 @@ comp = comp.dropna(subset=['ibq'])
 
 # sort and clean up
 comp = comp.sort_values(by=['gvkey', 'datadate']).drop_duplicates()
+comp['cshoq'] = np.where(comp['cshoq'] == 0, np.nan, comp['cshoq'])
+comp['ceqq'] = np.where(comp['ceqq'] == 0, np.nan, comp['ceqq'])
+comp['atq'] = np.where(comp['atq'] == 0, np.nan, comp['atq'])
+comp = comp.dropna(subset=['atq'])
 
 # convert datadate to date fmt
 comp['datadate'] = pd.to_datetime(comp['datadate'])
@@ -502,17 +523,23 @@ data_rawq = data_rawq[((data_rawq['exchcd'] == 1) | (data_rawq['exchcd'] == 2) |
 '''
 Note: me is CRSP market equity, mveq_f is Compustat market equity. Please choose the me below.
 '''
-# data_rawq['me'] = data_rawq['me']/1000  # CRSP ME
-data_rawq['me'] = data_rawq['mveq_f']  # Compustat ME
+data_rawq['me'] = data_rawq['me']/1000  # CRSP ME
+# data_rawq['me'] = data_rawq['mveq_f']  # Compustat ME
+
+# there are some ME equal to zero since this company do not have price or shares data, we drop these observations
+data_rawq['me'] = np.where(data_rawq['me'] == 0, np.nan, data_rawq['me'])
+data_rawq = data_rawq.dropna(subset=['me'])
 
 # count single stock years
-data_rawq['count'] = data_rawq.groupby(['gvkey']).cumcount()
+# data_rawq['count'] = data_rawq.groupby(['gvkey']).cumcount()
 
 # deal with the duplicates
 data_rawq.loc[data_rawq.groupby(['datadate', 'permno', 'linkprim'], as_index=False).nth([0]).index, 'temp'] = 1
 data_rawq = data_rawq[data_rawq['temp'].notna()]
 data_rawq.loc[data_rawq.groupby(['permno', 'yearend', 'datadate'], as_index=False).nth([-1]).index, 'temp'] = 1
 data_rawq = data_rawq[data_rawq['temp'].notna()]
+
+data_rawq = data_rawq.sort_values(by=['permno', 'jdate'])
 
 #######################################################################################################################
 #                                                   Quarterly Variables                                               #
@@ -714,11 +741,15 @@ data_rawq['pm'] = data_rawq['oiadpq']/data_rawq['saleq']
 # ato
 data_rawq['ato'] = data_rawq['saleq']/data_rawq['noa_l4']
 
+# roe
+data_rawq['ceqq_l1'] = data_rawq.groupby(['permno'])['ceqq'].shift(1)
+data_rawq['roe'] = data_rawq['ibq']/data_rawq['ceqq_l1']
+
 # Quarterly Accounting Variables
 chars_q = data_rawq[['gvkey', 'permno', 'datadate', 'jdate', 'sic', 'exchcd', 'shrcd', 'acc', 'bm', 'cfp',
                      'ep', 'agr', 'ni', 'op', 'cash', 'chcsho', 'rd', 'cashdebt', 'pctacc', 'gma', 'lev',
-                     'rdm', 'sgr', 'sp', 'invest', 'rd_sale', 'lgr', 'roa', 'depr', 'egr',
-                     'chato', 'chpm', 'chtx', 'noa', 'rna', 'pm', 'ato', 'count']]
+                     'rdm', 'sgr', 'sp', 'invest', 'rd_sale', 'lgr', 'roa', 'depr', 'egr', 'roe',
+                     'chato', 'chpm', 'chtx', 'noa', 'rna', 'pm', 'ato']]
 chars_q.reset_index(drop=True, inplace=True)
 
 #######################################################################################################################
@@ -732,7 +763,7 @@ crsp_mom = conn.raw_sql("""
 
 crsp_mom['permno'] = crsp_mom['permno'].astype(int)
 crsp_mom['jdate'] = pd.to_datetime(crsp_mom['date']) + MonthEnd(0)
-crsp_mom = crsp_mom.dropna()
+crsp_mom = crsp_mom.dropna(subset=['ret', 'retx', 'prc'])
 
 # add delisting return
 dlret = conn.raw_sql("""

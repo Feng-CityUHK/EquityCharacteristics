@@ -1003,7 +1003,7 @@ crsp_mom = conn.raw_sql("""
 
 crsp_mom['permno'] = crsp_mom['permno'].astype(int)
 crsp_mom['jdate'] = pd.to_datetime(crsp_mom['date']) + MonthEnd(0)
-crsp_mom = crsp_mom.dropna()
+crsp_mom = crsp_mom.dropna(subset=['ret', 'retx', 'prc'])
 
 # add delisting return
 dlret = conn.raw_sql("""
