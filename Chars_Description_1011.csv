@@ -1,0 +1,126 @@
+﻿Num,Acronym,Description,Author,Pub Year,Category
+A.2.1,Bm,Book-to-market equity,"Rosenberg, Reid, and Lanstein ",1985,Value-versus-growth
+A.2.2,Bmj,Book-to-June-end market equity, Asness and Frazzini ,2013,Value-versus-growth
+A.2.3,Bmq12,Quarterly Book-to-market Equity (12-month holding period),"Rosenberg, Reid, and Lanstein ",1985,Value-versus-growth
+A.2.9,Ep,Earnings-to-price,Basu,1983,Value-versus-growth
+A.2.10,"Ep q 1, Ep q 6, and Ep q 12","Q Quarterly Earnings-to-price(1-month holding period), uarterly Earnings-to-price(6-month holding period), Quarterly Earnings-to-price(12-month holding period), ",Basu,1983,Value-versus-growth
+A.2.12,Cp,Cash ﬂow-to-price,"Lakonishok, Shleifer, and Vishny ",1994,Value-versus-growth
+A.2.13,"Cpq1, Cpq6, Cpq12","Quarterly Cash Flow-to-price (1-month holding period), Quarterly Cash Flow-to-price (6-month holding period), Quarterly Cash Flow-to-price (12-month holding period)","Lakonishok, Shleifer, and Vishny",1994,Value-versus-growth
+A.2.14,Dp(dy),Dividend yield,Litzenberger and Ramaswamy,1979,Value-versus-growth
+A.2.16,Op and Nop, (Net) Payout Yield,"Richardson, and Roberts",2007,Value-versus-growth
+A.2.20,Em,Enterprise multiple,Loughran and Wellman,2011,Value-versus-growth
+A.2.21,"Emq1, Emq6","Quarterly Enterprise multiple (1-month holding period), Quarterly Enterprise multiple (6-month holding period)",Loughran and Wellman,2011,Value-versus-growth
+A.2.22,Sp,Sales-to-price,"Barbee, Mukherji, and Raines",1996,Value-versus-growth
+A.2.23,"Sp q 1, Sp q 6, and Sp q 12",Quarterly Sales-to-price,"Barbee, Mukherji, and Raines",1996,Value-versus-growth
+A.2.24,Ocp,Operating Cash Flow-to-price,"Desai, Rajgopal, and Venkatachalam",2004,Value-versus-growth
+A.2.26,Ir,Intangible Return,Daniel and Titman,2006,Value-versus-growth
+A.2.28,Ebp,Enterprise Book-to-price,"Penman, Richardson, and Tuna",2007,Value-versus-growth
+A.3.1,Aci,Abnormal Corporate Investment,"Titman, Wei, and Xie",2004,Investment
+A.3.2,I/A, Investment-to-assets,"Cooper, Gulen, and Schill",2008,Investment
+A.3.3,"Ia q 6, and Ia q 12",Quarterly Investment-to-assets,"Cooper, Gulen, and Schill",2008,Investment
+A.3.4,dPia,Changes in PPE and Inventory-to-assets,"Lyandres, Sun, and Zhang",2008,Investment
+A.3.5,Noa and dNoa,(Changes in) Net Operating Assets,"Hirshleifer, Hou, Teoh, and Zhang",2004,Investment
+A.3.6,dLno,Changes in Long-term Net Operating Assets,"Fairﬁeld, Whisenant, and Yohn",2003,Investment
+A.3.7,Ig,Investment Growth,Xing,2008,Investment
+A.3.8,2Ig,2-year Investment Growth,Anderson and Garcia-Feijoo,2006,Investment
+A.3.10,Nsi,Net Stock Issues,Pontiﬀ and Woodgate,2008,Investment
+A.3.11,dIi,% Change in Investment - % Change in Industry Investment,Abarbanell and Bushee,1998,Investment
+A.3.14,Ivg,Inventory Growth,Belo and Lin,2011,Investment
+A.3.15,Ivc,Inventory Changes,Thomas and Zhang,2002,Investment
+A.3.16,Oa(acc),Operating Accruals,Sloan,1996,Investment
+A.3.17,Ta,Total Accruals,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.18,dCoa,changes in Current Operating Assets,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.19,dNca,changes in Non-current Operating Assets,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.19,dNco,Changes in Net Non-current Operating Assets,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.20,dFin,Changes in Net Financial Assets,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.20,dFnl,changes in Financial Liabilities,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.20,dBe,changes in Book Equity,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+A.3.22,Poa,Percent operating accruals,"Hafzalla, Lundholm, and Van Winkle",2011,Investment
+A.3.23,Pta,Percent total accruals,"Hafzalla, Lundholm, and Van Winkle",2011,Investment
+A.3.24,Pda,Percent discretionary accruals,,,Investment
+A.3.25,Ndf,Net debt ﬁnance,"Bradshaw, Richardson, and Sloan",2006,Investment
+A.4.1,"Roe1, Roe6",Return on Equity,"Hou, Xue, and Zhang",2015,Profitability
+A.4.2,"dRoe1, dRoe6, and dRoe12",Changes in Return on Equity,"Hou, Xue, and Zhang",2015,Profitability
+A.4.3,Roa1,Return on Assets,"Balakrishnan, Bartov, and Faurel",2010,Profitability
+A.4.4,"dRoa1, dRoa6",Changes in Return on Assets,"Balakrishnan, Bartov, and Faurel",2010,Profitability
+A.4.5,Ato,Asset Turnover,Soliman,2008,Profitability
+A.4.6,Cto,Capital Turnover,Haugen and Baker,1996,Profitability
+A.4.7,"Rna q 1, Rna q 6, Atoq1","Quarterly Return on Net Operating Assets, Quarterly Asset Turnover",Soliman,2008,Profitability
+A.4.8,"Cto q1, Cto q6,",Quarterly Capital Turnover,Haugen and Baker,1996,Profitability
+A.4.9,Gpa,Gross Proﬁts-to-assets,Novy-Marx,2013,Profitability
+A.4.11,"Gla q 1, Gla q 6, and Gla q 12",Quarterly Gross Proﬁts-to-lagged Assets,,,Profitability
+A.4.12,Ope,Operating Proﬁts to Equity,Fama and French,2015,Profitability
+A.4.14,"Ole q 1, Ole q 6 ",Quarterly Operating Proﬁts-to-lagged Equity,,,Profitability
+A.4.15,Opa,Operating Proﬁts-to-assets,"Linnainmaa, and Nikolaev",2015,Profitability
+A.4.17,"Ola q 1, Ola q 6, and Ola q 12",Quarterly Operating Proﬁts-to-lagged Assets,,,Profitability
+A.4.18,Cop,Cash-based Operating Proﬁtability,"Gerakos, Linnainmaa, and Nikolaev",2016,Profitability
+A.4.19,Cla,Cash-based Operating Proﬁts-to-lagged Assets,,,Profitability
+A.4.20,Claq,Quarterly Cash-based Operating Proﬁts-to-lagged Assets,,,Profitability
+A.4.29,Tbi q 12,Quarterly Taxable Income-to-book Income,"Green, Hand, and Zhang",2013,Profitability
+A5.1,Oca and Ioca,(Industry-adjusted) Organizational Capital-to-assets,Eisfeldt and Papanikolaou,2013,Intangibles
+A.5.2,Adm,Advertising Expense-to-market,"Chan, Lakonishok, and Sougiannis",2001,Intangibles
+A.5.4,Rdm,R&D Expense-to-market,"Chan, Lakonishok, and Sougiannis",2001,Intangibles
+A.5.5,"Rdm q 1, Rdm q 6, and Rdm q 12",Quarterly R&D Expense-to-market,"Chan, Lakonishok, and Sougiannis",2001,Intangibles
+A.5.6,Rds q 6 and Rds q 12,Quarterly R&D Expense-to-sales,"Chan, Lakonishok, and Sougiannis",2001,Intangibles
+A.5.8,Ol,Operating Leverage,Novy-Marx,2011,Intangibles
+A.5.9,"Ol q 1, Ol q 6, and Ol q 12",Quarterly Operating Leverage,Novy-Marx,2011,Intangibles
+A.5.11,Rca,R&D Capital-to-assets,Li,2011,Intangibles
+A.5.24,Etr,Eﬀective Tax Rate,Abarbanell and Bushee,1998,Intangibles
+A.5.46,"Alm q 1, Alm q 6, and Alm q 12",Quarterly Asset Liquidity,Ortiz-Molina and Phillips,2014,Intangibles
+A.5.50,"R a 1 , R n 1 , R a [2,5] , R n[2,5] , R a[6,10] , R n[6,10] , R a[11,15] , and R a[16,20]",Seasonality,Heston and Sadka,2008,Intangibles
+A.6.8,Beta1,Market Beta,Fama and MacBeth,1973,Frictions
+A.6.13,Dtv12,"dollar trading volume, 12-month holding period","Brennan, Chordia, and Subrahmanyam",1998,Frictions
+A.6.21,Isff1,"idiosyncratic skewness estimated from the Fama-French 3-factor model, 1-month holding period",Harvey and Siddique,2000,Frictions
+A.6.22,Isq1,"idiosyncratic skewness estimated from the q-factor model, 1-month holding period",Harvey and Siddique,2000,Frictions
+A.6.3,Ivff1,"idiosyncratic volatility estimated from the Fama-French 3-factor model, 1-month holding period","Ang, Hodrick, Xing, and Zhang",2006,Frictions
+A.6.5,Ivq1,"idiosyncratic volatility estimated from the q-factor model, 1-month holding period","Ang, Hodrick, Xing, and Zhang",2006,Frictions
+A.6.1,Me,the market equity,Banz,1981,Frictions
+A.6.24,Srev,short-term reversal,Jegadeesh,1990,Frictions
+A.6.7,Sv1,"systematic volatility, 1-month holding period","Ang, Hodrick, Xing, and Zhang",2006,Frictions
+A.6.6,Tv1,"total volatility, 1-month holding period","Ang, Hodrick, Xing, and Zhang",2006,Frictions
+A.1.2,Abr1,"cumulative abnormal returns around earnings announcement dates, 1-month holding period","Chan, Jegadeesh, and Lakonishok",1996,Momentum
+A.1.2,Abr6,"cumulative abnormal returns around earnings announcement dates, 6-month holding period","Chan, Jegadeesh, and Lakonishok",1996,Momentum
+A.1.2,Abr12,"cumulative abnormal returns around earnings announcement dates, 12-month holding period","Chan, Jegadeesh, and Lakonishok",1996,Momentum
+,abr,Cumulative Abnormal Returns Around Earnings Announcement Dates,"We calculate cumulative abnormal stock return (Abr) around the latest quarterly earnings announcement date (Compustat quarterly item RDQ) (Chan, Jegadeesh, and Lakonishok 1996)): Abr_i = \sum_{d=-2}^{+1}r_{id}-r{md}, in which r id is stock i’s return on day d (with the earnings announced on day 0) and r md is the market index return. We cumulate returns until one (trading) day after the announcement date to account for the one-day-delayed reaction to earnings news. r md is the value-weighted market return for the Abr deciles with NYSE breakpoints and value-weighted returns, but is the equal-weighted market return with all-but-micro breakpoints and equal-weighted returns.",,
+,agr,Asset growth,Annual percent change in total assets (at),,
+,baspread,Bid-ask spread rolling 3m,Monthly average of daily bid-ask spread divided by average of daily spread,,
+,beta,Beta rolling 3m,Estimated market beta from daily returns,,
+,bm_ia,Industry-adjusted book to market,Industry adjusted book-to-market ratio,,
+,cash,Cash holdings,Cash and cash equivalents divided by average total assets,,
+,cashdebt,Cash ﬂow to debt,Earnings before depreciation and extraordinary items (ib+dp) divided by avg. total liabilities (lt),,
+,chcsho,Change in shares outstanding,Annual percent change in shares outstanding (csho),,
+,chpm,Industry-adjusted change in proﬁt margin,2-digit SIC - ﬁscal-year mean adjusted change in income before extraordinary items (ib) divided by sales (sale),,
+,chtx,Change in tax expense,Percent change in total taxes (txtq) from quartert-4 to t,,
+,cinvest,Corporate investment,"Change over one quarter in net PP&E (ppentq) divided by sales (saleq) - average of this variable for prior 3 quarters; if saleq = 0, then scale by 0.01",,
+,depr,Depreciation / PP&E,Depreciation divided by PP&E,,
+,dolvol,Dollar trading volume,Natural log of trading volume times price per share from month t-2,,
+,gma,Gross profitability,Revenues (revt) minus cost of goods sold (cogs) divided by lagged total assets (at),,
+,grltnoa,Growth in long-term net operating assets,Growth in long-term net operating assets,,
+,herf,Industry sales concentration,2-digit SIC - ﬁscal-year sales concentration (sum of squared percent of sales in industry for each company).,,
+,hire,Employee growth rate,Percent change in number of employees (emp),,
+,ill,Illiquidity rolling 3m,Average of daily (absolute return / dollar volume).,,
+,lev,Leverage,Total liabilities (lt) divided by ﬁscal year-end market capitalization,,
+,lgr,Growth in long-term debt,Annual percent change in total liabilities (lt),,
+,maxret,Maximum daily returns rolling 3m,Maximum daily return from returns during calendar montht-1,,
+,me_ia,Industry-adjusted size,2-digit SIC industry-adjusted ﬁscal year-end market capitalization,,
+,mom12m,Momentum rolling 12m,11-month cumulative returns ending one month before month end,,
+,mom1m,Momentum ,1-month cumulative return,,
+,mom36m,Momentum rolling 36m,Cumulative returns from monthst-36 to t-13,,
+,mom60m,Momentum rolling 60m,Cumulative returns from monthst-60 to t-13,,
+,mom6m,Momentum rolling 6m,5-month cumulative returns ending one month before month end,,
+,nincr,Number of earnings increases,Number of consecutive quarters (up to eight quarters) with an increase in earnings (ibq) over same quarter in the prior year,,
+,op,Operating proﬁtability,"Following Fama and French (2015), we measure operating proﬁtability to equity, Ope, as total revenue (Compustat annual item REVT) minus cost of goods sold (item COGS, zero if missing), minus selling, general, and administrative expenses (item XSGA, zero if missing), and minus interest expense (item XINT, zero if missing), scaled by book equity (the denominator is current, not lagged, book equity). We require at least one of the three expense items (COGS, XSGA, and XINT) to be non-missing. Book equity is stockholders’ book equity, plus balance sheet deferred taxes and investment tax credit (item TXDITC) if available, minus the book value of preferred stock. Stockholders’ equity is the value reported by Compustat (item SEQ), if it is available. If not, we measure stockholders’ equity as the book value of common equity (item CEQ) plus the par value of preferred stock (item PSTK), or the book value of assets (item AT) minus total liabilities (item LT). Depending on availability, we use redemption (item PSTKRV), liquidating (item PSTKL), or par value (item PSTK) for the book value of preferred stock.",,
+,pm,proﬁt margin,"Soliman (2008) use DuPont analysis to decompose Roe as Rna + FLEV × SPREAD, in which Roe is return on equity, Rna is return on net operating assets, FLEV is ﬁnancial leverage, and SPREAD is the diﬀerence between return on net operating assets and borrowing costs. We can further decompose Rna as Pm × Ato, in which Pm is proﬁt margin and Ato is asset turnover. Pm is operating income after depreciation divided by sales (item SALE) for the ﬁscal year ending in calendar year t − 1.",,
+,pscore,Performance Score,Sum of 9 indicator variables to form fundamental health score,,
+,rd_sale,R&D to sales,R&D expense divided by sales (xrd/sale),,
+,re,Revisions in analysts’ earnings forecasts,"Following Chan, Jegadeesh, and Lakonishok (1996), we measure earnings surprise as the revisions in analysts’ forecasts of earnings obtained from the Institutional Brokers’ Estimate System (IBES). Because analysts’ forecasts are not necessarily revised each month, we construct a six-month moving average of past changes in analysts’ forecasts: RE_{it}=\sum_{\iota=1}^6\frac{",,
+,rsup,Revenue surprise,Sales from quarter t minus sales from quarter t-4 (saleq) divided by ﬁscal-quarter-end market capitalization (cshoq * prccq),,
+,rvar_capm,Residual variance - CAPM rolling 3m,Daily Stock residual variance of CAPM,,
+,rvar_ff3,Residual variance - ff3 rolling 3m,Daily Stock residual variance of Fama French 3 factors,,
+,rvar_mean,return variance rolling 3m,Daily Stock return variance,,
+,sgr,Sales growth,Annual percent change in sales (sale),,
+,std_dolvol,Std of dollar trading volume rolling 3m,Monthly standard deviation of daily dollar trading volume,,
+,std_turn,Std. of Share turnover rolling 3m,Monthly standard deviation of daily share turnover,,
+,sue,Unexpected quarterly earnings,"Unexpected quarterly earnings divided by ﬁscal-quarter-end market cap. Unexpected earnings is I/B/E/S actual earnings minus median forecasted earnings if available, else it is the seasonally differenced quarterly earnings before extraordinary items from Compustat quarterly ﬁle",,
+,turn,Shares turnover,Average monthly trading volume for most recent 3 months scaled by number of shares outstanding in current month,,
+,zerotrade,Number of zero-trading days rolling 3m,Turnover weighted number of zero trading days for most recent 1 month,,
