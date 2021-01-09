@@ -1,14 +1,21 @@
 import pandas as pd
 import pickle as pkl
 import numpy as np
-import wrds
+from tqdm import tqdm
 from functions import *
 
 ####################
 #    All Stocks    #
 ####################
+with open('chars_q_raw.pkl', 'rb') as f:
+    chars_q = pkl.load(f)
 
-with open('chars_a_60.pkl', 'rb') as f:
+chars_q = chars_q.dropna(subset=['permno'])
+chars_q[['permno', 'gvkey']] = chars_q[['permno', 'gvkey']].astype(int)
+chars_q['jdate'] = pd.to_datetime(chars_q['jdate'])
+chars_q = chars_q.drop_duplicates(['permno', 'jdate'])
+
+with open('chars_a_raw.pkl', 'rb') as f:
     chars_a = pkl.load(f)
 
 chars_a = chars_a.dropna(subset=['permno'])
@@ -16,101 +23,115 @@ chars_a[['permno', 'gvkey']] = chars_a[['permno', 'gvkey']].astype(int)
 chars_a['jdate'] = pd.to_datetime(chars_a['jdate'])
 chars_a = chars_a.drop_duplicates(['permno', 'jdate'])
 
-with open('chars_q_raw.pkl', 'rb') as f:
-    chars_q = pkl.load(f)
+# information list
+obs_var_list = ['gvkey', 'permno', 'jdate', 'sic', 'ret', 'retx', 'retadj', 'exchcd', 'shrcd']
+# characteristics with quarterly and annual frequency at the same time
+accounting_var_list = ['datadate', 'acc', 'bm', 'agr', 'alm', 'ato',  'cash', 'cashdebt', 'cfp', 'chcsho', 'chpm',
+                       'chtx', 'depr', 'ep', 'gma', 'grltnoa', 'lev', 'lgr', 'ni', 'noa', 'op', 'pctacc', 'pm',
+                       'rd_sale', 'rdm', 'rna', 'roa', 'roe', 'rsup', 'sgr', 'sp']
+a_var_list = ['a_'+i for i in accounting_var_list]
+q_var_list = ['q_'+i for i in accounting_var_list]
+# annual frequency only list
+a_only_list = ['adm', 'bm_ia', 'herf', 'hire', 'me_ia']
+# quarterly frequency only list
+q_only_list = ['abr', 'sue', 'cinvest', 'nincr', 'pscore',
+               # 'turn', 'dolvol'
+               ]
+# monthly frequency only list
+m_var_list = ['baspread', 'beta', 'ill', 'maxret', 'mom12m', 'mom1m', 'mom36m', 'mom60m', 'mom6m', 're', 'rvar_capm',
+              'rvar_ff3', 'rvar_mean', 'seas1a', 'std_dolvol', 'std_turn', 'zerotrade', 'me', 'dy',
+              'turn', 'dolvol' # need to rerun the accounting to put them in to char_a
+              ]
 
-# use annual variables to fill na of quarterly variables
-chars_q = fillna_atq(df_q=chars_q, df_a=chars_a)
+df_a = chars_a[obs_var_list + accounting_var_list + a_only_list + m_var_list]
+df_a.columns = obs_var_list + a_var_list + a_only_list + m_var_list
+df_a = df_a.sort_values(obs_var_list)
 
-# merge annual variables to quarterly variables
-chars_a_var = chars_a[['permno', 'jdate', 'dy', 'hire', 'herf', 'me_ia', 'bm_ia']]
-chars_q = pd.merge(chars_q, chars_a_var, how='left', on=['permno', 'jdate'])
+df_q = chars_q[obs_var_list + accounting_var_list + q_only_list]
+df_q.columns = obs_var_list + q_var_list + q_only_list
+# drop the same information columns for merging
+df_q = df_q.drop(['sic', 'ret', 'retx', 'retadj', 'exchcd', 'shrcd'], axis=1)
 
-# adm is annual variable
-adm = chars_a[['permno', 'jdate', 'adm']]
-chars_q = pd.merge(chars_q, adm, how='left', on=['permno', 'jdate'])
+df = df_a.merge(df_q, how='left', on=['gvkey', 'jdate', 'permno'])
 
-# impute missing values, you can choose different func form functions, such as ffi49/ffi10
-chars_q_impute = chars_q.copy()
-chars_q_impute['sic'] = chars_q_impute['sic'].astype(int)
-chars_q_impute['jdate'] = pd.to_datetime(chars_q_impute['jdate'])
+# first element in accounting_var_list is datadate
+for i in tqdm(accounting_var_list[1:]):
+    print('processing %s' % i)
+    a = 'a_'+i
+    q = 'q_'+i
+    t1 = 'tmp1_'+i
+    t2 = 'tmp2_'+i
+    t3 = 'tmp3_'+i
+    t4 = 'tmp4_'+i
+    t5 = 'tmp5_'+i
+    
+    # tmp1: if the annual variable is available
+    df[t1] = np.where(df[a].isna(), False, True)
+    # tmp2: if the quarterly variable is available
+    df[t2] = np.where(df[q].isna(), False, True)
+    # tmp3: both
+    df[t3] = df[t1] & df[t2]
+    # tmp4: latest one
+    df[t4] = np.where(df['q_datadate'] < df['a_datadate'], df[a], df[q])
+    # available one
+    df[t5] = np.where(df[t1], df[a], df[q])
+    # final
+    df[i] = np.where(df[t3], df[t4], df[t5])
+    df = df.drop([a, q, t1, t2, t3, t4, t5], axis=1)
 
-chars_q_impute['ffi49'] = ffi49(chars_q_impute)
-chars_q_impute['ffi49'] = chars_q_impute['ffi49'].fillna(49)  # we treat na in ffi49 as 'other'
-chars_q_impute['ffi49'] = chars_q_impute['ffi49'].astype(int)
+# drop the datadate of different frequency
+df = df.drop(['a_datadate', 'q_datadate'], axis=1)
+
+# drop optional variables, you can adjust it by your selection
+df = df.drop(['ret', 'retx'], axis=1)
+df = df.rename(columns={'retadj': 'ret'})  # retadj is return adjusted by dividend
+
+# save raw data
+with open('chars60_raw_no_impute.pkl', 'wb') as f:
+    pkl.dump(df, f, protocol=4)
+
+# impute missing values, you can choose different func form functions.py, such as ffi49/ffi10
+df_impute = df.copy()
+df_impute['sic'] = df_impute['sic'].astype(int)
+df_impute['jdate'] = pd.to_datetime(df_impute['jdate'])
+
+df_impute['ffi49'] = ffi49(df_impute)
+df_impute['ffi49'] = df_impute['ffi49'].fillna(49)  # we treat na in ffi49 as 'other'
+df_impute['ffi49'] = df_impute['ffi49'].astype(int)
 
 # there are two ways to impute: industrial median or mean
-chars_q_impute = fillna_ind(chars_q_impute, method='median', ffi=49)
-# we use all stocks' mean or median to fill na that are not filled by value of ffi
-chars_q_impute = fillna_all(chars_q_impute, method='median')
-chars_q_impute['re'] = chars_q_impute['re'].fillna(0)  # re use IBES database, there are lots of missing data
+df_impute = fillna_ind(df_impute, method='median', ffi=49)
 
-chars_q_impute['year'] = chars_q_impute['jdate'].dt.year
-chars_q_impute = chars_q_impute[chars_q_impute['year'] >= 1972]
-chars_q_impute = chars_q_impute.drop(['year'], axis=1)
+df_impute = fillna_all(df_impute, method='median')
+df_impute['re'] = df_impute['re'].fillna(0)  # re use IBES database, there are lots of missing data
 
-chars_q_impute = chars_q_impute[['permno', 'gvkey', 'datadate', 'jdate', 'ffi49', 'sic', 'exchcd', 'shrcd', 'ret',
-                                 'retx', 'retadj', 'me', 'abr', 'acc', 'adm', 'agr',
-                                 'alm', 'ato', 'baspread', 'beta', 'bm', 'bm_ia',
-                                 'cash',  'cashdebt', 'cfp', 'chcsho', 'chpm', 'chtx',
-                                 'cinvest', 'depr', 'dolvol', 'dy', 'ep', 'gma',
-                                 'grltnoa', 'herf', 'hire', 'ill', 'lev', 'lgr',
-                                 'maxret', 'me_ia', 'mom12m', 'mom1m', 'mom36m', 'mom60m',
-                                 'mom6m', 'ni', 'nincr', 'noa', 'op', 'pctacc', 'pm',
-                                 'pscore', 'rd_sale', 'rdm', 're', 'rna', 'roa',
-                                 'roe', 'rsup', 'rvar_capm', 'rvar_ff3', 'rvar_mean',
-                                 'seas1a', 'sgr', 'sp', 'std_dolvol', 'std_turn', 'sue',
-                                 'turn', 'zerotrade']]
+df_impute['year'] = df_impute['jdate'].dt.year
+df_impute = df_impute[df_impute['year'] >= 1972]
+df_impute = df_impute.drop(['year'], axis=1)
 
-# process me and shift data
-chars_q_impute['log_me'] = np.log(chars_q_impute['me'])
-chars_q_impute = chars_q_impute.rename(columns={'me': 'lag_me'})
-chars_q_impute['ret'] = chars_q_impute.groupby(['permno'])['ret'].shift(-1)
-chars_q_impute['retx'] = chars_q_impute.groupby(['permno'])['retx'].shift(-1)
-chars_q_impute['retadj'] = chars_q_impute.groupby(['permno'])['retadj'].shift(-1)
+with open('chars60_raw_imputed.pkl', 'wb') as f:
+    pkl.dump(df_impute, f, protocol=4)
 
-# drop na due to lag
-chars_q_impute = chars_q_impute.dropna()
+# standardize raw data
+df_rank = standardize(df)
+df['year'] = df['jdate'].dt.year
+df = df[df['year'] >= 1972]
+df = df.drop(['year'], axis=1)
+df_rank['me'] = df['me']
+df_rank['log_me'] = np.log(df['me'])
+with open('chars60_rank_no_impute.pkl', 'wb') as f:
+    pkl.dump(df_rank, f, protocol=4)
 
-with open('chars_impute_60.pkl', 'wb') as f:
-    pkl.dump(chars_q_impute, f, protocol=4)
+# standardize imputed data
+df_rank = standardize(df_impute)
+df_rank['year'] = df_rank['jdate'].dt.year
+df_rank = df_rank[df_rank['year'] >= 1972]
+df_rank = df_rank.drop(['year'], axis=1)
+df_rank['me'] = df['me']
+df_rank['log_me'] = np.log(df['me'])
+with open('chars60_rank_imputed.pkl', 'wb') as f:
+    pkl.dump(df_rank, f, protocol=4)
 
-# standardize characteristics
-chars_q_rank = chars_q.copy()
-chars_q_rank['sic'] = chars_q_rank['sic'].astype(int)
-chars_q_rank['jdate'] = pd.to_datetime(chars_q_rank['jdate'])
-
-chars_q_rank['ffi49'] = ffi49(chars_q_rank)
-chars_q_rank['ffi49'] = chars_q_rank['ffi49'].fillna(49)  # we treat na in ffi49 as 'other'
-chars_q_rank['ffi49'] = chars_q_rank['ffi49'].astype(int)
-
-# process me and shift data
-chars_q_rank['log_me'] = np.log(chars_q_rank['me'])
-chars_q_rank = chars_q_rank.rename(columns={'me': 'lag_me'})
-chars_q_rank['ret'] = chars_q_rank.groupby(['permno'])['ret'].shift(-1)
-chars_q_rank['retx'] = chars_q_rank.groupby(['permno'])['retx'].shift(-1)
-chars_q_rank['retadj'] = chars_q_rank.groupby(['permno'])['retadj'].shift(-1)
-
-# standardize data
-chars_q_rank = standardize(chars_q_rank)
-chars_q_rank['year'] = chars_q_rank['jdate'].dt.year
-chars_q_rank = chars_q_rank[chars_q_rank['year'] >= 1972]
-chars_q_rank = chars_q_rank.drop(['year'], axis=1)
-
-chars_q_rank = chars_q_rank[['permno', 'gvkey', 'datadate', 'jdate', 'ffi49', 'sic', 'exchcd', 'shrcd', 'ret',
-                             'retx', 'retadj', 'lag_me', 'rank_log_me', 'rank_abr', 'rank_acc', 'rank_adm', 'rank_agr',
-                             'rank_alm', 'rank_ato', 'rank_baspread', 'rank_beta', 'rank_bm', 'rank_bm_ia', 'rank_cash',
-                             'rank_cashdebt', 'rank_cfp', 'rank_chcsho', 'rank_chpm', 'rank_chtx', 'rank_cinvest',
-                             'rank_depr', 'rank_dolvol', 'rank_dy', 'rank_ep', 'rank_gma', 'rank_grltnoa', 'rank_herf',
-                             'rank_hire', 'rank_ill', 'rank_lev', 'rank_lgr', 'rank_maxret', 'rank_me_ia',
-                             'rank_mom12m', 'rank_mom1m', 'rank_mom36m', 'rank_mom60m', 'rank_mom6m', 'rank_ni',
-                             'rank_nincr', 'rank_noa', 'rank_op', 'rank_pctacc', 'rank_pm', 'rank_pscore',
-                             'rank_rd_sale', 'rank_rdm', 'rank_re', 'rank_rna', 'rank_roa', 'rank_roe', 'rank_rsup',
-                             'rank_rvar_capm', 'rank_rvar_ff3', 'rank_rvar_mean', 'rank_seas1a', 'rank_sgr', 'rank_sp',
-                             'rank_std_dolvol', 'rank_std_turn', 'rank_sue', 'rank_turn', 'rank_zerotrade']]
-
-with open('chars_rank_60.pkl', 'wb') as f:
-    pkl.dump(chars_q_rank, f, protocol=4)
 
 ####################
 #      SP1500      #
@@ -120,7 +141,7 @@ with open('/home/jianxinma/chars/data/sp1500_impute_benchmark.pkl', 'rb') as f:
 
 sp1500_index = sp1500_index[['gvkey', 'jdate']]
 
-sp1500_impute = pd.merge(sp1500_index, chars_q_impute, how='left', on=['gvkey', 'jdate'])
+sp1500_impute = pd.merge(sp1500_index, df_impute, how='left', on=['gvkey', 'jdate'])
 
 # for test
 # test = sp1500_rank.groupby(['jdate'])['gvkey'].nunique()
@@ -129,7 +150,7 @@ with open('sp1500_impute_60.pkl', 'wb') as f:
     pkl.dump(sp1500_impute, f, protocol=4)
 
 # standardize characteristics
-sp1500_rank = pd.merge(sp1500_index, chars_q_rank, how='left', on=['gvkey', 'jdate'])
+sp1500_rank = pd.merge(sp1500_index, df_rank, how='left', on=['gvkey', 'jdate'])
 
 with open('sp1500_rank_60.pkl', 'wb') as f:
     pkl.dump(sp1500_rank, f, protocol=4)

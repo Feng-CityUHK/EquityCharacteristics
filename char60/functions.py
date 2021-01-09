@@ -1,6 +1,7 @@
 import pandas as pd
 import pickle as pkl
 import numpy as np
+from tqdm import tqdm
 import re
 
 def ffi49(df):
@@ -431,17 +432,21 @@ def fillna_all(df, method):
 
 
 def standardize(df):
-    df_temp = df.groupby(['jdate'], as_index=False)['gvkey'].count()
-    df_temp = df_temp.rename(columns={'gvkey': 'count'})
-    df = pd.merge(df, df_temp, how='left', on='jdate')
+    # exclude the the information columns
     col_names = df.columns.values.tolist()
     list_to_remove = ['permno', 'date', 'jdate', 'datadate', 'gvkey', 'sic', 'count', 'exchcd', 'shrcd', 'ffi49', 'ret',
                       'retadj', 'retx', 'lag_me']
     col_names = list(set(col_names).difference(set(list_to_remove)))
-    df = df.fillna(0)
-    for col_name in col_names:
-        df['%s_rank' % col_name] = df.groupby(['jdate'])['%s' % col_name].rank()
-        df['rank_%s' % col_name] = (df['%s_rank' % col_name]-1)/(df['count']-1)*2 - 1
-        df = df.drop(['%s_rank' % col_name, '%s' % col_name], axis=1)
+    for col_name in tqdm(col_names):
+        print('processing %s' % col_name)
+        # count the non-missing number of factors, we only count non-missing values
+        unique_count = df.dropna(subset=['%s' % col_name]).groupby(['jdate'])['%s' % col_name].unique().apply(len)
+        unique_count = pd.DataFrame(unique_count).reset_index()
+        unique_count.columns = ['jdate', 'count']
+        df = pd.merge(df, unique_count, how='left', on=['jdate'])
+        # ranking, and then standardize the data
+        df['%s_rank' % col_name] = df.groupby(['jdate'])['%s' % col_name].rank(method='dense')
+        df['rank_%s' % col_name] = (df['%s_rank' % col_name] - 1) / (df['count'] - 1) * 2 - 1
+        df = df.drop(['%s_rank' % col_name, '%s' % col_name, 'count'], axis=1)
+        df = df.fillna(0)
     return df
-

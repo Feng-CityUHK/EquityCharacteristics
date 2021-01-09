@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 import wrds
-import psycopg2
 from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 from pandasql import *
