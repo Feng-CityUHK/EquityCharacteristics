@@ -85,6 +85,7 @@ df = df.drop(['a_datadate', 'q_datadate'], axis=1)
 # drop optional variables, you can adjust it by your selection
 df = df.drop(['ret', 'retx'], axis=1)
 df = df.rename(columns={'retadj': 'ret'})  # retadj is return adjusted by dividend
+df['ret'] = df.groupby(['permno'])['ret'].shift(-1)  # we shift return in t period to t+1 for prediction
 
 # save raw data
 with open('chars60_raw_no_impute.pkl', 'wb') as f:
