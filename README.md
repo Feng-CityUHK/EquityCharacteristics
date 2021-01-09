@@ -33,6 +33,28 @@ Many papers contribute a lot to this repository. I am very sorry for only listin
 
 This topic is summaried by **Green Hand Zhang** and **Hou Xue Zhang**.
 
+### Files
+
+#### Main Files
+- accounting.py  -- most annual, quarterly and monthly frequency characteristics
+- functions.py -- impute and rank functions
+- merge_chars.py -- merge all the characteristics from different pickle file into one pickle file
+- inpute_rank_output_bchmk.py -- impute the missing values and standardize raw data
+
+#### Single Characteristic Files
+- beta.py -- 3 months rolling CAPM beta
+- rvar_capm.py, rvar_ff3.py -- residual variance of CAPM and fama french 3 factors model, rolling window is 3 months
+- rvar_mean.py -- variance of return, rolling window is 3 months
+- abr.py -- cumulative abnormal returns around earnings announcement dates
+- re.py -- revisions in analysts’ earnings forecasts
+- sue.py -- unexpected quarterly earnings
+- ill.py -- illiquidity, rolling window is 3 months
+- maxret_d.py -- maximum daily returns, rolling window is 3 months
+- std_dolvol.py -- std of dollar trading volume, rolling window is 3 months
+- std_turn.py -- std of Share turnover, rolling window is 3 months
+- bid_ask_spread.py -- bid-ask spread, rolling window is 3 months
+- zerotrade.py -- number of zero-trading days, rolling window is 3 months
+
 ### Portfolio Characteristics
 
 Portfolio charactaristics is the equal-weighted / value-weighted averge of the characteristics for all equities in the portfolio.
