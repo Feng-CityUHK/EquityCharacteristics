@@ -33,14 +33,14 @@ For financial researches, we need equity characteristics. This repository is a t
 - ill.py -- illiquidity, rolling window is 3 months
 - maxret_d.py -- maximum daily returns, rolling window is 3 months
 - std_dolvol.py -- std of dollar trading volume, rolling window is 3 months
-- std_turn.py -- std of Share turnover, rolling window is 3 months
+- std_turn.py -- std of share turnover, rolling window is 3 months
 - bid_ask_spread.py -- bid-ask spread, rolling window is 3 months
 - zerotrade.py -- number of zero-trading days, rolling window is 3 months
 
 ## How to use
 
 1. run accounting.py
-2. run all the singl characteristic files
+2. run all the single characteristic files
 3. run merge_chars.py
 4. run impute_rank_output_bckmk.py (you may want to commen the part of sp1500 in this file if you just need the all stocks version)
 
@@ -52,7 +52,7 @@ The date range is 1972 to 2019. The stock universe is top 3 exchanges (NYSE/AMEX
 
 The currant time of data is $ret_t = chars_{t-1}$
 
-1. chars_raw_no_impute.pkl (all data with original missin value)
+1. chars_raw_no_impute.pkl (all data with original missing value)
 2. chars_raw_imputed.pkl (impute missing value with industry median/mean value)
 3. chars_rank_no_imputed.pkl (standardize chars_raw_no_impute.pkl)
 4. chars_rank_imputed.pkl (standardize chars_raw_imputed.pkl)
@@ -63,7 +63,7 @@ The currant time of data is $ret_t = chars_{t-1}$
 - time: datadate, jdate, year ('datadate' is the available time for data and 'jdate' is the data that we use it)
 - industry: sic, ffi49
 - exchange info: exchcd, shrcd
-- return: ret (we also provide original return and return without dividend, you can keep them bu modifing impute_rank_output_bchmk.py)
+- return: ret (we also provide original return and return without dividend, you can keep them by modifing impute_rank_output_bchmk.py)
 - market equity: me/rank_me
 
 ## Method
