@@ -114,22 +114,24 @@ with open('chars60_raw_imputed.pkl', 'wb') as f:
     pkl.dump(df_impute, f, protocol=4)
 
 # standardize raw data
-df_rank = standardize(df)
-df['year'] = df['jdate'].dt.year
-df = df[df['year'] >= 1972]
-df = df.drop(['year'], axis=1)
-df_rank['me'] = df['me']
-df_rank['log_me'] = np.log(df['me'])
+df_rank = df.copy()
+df_rank['lag_me'] = df_rank['me']
+df_rank = standardize(df_rank)
+df_rank['year'] = df_rank['jdate'].dt.year
+df_rank = df_rank[df_rank['year'] >= 1972]
+df_rank = df_rank.drop(['year'], axis=1)
+df_rank['log_me'] = np.log(df_rank['lag_me'])
 with open('chars60_rank_no_impute.pkl', 'wb') as f:
     pkl.dump(df_rank, f, protocol=4)
 
 # standardize imputed data
-df_rank = standardize(df_impute)
+df_rank = df_impute.copy()
+df_rank['lag_me'] = df_rank['me']
+df_rank = standardize(df_rank)
 df_rank['year'] = df_rank['jdate'].dt.year
 df_rank = df_rank[df_rank['year'] >= 1972]
 df_rank = df_rank.drop(['year'], axis=1)
-df_rank['me'] = df['me']
-df_rank['log_me'] = np.log(df['me'])
+df_rank['log_me'] = np.log(df_rank['lag_me'])
 with open('chars60_rank_imputed.pkl', 'wb') as f:
     pkl.dump(df_rank, f, protocol=4)
 
