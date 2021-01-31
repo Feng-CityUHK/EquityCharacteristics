@@ -60,7 +60,7 @@ The currant time of data is $ret_t = chars_{t-1}$
 ### Information Variables:
 
 - stock indicator: gvkey, permno
-- time: datadate, jdate, year ('datadate' is the available time for data and 'jdate' is the data that we use it)
+- time: datadate, date, year ('datadate' is the available time for data and 'date' is the date of return)
 - industry: sic, ffi49
 - exchange info: exchcd, shrcd
 - return: ret (we also provide original return and return without dividend, you can keep them by modifing impute_rank_output_bchmk.py)
