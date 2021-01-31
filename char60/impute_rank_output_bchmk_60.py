@@ -86,6 +86,9 @@ df = df.drop(['a_datadate', 'q_datadate'], axis=1)
 df = df.drop(['ret', 'retx'], axis=1)
 df = df.rename(columns={'retadj': 'ret'})  # retadj is return adjusted by dividend
 df['ret'] = df.groupby(['permno'])['ret'].shift(-1)  # we shift return in t period to t+1 for prediction
+df['date'] = df.groupby(['permno'])['jdate'].shift(-1)  # date is return date, jdate is predictor date
+df = df.drop(['jdate'], axis=1)  # now we only keep the date of return
+df = df.dropna(subset=['ret']).reset_index(drop=True)
 
 # save raw data
 with open('chars60_raw_no_impute.pkl', 'wb') as f:
@@ -94,7 +97,7 @@ with open('chars60_raw_no_impute.pkl', 'wb') as f:
 # impute missing values, you can choose different func form functions.py, such as ffi49/ffi10
 df_impute = df.copy()
 df_impute['sic'] = df_impute['sic'].astype(int)
-df_impute['jdate'] = pd.to_datetime(df_impute['jdate'])
+df_impute['date'] = pd.to_datetime(df_impute['date'])
 
 df_impute['ffi49'] = ffi49(df_impute)
 df_impute['ffi49'] = df_impute['ffi49'].fillna(49)  # we treat na in ffi49 as 'other'
@@ -106,7 +109,7 @@ df_impute = fillna_ind(df_impute, method='median', ffi=49)
 df_impute = fillna_all(df_impute, method='median')
 df_impute['re'] = df_impute['re'].fillna(0)  # re use IBES database, there are lots of missing data
 
-df_impute['year'] = df_impute['jdate'].dt.year
+df_impute['year'] = df_impute['date'].dt.year
 df_impute = df_impute[df_impute['year'] >= 1972]
 df_impute = df_impute.drop(['year'], axis=1)
 
@@ -117,10 +120,11 @@ with open('chars60_raw_imputed.pkl', 'wb') as f:
 df_rank = df.copy()
 df_rank['lag_me'] = df_rank['me']
 df_rank = standardize(df_rank)
-df_rank['year'] = df_rank['jdate'].dt.year
+df_rank['year'] = df_rank['date'].dt.year
 df_rank = df_rank[df_rank['year'] >= 1972]
 df_rank = df_rank.drop(['year'], axis=1)
 df_rank['log_me'] = np.log(df_rank['lag_me'])
+
 with open('chars60_rank_no_impute.pkl', 'wb') as f:
     pkl.dump(df_rank, f, protocol=4)
 
@@ -128,10 +132,11 @@ with open('chars60_rank_no_impute.pkl', 'wb') as f:
 df_rank = df_impute.copy()
 df_rank['lag_me'] = df_rank['me']
 df_rank = standardize(df_rank)
-df_rank['year'] = df_rank['jdate'].dt.year
+df_rank['year'] = df_rank['date'].dt.year
 df_rank = df_rank[df_rank['year'] >= 1972]
 df_rank = df_rank.drop(['year'], axis=1)
 df_rank['log_me'] = np.log(df_rank['lag_me'])
+
 with open('chars60_rank_imputed.pkl', 'wb') as f:
     pkl.dump(df_rank, f, protocol=4)
 
@@ -142,9 +147,9 @@ with open('chars60_rank_imputed.pkl', 'wb') as f:
 with open('/home/jianxinma/chars/data/sp1500_impute_benchmark.pkl', 'rb') as f:
     sp1500_index = pkl.load(f)
 
-sp1500_index = sp1500_index[['gvkey', 'jdate']]
+sp1500_index = sp1500_index[['gvkey', 'date']]
 
-sp1500_impute = pd.merge(sp1500_index, df_impute, how='left', on=['gvkey', 'jdate'])
+sp1500_impute = pd.merge(sp1500_index, df_impute, how='left', on=['gvkey', 'date'])
 
 # for test
 # test = sp1500_rank.groupby(['jdate'])['gvkey'].nunique()
@@ -153,7 +158,7 @@ with open('sp1500_impute_60.pkl', 'wb') as f:
     pkl.dump(sp1500_impute, f, protocol=4)
 
 # standardize characteristics
-sp1500_rank = pd.merge(sp1500_index, df_rank, how='left', on=['gvkey', 'jdate'])
+sp1500_rank = pd.merge(sp1500_index, df_rank, how='left', on=['gvkey', 'date'])
 
 with open('sp1500_rank_60.pkl', 'wb') as f:
     pkl.dump(sp1500_rank, f, protocol=4)

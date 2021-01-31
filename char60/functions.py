@@ -336,13 +336,13 @@ def fillna_atq(df_q, df_a):
             na_columns_list.append(i)
     # get annual columns from df_a
     df_temp = df_a[na_columns_list].copy()
-    df_temp[['permno', 'jdate']] = df_a[['permno', 'jdate']].copy()
+    df_temp[['permno', 'date']] = df_a[['permno', 'date']].copy()
     # rename annual columns in the form of 'chars_a'
     for na_column in na_columns_list:
         df_temp = df_temp.rename(columns={'%s' % na_column: '%s_a' % na_column})
     df_temp = df_temp.reset_index(drop=True)
     # use annual chars to fill quarterly na
-    df_q = pd.merge(df_q, df_temp, how='left', on=['permno', 'jdate'])
+    df_q = pd.merge(df_q, df_temp, how='left', on=['permno', 'date'])
     for na_column in na_columns_list:
         df_q['%s' % na_column] = np.where(df_q['%s' % na_column].isnull(), df_q['%s_a' % na_column], df_q['%s' % na_column])
         df_q = df_q.drop(['%s_a' % na_column], axis=1)
@@ -354,9 +354,9 @@ def fillna_ind(df, method, ffi):
     na_columns_list = df.columns[df.isna().any()].tolist()
     for na_column in na_columns_list:
         if method == 'mean':
-            df_temp = df.groupby(['jdate', 'ffi%s' % ffi])['%s' % na_column].mean()
+            df_temp = df.groupby(['date', 'ffi%s' % ffi])['%s' % na_column].mean()
         elif method == 'median':
-            df_temp = df.groupby(['jdate', 'ffi%s' % ffi])['%s' % na_column].median()
+            df_temp = df.groupby(['date', 'ffi%s' % ffi])['%s' % na_column].median()
         else:
             None
         df_fill = pd.concat([df_fill, df_temp], axis=1)
@@ -367,18 +367,18 @@ def fillna_ind(df, method, ffi):
         else:
             None
     df_fill = df_fill.reset_index()
-    # reset multiple index to jdate and ffi code
+    # reset multiple index to date and ffi code
     df_fill['index'] = df_fill['index'].astype(str)
     index_temp = df_fill['index'].str.split(',', expand=True)
-    index_temp.columns = ['jdate', 'ffi%s' % ffi]
-    index_temp['jdate'] = index_temp['jdate'].str.strip('(Timestamp(\' \')')
+    index_temp.columns = ['date', 'ffi%s' % ffi]
+    index_temp['date'] = index_temp['date'].str.strip('(Timestamp(\' \')')
     index_temp['ffi%s' % ffi] = index_temp['ffi%s' % ffi].str.strip(')')
-    df_fill[['jdate', 'ffi%s' % ffi]] = index_temp[['jdate', 'ffi%s' % ffi]]
+    df_fill[['date', 'ffi%s' % ffi]] = index_temp[['date', 'ffi%s' % ffi]]
     df_fill = df_fill.drop(['index'], axis=1)
-    df_fill['jdate'] = pd.to_datetime(df_fill['jdate'])
+    df_fill['date'] = pd.to_datetime(df_fill['date'])
     df_fill['ffi49'] = df_fill['ffi49'].astype(int)
     # fill na
-    df = pd.merge(df, df_fill, how='left', on=['jdate', 'ffi%s' % ffi])
+    df = pd.merge(df, df_fill, how='left', on=['date', 'ffi%s' % ffi])
     for na_column in na_columns_list:
         if method == 'mean':
             df['%s' % na_column] = df['%s' % na_column].fillna(df['%s_mean' % na_column])
@@ -396,9 +396,9 @@ def fillna_all(df, method):
     na_columns_list = df.columns[df.isna().any()].tolist()
     for na_column in na_columns_list:
         if method == 'mean':
-            df_temp = df.groupby(['jdate'])['%s' % na_column].mean()
+            df_temp = df.groupby(['date'])['%s' % na_column].mean()
         elif method == 'median':
-            df_temp = df.groupby(['jdate'])['%s' % na_column].median()
+            df_temp = df.groupby(['date'])['%s' % na_column].median()
         else:
             None
         df_fill = pd.concat([df_fill, df_temp], axis=1)
@@ -409,16 +409,16 @@ def fillna_all(df, method):
         else:
             None
     df_fill = df_fill.reset_index()
-    # reset multiple index to jdate and ffi code
+    # reset multiple index to date and ffi code
     df_fill['index'] = df_fill['index'].astype(str)
     index_temp = df_fill['index'].str.split(',', expand=True)
-    index_temp.columns = ['jdate']
-    index_temp['jdate'] = index_temp['jdate'].str.strip('(Timestamp(\' \')')
-    df_fill[['jdate']] = index_temp[['jdate']]
+    index_temp.columns = ['date']
+    index_temp['date'] = index_temp['date'].str.strip('(Timestamp(\' \')')
+    df_fill[['date']] = index_temp[['date']]
     df_fill = df_fill.drop(['index'], axis=1)
-    df_fill['jdate'] = pd.to_datetime(df_fill['jdate'])
+    df_fill['date'] = pd.to_datetime(df_fill['date'])
     # fill na
-    df = pd.merge(df, df_fill, how='left', on='jdate')
+    df = pd.merge(df, df_fill, how='left', on='date')
     for na_column in na_columns_list:
         if method == 'mean':
             df['%s' % na_column] = df['%s' % na_column].fillna(df['%s_mean' % na_column])
@@ -434,18 +434,18 @@ def fillna_all(df, method):
 def standardize(df):
     # exclude the the information columns
     col_names = df.columns.values.tolist()
-    list_to_remove = ['permno', 'date', 'jdate', 'datadate', 'gvkey', 'sic', 'count', 'exchcd', 'shrcd', 'ffi49', 'ret',
+    list_to_remove = ['permno', 'date', 'date', 'datadate', 'gvkey', 'sic', 'count', 'exchcd', 'shrcd', 'ffi49', 'ret',
                       'retadj', 'retx', 'lag_me']
     col_names = list(set(col_names).difference(set(list_to_remove)))
     for col_name in tqdm(col_names):
         print('processing %s' % col_name)
         # count the non-missing number of factors, we only count non-missing values
-        unique_count = df.dropna(subset=['%s' % col_name]).groupby(['jdate'])['%s' % col_name].unique().apply(len)
+        unique_count = df.dropna(subset=['%s' % col_name]).groupby(['date'])['%s' % col_name].unique().apply(len)
         unique_count = pd.DataFrame(unique_count).reset_index()
-        unique_count.columns = ['jdate', 'count']
-        df = pd.merge(df, unique_count, how='left', on=['jdate'])
+        unique_count.columns = ['date', 'count']
+        df = pd.merge(df, unique_count, how='left', on=['date'])
         # ranking, and then standardize the data
-        df['%s_rank' % col_name] = df.groupby(['jdate'])['%s' % col_name].rank(method='dense')
+        df['%s_rank' % col_name] = df.groupby(['date'])['%s' % col_name].rank(method='dense')
         df['rank_%s' % col_name] = (df['%s_rank' % col_name] - 1) / (df['count'] - 1) * 2 - 1
         df = df.drop(['%s_rank' % col_name, '%s' % col_name, 'count'], axis=1)
         df = df.fillna(0)
