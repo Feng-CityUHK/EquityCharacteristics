@@ -448,5 +448,5 @@ def standardize(df):
         df['%s_rank' % col_name] = df.groupby(['date'])['%s' % col_name].rank(method='dense')
         df['rank_%s' % col_name] = (df['%s_rank' % col_name] - 1) / (df['count'] - 1) * 2 - 1
         df = df.drop(['%s_rank' % col_name, '%s' % col_name, 'count'], axis=1)
-        df = df.fillna(0)
+    df = df.fillna(0)
     return df
