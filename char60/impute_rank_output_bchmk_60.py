@@ -1,5 +1,6 @@
 import pandas as pd
 import pickle as pkl
+import pyarrow.feather as feather
 import numpy as np
 from tqdm import tqdm
 from functions import *
@@ -7,16 +8,16 @@ from functions import *
 ####################
 #    All Stocks    #
 ####################
-with open('chars_q_raw.pkl', 'rb') as f:
-    chars_q = pkl.load(f)
+with open('chars_q_raw.feather', 'rb') as f:
+    chars_q = feather.read_feather(f)
 
 chars_q = chars_q.dropna(subset=['permno'])
 chars_q[['permno', 'gvkey']] = chars_q[['permno', 'gvkey']].astype(int)
 chars_q['jdate'] = pd.to_datetime(chars_q['jdate'])
 chars_q = chars_q.drop_duplicates(['permno', 'jdate'])
 
-with open('chars_a_raw.pkl', 'rb') as f:
-    chars_a = pkl.load(f)
+with open('chars_a_raw.feather', 'rb') as f:
+    chars_a = feather.read_feather(f)
 
 chars_a = chars_a.dropna(subset=['permno'])
 chars_a[['permno', 'gvkey']] = chars_a[['permno', 'gvkey']].astype(int)
@@ -91,8 +92,8 @@ df = df.drop(['jdate'], axis=1)  # now we only keep the date of return
 df = df.dropna(subset=['ret']).reset_index(drop=True)
 
 # save raw data
-with open('chars60_raw_no_impute.pkl', 'wb') as f:
-    pkl.dump(df, f, protocol=4)
+with open('chars60_raw_no_impute.feather', 'wb') as f:
+    feather.write_feather(df, f)
 
 # impute missing values, you can choose different func form functions.py, such as ffi49/ffi10
 df_impute = df.copy()
@@ -113,8 +114,8 @@ df_impute['year'] = df_impute['date'].dt.year
 df_impute = df_impute[df_impute['year'] >= 1972]
 df_impute = df_impute.drop(['year'], axis=1)
 
-with open('chars60_raw_imputed.pkl', 'wb') as f:
-    pkl.dump(df_impute, f, protocol=4)
+with open('chars60_raw_imputed.feather', 'wb') as f:
+    feather.write_feather(df_impute, f)
 
 # standardize raw data
 df_rank = df.copy()
@@ -125,8 +126,8 @@ df_rank = df_rank[df_rank['year'] >= 1972]
 df_rank = df_rank.drop(['year'], axis=1)
 df_rank['log_me'] = np.log(df_rank['lag_me'])
 
-with open('chars60_rank_no_impute.pkl', 'wb') as f:
-    pkl.dump(df_rank, f, protocol=4)
+with open('chars60_rank_no_impute.feather', 'wb') as f:
+    feather.write_feather(df_rank, f)
 
 # standardize imputed data
 df_rank = df_impute.copy()
@@ -137,15 +138,15 @@ df_rank = df_rank[df_rank['year'] >= 1972]
 df_rank = df_rank.drop(['year'], axis=1)
 df_rank['log_me'] = np.log(df_rank['lag_me'])
 
-with open('chars60_rank_imputed.pkl', 'wb') as f:
-    pkl.dump(df_rank, f, protocol=4)
+with open('chars60_rank_imputed.feather', 'wb') as f:
+    feather.write_feather(df_rank, f)
 
 
 ####################
 #      SP1500      #
 ####################
-with open('/home/jianxinma/chars/data/sp1500_impute_benchmark.pkl', 'rb') as f:
-    sp1500_index = pkl.load(f)
+with open('/home/jianxinma/chars/data/sp1500_impute_benchmark.feather', 'rb') as f:
+    sp1500_index = feather.read_feather(f)
 
 sp1500_index = sp1500_index[['gvkey', 'date']]
 
@@ -154,11 +155,11 @@ sp1500_impute = pd.merge(sp1500_index, df_impute, how='left', on=['gvkey', 'date
 # for test
 # test = sp1500_rank.groupby(['jdate'])['gvkey'].nunique()
 
-with open('sp1500_impute_60.pkl', 'wb') as f:
-    pkl.dump(sp1500_impute, f, protocol=4)
+with open('sp1500_impute_60.feather', 'wb') as f:
+    feather.write_feather(sp1500_impute, f)
 
 # standardize characteristics
 sp1500_rank = pd.merge(sp1500_index, df_rank, how='left', on=['gvkey', 'date'])
 
-with open('sp1500_rank_60.pkl', 'wb') as f:
-    pkl.dump(sp1500_rank, f, protocol=4)
+with open('sp1500_rank_60.feather', 'wb') as f:
+    feather.write_feather(sp1500_rank, f)

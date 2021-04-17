@@ -9,6 +9,7 @@ from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 from pandasql import *
 import pickle as pkl
+import pyarrow.feather as feather
 
 ###################
 # Connect to WRDS #
@@ -102,5 +103,5 @@ df = df.drop_duplicates(['permno', 'date'])
 df['datadate'] = pd.to_datetime(df['datadate'])
 df = df[['gvkey', 'permno', 'datadate', 'date', 'sue']]
 
-with open('sue.pkl', 'wb') as f:
-    pkl.dump(df, f)
+with open('sue.feather', 'wb') as f:
+    feather.write_feather(df, f)

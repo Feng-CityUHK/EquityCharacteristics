@@ -3,6 +3,7 @@ import numpy as np
 import wrds
 from pandas.tseries.offsets import *
 import pickle as pkl
+import pyarrow.feather as feather
 from functions import *
 
 ###################
@@ -1086,7 +1087,8 @@ crsp_mom['dy'] = ttm12(series='mdivpay', df=crsp_mom)/crsp_mom['me']
 data_rawa = data_rawa.drop(['date', 'ret', 'retx', 'me'], axis=1)
 data_rawa = pd.merge(crsp_mom, data_rawa, how='left', on=['permno', 'jdate'])
 data_rawa['datadate'] = data_rawa.groupby(['permno'])['datadate'].fillna(method='ffill')
-data_rawa = data_rawa.groupby(['permno', 'datadate'], as_index=False).fillna(method='ffill')
+data_rawa[['permno1', 'datadate1']] = data_rawa[['permno', 'datadate']]  # avoid the bug of 'groupby' for py 3.8
+data_rawa = data_rawa.groupby(['permno1', 'datadate1'], as_index=False).fillna(method='ffill')
 data_rawa = data_rawa[((data_rawa['exchcd'] == 1) | (data_rawa['exchcd'] == 2) | (data_rawa['exchcd'] == 3)) &
                       ((data_rawa['shrcd'] == 10) | (data_rawa['shrcd'] == 11))]
 
@@ -1094,7 +1096,8 @@ data_rawa = data_rawa[((data_rawa['exchcd'] == 1) | (data_rawa['exchcd'] == 2) |
 data_rawq = data_rawq.drop(['date', 'ret', 'retx', 'me'], axis=1)
 data_rawq = pd.merge(crsp_mom, data_rawq, how='left', on=['permno', 'jdate'])
 data_rawq['datadate'] = data_rawq.groupby(['permno'])['datadate'].fillna(method='ffill')
-data_rawq = data_rawq.groupby(['permno', 'datadate'], as_index=False).fillna(method='ffill')
+data_rawq[['permno1', 'datadate1']] = data_rawq[['permno', 'datadate']]  # avoid the bug of 'groupby' for py 3.8
+data_rawq = data_rawq.groupby(['permno1', 'datadate1'], as_index=False).fillna(method='ffill')
 data_rawq = data_rawq[((data_rawq['exchcd'] == 1) | (data_rawq['exchcd'] == 2) | (data_rawq['exchcd'] == 3)) &
                       ((data_rawq['shrcd'] == 10) | (data_rawq['shrcd'] == 11))]
 
@@ -1208,8 +1211,8 @@ chars_q = data_rawq[['gvkey', 'permno', 'datadate', 'jdate', 'sic', 'exchcd', 's
                      'turn', 'dolvol']]
 chars_q.reset_index(drop=True, inplace=True)
 
-with open('chars_a_60.pkl', 'wb') as f:
-    pkl.dump(chars_a, f)
+with open('chars_a_60.feather', 'wb') as f:
+    feather.write_feather(chars_a, f)
 
-with open('chars_q_60.pkl', 'wb') as f:
-    pkl.dump(chars_q, f)
+with open('chars_q_60.feather', 'wb') as f:
+    feather.write_feather(chars_q, f)
