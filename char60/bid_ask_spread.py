@@ -15,6 +15,7 @@ from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 import datetime
 import pickle as pkl
+import pyarrow.feather as feather
 import multiprocessing as mp
 
 ###################
@@ -156,5 +157,5 @@ crsp = crsp.dropna(subset=['baspread'])  # drop NA due to rolling
 crsp = crsp.reset_index(drop=True)
 crsp = crsp[['permno', 'date', 'baspread']]
 
-with open('baspread.pkl', 'wb') as f:
-    pkl.dump(crsp, f)
+with open('baspread.feather', 'wb') as f:
+    feather.write_feather(crsp, f)

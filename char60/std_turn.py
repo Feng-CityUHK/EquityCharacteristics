@@ -15,6 +15,7 @@ from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 import datetime
 import pickle as pkl
+import pyarrow.feather as feather
 import multiprocessing as mp
 
 ###################
@@ -154,5 +155,5 @@ crsp = crsp.dropna(subset=['std_turn'])  # drop NA due to rolling
 crsp = crsp.reset_index(drop=True)
 crsp = crsp[['permno', 'date', 'std_turn']]
 
-with open('std_turn.pkl', 'wb') as f:
-    pkl.dump(crsp, f)
+with open('std_turn.feather', 'wb') as f:
+    feather.write_feather(crsp, f)

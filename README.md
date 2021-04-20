@@ -52,10 +52,10 @@ The date range is 1972 to 2019. The stock universe is top 3 exchanges (NYSE/AMEX
 
 The currant time of data is $ret_t = chars_{t-1}$
 
-1. chars_raw_no_impute.pkl (all data with original missing value)
-2. chars_raw_imputed.pkl (impute missing value with industry median/mean value)
-3. chars_rank_no_imputed.pkl (standardize chars_raw_no_impute.pkl)
-4. chars_rank_imputed.pkl (standardize chars_raw_imputed.pkl)
+1. chars_raw_no_impute.feather (all data with original missing value)
+2. chars_raw_imputed.feather (impute missing value with industry median/mean value)
+3. chars_rank_no_imputed.feather (standardize chars_raw_no_impute.pkl)
+4. chars_rank_imputed.feather (standardize chars_raw_imputed.pkl)
 
 ### Information Variables:
 

@@ -7,6 +7,7 @@ import datetime as dt
 import wrds
 from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
+import pyarrow.feather as feather
 import pickle as pkl
 import sqlite3
 
@@ -232,5 +233,5 @@ df['rdq'] = pd.to_datetime(df['rdq'])
 df['rdq_plus_1d'] = pd.to_datetime(df['rdq_plus_1d'])
 df = df[['gvkey', 'permno', 'datadate', 'rdq', 'rdq_plus_1d', 'abr', 'date']]
 
-with open('abr.pkl', 'wb') as f:
-    pkl.dump(df, f)
+with open('abr.feather', 'wb') as f:
+    feather.write_feather(df, f)
