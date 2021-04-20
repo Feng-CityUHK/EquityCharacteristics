@@ -142,24 +142,24 @@ with open('chars60_rank_imputed.feather', 'wb') as f:
     feather.write_feather(df_rank, f)
 
 
-####################
-#      SP1500      #
-####################
-with open('/home/jianxinma/chars/data/sp1500_impute_benchmark.feather', 'rb') as f:
-    sp1500_index = feather.read_feather(f)
+# ####################
+# #      SP1500      #
+# ####################
+# with open('/home/jianxinma/chars/data/sp1500_impute_benchmark.feather', 'rb') as f:
+#     sp1500_index = feather.read_feather(f)
 
-sp1500_index = sp1500_index[['gvkey', 'date']]
+# sp1500_index = sp1500_index[['gvkey', 'date']]
 
-sp1500_impute = pd.merge(sp1500_index, df_impute, how='left', on=['gvkey', 'date'])
+# sp1500_impute = pd.merge(sp1500_index, df_impute, how='left', on=['gvkey', 'date'])
 
-# for test
-# test = sp1500_rank.groupby(['jdate'])['gvkey'].nunique()
+# # for test
+# # test = sp1500_rank.groupby(['jdate'])['gvkey'].nunique()
 
-with open('sp1500_impute_60.feather', 'wb') as f:
-    feather.write_feather(sp1500_impute, f)
+# with open('sp1500_impute_60.feather', 'wb') as f:
+#     feather.write_feather(sp1500_impute, f)
 
-# standardize characteristics
-sp1500_rank = pd.merge(sp1500_index, df_rank, how='left', on=['gvkey', 'date'])
+# # standardize characteristics
+# sp1500_rank = pd.merge(sp1500_index, df_rank, how='left', on=['gvkey', 'date'])
 
-with open('sp1500_rank_60.feather', 'wb') as f:
-    feather.write_feather(sp1500_rank, f)
+# with open('sp1500_rank_60.feather', 'wb') as f:
+#     feather.write_feather(sp1500_rank, f)

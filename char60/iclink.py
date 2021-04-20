@@ -6,6 +6,7 @@ from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 from pandasql import *
 from fuzzywuzzy import fuzz
+import pyarrow.feather as feather
 
 # reference: https://wrds-www.wharton.upenn.edu/pages/support/applications/python-replications/linking-ibes-and-crsp-data-python/
 #####################################

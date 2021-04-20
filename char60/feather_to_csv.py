@@ -2,7 +2,7 @@ import pickle as pkl
 import pyarrow.feather as feather
 import pandas as pd
 
-with open('/Users/eric/Downloads/chars_rank_60.feather', 'rb') as f:
+with open('chars60_rank_imputed.feather', 'rb') as f:
     chars = feather.read_feather(f)
 
 print(chars.columns.values)
