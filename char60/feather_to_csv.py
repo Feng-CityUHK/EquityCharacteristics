@@ -10,8 +10,8 @@ with open('chars60_rank_imputed.feather', 'rb') as f:
 
 print(chars.columns.values)
 
-chars['jdate'] = pd.to_datetime(chars['jdate'])
-chars['year'] = chars['jdate'].dt.year
+chars['date'] = pd.to_datetime(chars['date'])
+chars['year'] = chars['date'].dt.year
 chars_1970s = chars[chars['year'] < 1980]
 chars_1980s = chars[(chars['year'] >= 1980) & (chars['year'] < 1990)]
 chars_1990s = chars[(chars['year'] >= 1990) & (chars['year'] < 2000)]
