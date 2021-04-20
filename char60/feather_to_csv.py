@@ -2,6 +2,9 @@ import pickle as pkl
 import pyarrow.feather as feather
 import pandas as pd
 
+# with open('chars60_raw_imputed.feather', 'rb') as f:
+#     chars = feather.read_feather(f)
+
 with open('chars60_rank_imputed.feather', 'rb') as f:
     chars = feather.read_feather(f)
 
