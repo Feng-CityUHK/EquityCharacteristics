@@ -210,7 +210,7 @@ sue = sue.drop_duplicates(['permno', 'jdate'])
 
 chars_q = pd.merge(chars_q, sue, how='left', on=['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/re.feather', 'rb') as f:
+with open('/home/jianxinma/chars/data/myre.feather', 'rb') as f:
     re = feather.read_feather(f)
 
 re['permno'] = re['permno'].astype(int)

@@ -20,7 +20,7 @@ conn = wrds.Connection()
 # Merging IBES and CRSP by using ICLINK table. Merging last month price #
 #########################################################################
 
-with open('iclink.pkl', 'rb')as f:
+with open('iclink.feather', 'rb')as f:
     iclink = pkl.load(f)
 
 ibes = conn.raw_sql("""
@@ -117,5 +117,5 @@ ibes_crsp = ibes_crsp.drop_duplicates(['ticker', 'statpers'])
 ibes_crsp = ibes_crsp[['ticker', 'statpers', 'fpedats', 'anndats_act', 'curr_act', 'permno', 're']]
 ibes_crsp.rename(columns={'statpers': 'date'}, inplace=True)
 
-with open('re.feather', 'wb') as f:
+with open('myre.feather', 'wb') as f:
     feather.write_feather(ibes_crsp, f)
