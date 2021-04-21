@@ -120,6 +120,7 @@ with open('chars60_raw_imputed.feather', 'wb') as f:
 # standardize raw data
 df_rank = df.copy()
 df_rank['lag_me'] = df_rank['me']
+df_rank['bm'] = np.where(df_rank['bm']<0,np.nan,df_rank['bm']) # if bm<0 then bm=nan and rank_bm=0
 df_rank = standardize(df_rank)
 df_rank['year'] = df_rank['date'].dt.year
 df_rank = df_rank[df_rank['year'] >= 1972]
