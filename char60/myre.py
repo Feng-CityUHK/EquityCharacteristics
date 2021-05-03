@@ -21,7 +21,7 @@ conn = wrds.Connection()
 #########################################################################
 
 with open('iclink.feather', 'rb')as f:
-    iclink = pkl.load(f)
+    iclink = feather.read_feather(f)
 
 ibes = conn.raw_sql("""
                          select
