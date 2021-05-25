@@ -15,7 +15,7 @@ chars_a['jdate'] = pd.to_datetime(chars_a['jdate'])
 chars_a = chars_a.drop_duplicates(['permno', 'jdate'])
 
 with open('beta.feather', 'rb') as f:
-    beta = feather.read_feather(f)x
+    beta = feather.read_feather(f)
 
 beta['permno'] = beta['permno'].astype(int)
 beta['jdate'] = pd.to_datetime(beta['date']) + MonthEnd(0)
