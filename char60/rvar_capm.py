@@ -25,7 +25,7 @@ conn = wrds.Connection()
 
 # CRSP Block
 crsp = conn.raw_sql("""
-                      select a.permno, a.date, a.ret, (a.ret - b.rf) as exret, b.mktrf
+                      select a.permno, a.date, a.ret, b.rf, b.mktrf
                       from crsp.dsf as a
                       left join ff.factors_daily as b
                       on a.date=b.date
@@ -40,6 +40,23 @@ crsp['permno'] = crsp['permno'].astype(int)
 
 # Line up date to be end of month
 crsp['date'] = pd.to_datetime(crsp['date'])
+
+# add delisting return
+dlret = conn.raw_sql("""
+                     select permno, dlret, dlstdt 
+                     from crsp.dsedelist
+                     """)
+
+dlret.permno = dlret.permno.astype(int)
+dlret['dlstdt'] = pd.to_datetime(dlret['dlstdt'])
+dlret['date'] = dlret['dlstdt']
+
+# merge delisting return to crsp return
+crsp = pd.merge(crsp, dlret, how='left', on=['permno', 'date'])
+crsp['dlret'] = crsp['dlret'].fillna(0)
+crsp['ret'] = crsp['ret'].fillna(0)
+crsp['retadj'] = (1 + crsp['ret']) * (1 + crsp['dlret']) - 1
+crsp['exret'] = crsp['retadj'] - crsp['rf']
 
 # find the closest trading day to the end of the month
 crsp['monthend'] = crsp['date'] + MonthEnd(0)
