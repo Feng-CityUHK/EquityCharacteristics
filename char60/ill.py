@@ -39,6 +39,22 @@ crsp['permno'] = crsp['permno'].astype(int)
 # Line up date to be end of month
 crsp['date'] = pd.to_datetime(crsp['date'])
 
+# add delisting return
+dlret = conn.raw_sql("""
+                     select permno, dlret, dlstdt 
+                     from crsp.dsedelist
+                     """)
+
+dlret.permno = dlret.permno.astype(int)
+dlret['dlstdt'] = pd.to_datetime(dlret['dlstdt'])
+dlret['date'] = dlret['dlstdt']
+
+# merge delisting return to crsp return
+crsp = pd.merge(crsp, dlret, how='left', on=['permno', 'date'])
+crsp['dlret'] = crsp['dlret'].fillna(0)
+crsp['ret'] = crsp['ret'].fillna(0)
+crsp['retadj'] = (1 + crsp['ret']) * (1 + crsp['dlret']) - 1
+
 # find the closest trading day to the end of the month
 crsp['monthend'] = crsp['date'] + MonthEnd(0)
 crsp['date_diff'] = crsp['monthend'] - crsp['date']
@@ -92,8 +108,8 @@ def get_baspread(df, firm_list):
             else:
                 index = temp.tail(1).index
                 X = pd.DataFrame()
-                X[['vol', 'prc', 'ret']] = temp[['vol', 'prc', 'ret']]
-                ill = (abs(X['ret']) / abs(X['prc'])*X['vol']).mean()
+                X[['vol', 'prc', 'retadj']] = temp[['vol', 'prc', 'retadj']]
+                ill = (abs(X['retadj']) / abs(X['prc'])*X['vol']).mean()
                 df.loc[index, 'ill'] = ill
     return df
 
