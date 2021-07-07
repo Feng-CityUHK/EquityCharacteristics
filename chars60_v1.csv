@@ -1,0 +1,62 @@
+Acronym,Description,Author,Pub Year,Category
+abr,cumulative abnormal returns around earnings announcement dates,"Chan, Jegadeesh, and Lakonishok",1996,Momentum
+acc,Operating Accruals,Sloan,1996,Investment
+adm,Advertising Expense-to-market,"Chan, Lakonishok, and Sougiannis",2001,Intangibles
+agr,Asset growth,"Cooper, Gulen and Schill",2008,Investment 
+alm,Quarterly Asset Liquidity,Ortiz-Molina and Phillips,2014,Intangibles
+ato,Asset Turnover,Soliman,2008,Profitability
+baspread,Bid-ask spread rolling 3m,Amihud and Mendelson,1989,Frictions
+beta,Beta rolling 3m,Fama and MacBeth,1973,Trading frictions 
+bm ,Book-to-market equity,"Rosenberg, Reid, and Lanstein ",1985,Value-versus-growth
+bm_ia,Industry-adjusted book to market,"Asness, Porter and Stevens",2000,Value-versus-growth
+cash,Cash holdings,"Lakonishok, Shleifer, and Vishny ",1994,Value-versus-growth
+cashdebt,Cash to debt,Ou and Penman,1989,Value-versus-growth
+cfp,Cashflow-to-price,"Lakonishok, Shleifer, and Vishny ",1994,Value-versus-growth
+chcsho,Change in shares outstanding,Pontiff and Woodgate,2008,Investment 
+chpm ,Industry-adjusted change in profit margin,Soliman,2008,Profitability 
+chtx,Change in tax expense,Thomas and Zhang,2011,Momentum 
+cinvest,Corporate investment,"Titman, Wei and Xie",2004,Investment 
+depr,Depreciation / PPandE,Holthausen and Larcker,1992,Momentum 
+dolvol,Dollar trading volume,"Chordia, Subrahmanyam and Anshuman",2001,Trading frictions 
+dy,Dividend yield,Litzenberger and Ramaswamy,1979,Value-versus-growth
+ep,Earnings-to-price,Basu,1983,Value-versus-growth
+gma,Gross profitability,Novy-Marx,2013,Investment
+grltnoa,Growth in long-term net operating assets,"Fairfield, Whisenant and Yohn",2003,Investment
+herf,Industry sales concentration,Hou and Robinson,2006,Intangibles 
+hire,Employee growth rate,"Bazdresch, Belo and Lin",2014,Intangibles 
+ill,Illiquidity rolling 3m,Amihud,2002,Trading frictions 
+lev,Leverage,Bhandari,1988,Value-versus-growth 
+lgr,Growth in long-term debt,"Richardson, Sloan, Soliman and Tuna",2005,Investment 
+maxret,Maximum daily returns rolling 3m,"Bali, Cakici and Whitelaw",2011,Trading frictions 
+me ,the market equity,Banz,1981,Frictions
+me_ia ,Industry-adjusted size,"Asness, Porter and Stevens",2000,Frictions
+mom12m,Momentum rolling 12m,Jegadeesh,1990,Momentum 
+mom1m,Momentum ,Jegadeesh and Titman,1993,Momentum 
+mom36m,Momentum rolling 36m,Jegadeesh and Titman,1993,Momentum 
+mom60m,Momentum rolling 60m,Jegadeesh and Titman,1993,Momentum 
+mom6m,Momentum rolling 6m,Jegadeesh and Titman,1993,Momentum 
+ni ,Net Stock Issues,Pontiﬀ and Woodgate,2008,Investment
+nincr,Number of earnings increases,"Barth, Elliott and Finn",1999,Momentum 
+noa,(Changes in) Net Operating Assets,"Hirshleifer, Hou, Teoh, and Zhang",2004,Investment
+op,Operating proﬁtability,Fama and French,2015,Profitability 
+pctacc,Percent operating accruals,"Hafzalla, Lundholm, and Van Winkle",2011,Investment
+pm ,proﬁt margin,Soliman,2008,Profitability
+ps,Performance Score,Piotroski,2000,Profitability 
+rd_sale,RandD to sales,"Guo, Lev and Shi",2006,Intangibles 
+rdm ,RandD Expense-to-market,"Chan, Lakonishok, and Sougiannis",2001,Intangibles
+re,Revisions in analysts earnings forecasts,"Chan, Jegadeesh, and Lakonishok",1996,Intangibles 
+rna ,"Quarterly Return on Net Operating Assets, Quarterly Asset Turnover",Soliman,2008,Profitability
+Roa1,Return on Assets,"Balakrishnan, Bartov, and Faurel",2010,Profitability
+roe ,Return on Equity,"Hou, Xue, and Zhang",2015,Profitability
+rsup,Revenue surprise,Kama,2009,Momentum 
+rvar_capm,Residual variance - CAPM rolling 3m,Daily Stock residual variance of CAPM,,Trading frictions 
+rvar_ff3,Residual variance - ff3 rolling 3m,Daily Stock residual variance of Fama French 3 factors,,Trading frictions 
+rvar_mean,return variance rolling 3m,Daily Stock return variance,,Trading frictions 
+seas1a,Seasonality,Heston and Sadka,2008,Intangibles
+sgr,Sales growth,"Lakonishok, Shleifer and Vishny",1994,Value-versus-growth 
+sp,Sales-to-price,"Barbee, Mukherji, and Raines",1996,Value-versus-growth
+std_dolvol,Std of dollar trading volume rolling 3m,"Chordia, Subrahmanyam and Anshuman",2001,Trading frictions 
+std_turn,Std. of Share turnover rolling 3m,"Chordia, Subrahmanyam, andAnshuman",2001,Trading frictions 
+sue,Unexpected quarterly earnings,"Rendelman, Jones and Latane",1982,Momentum 
+turn,Shares turnover,"Datar, Naik and Radcliffe",1998,Trading frictions 
+zerotrade,Number of zero-trading days rolling 3m,Liu,2006,Trading frictions 
