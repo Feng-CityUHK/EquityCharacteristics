@@ -8,7 +8,6 @@ import wrds
 from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 import pyarrow.feather as feather
-import pickle as pkl
 import sqlite3
 
 ###################
@@ -53,7 +52,7 @@ ccm1 = pd.merge(comp, ccm, how='left', on=['gvkey'])
 ccm1['rdq'] = pd.to_datetime(ccm1['rdq'])
 
 # set link date bounds
-ccm2 = ccm1[(ccm1['datadate']>=ccm1['linkdt']) & (ccm1['datadate']<=ccm1['linkenddt'])]
+ccm2 = ccm1[(ccm1['datadate'] >= ccm1['linkdt']) & (ccm1['datadate'] <= ccm1['linkenddt'])]
 ccm2 = ccm2[['gvkey', 'datadate', 'rdq', 'fyearq', 'fqtr', 'permno']]
 
 ###################
@@ -69,21 +68,23 @@ crsp_dsi = conn.raw_sql("""
 
 crsp_dsi['date'] = pd.to_datetime(crsp_dsi['date'])
 
+ccm3 = ccm2.copy()
 for i in range(6):  # we only consider the condition that the day after rdq is not a trading day, which is up to 5 days
-    ccm2['trad_%s' % i] = ccm2['rdq'] + pd.DateOffset(days=i)  # set rdq + i days to match trading day
+    ccm3['trad_%s' % i] = ccm3['rdq'] + pd.DateOffset(days=i)  # set rdq + i days to match trading day
     crsp_dsi['trad_%s' % i] = crsp_dsi['date']  # set the merging key
     crsp_dsi = crsp_dsi[['date', 'trad_%s' % i]]  # reset trading day columns to avoid repeat merge
-    comp_temp = pd.merge(ccm2, crsp_dsi, how='left', on='trad_%s' % i)
-    comp_temp['trad_%s' % i] = comp_temp['date']  # reset rdq + i days to matched trading day
+    ccm3 = pd.merge(ccm3, crsp_dsi, how='left', on='trad_%s' % i)
+    ccm3['trad_%s' % i] = ccm3['date']  # reset rdq + i days to matched trading day
+    ccm3 = ccm3.drop(['date'], axis=1)
 
 # fill NA from rdq + 5 days to rdq + 0 days, then get trading day version of rdq
 for i in range(5, 0, -1):
     count = i-1
-    comp_temp['trad_%s' % count] = np.where(comp_temp['trad_%s' % count].isnull(),
-                                            comp_temp['trad_%s' % i], comp_temp['trad_%s' % count])
-    comp_temp['rdq_trad'] = comp_temp['trad_%s' % count]
+    ccm3['trad_%s' % count] = np.where(ccm3['trad_%s' % count].isnull(), ccm3['trad_%s' % i], ccm3['trad_%s' % count])
 
-comp_temp = comp_temp[['gvkey', 'permno', 'datadate', 'fyearq', 'fqtr', 'rdq', 'rdq_trad']]
+ccm3['rdq_trad'] = ccm3['trad_0']
+
+ccm3 = ccm3[['gvkey', 'permno', 'datadate', 'fyearq', 'fqtr', 'rdq', 'rdq_trad']]
 
 print('='*10, 'crsp block is ready', '='*10)
 #############################
@@ -141,22 +142,22 @@ crsp_d['abrd'] = crsp_d['retadj'] - crsp_d['sprtrn']
 crsp_d = crsp_d[['date', 'permno', 'ret', 'retadj', 'sprtrn', 'abrd']]
 
 # date count regarding to rdq
-comp_temp['minus10d'] = comp_temp['rdq_trad'] - pd.Timedelta(days=10)
-comp_temp['plus5d'] = comp_temp['rdq_trad'] + pd.Timedelta(days=5)
+ccm3['minus10d'] = ccm3['rdq_trad'] - pd.Timedelta(days=10)
+ccm3['plus5d'] = ccm3['rdq_trad'] + pd.Timedelta(days=5)
 
 # df = sqldf("""select a.*, b.date, b.abrd
-#               from comp_temp a left join crsp_d b
+#               from ccm3 a left join crsp_d b
 #               on a.permno=b.permno
 #               and a.minus10d<=b.date
 #               and b.date<=a.plus5d
 #               order by a.permno, a.rdq_trad, b.date;""", globals())
 
 sql = sqlite3.connect(':memory:')
-comp_temp.to_sql('comp_temp', sql, index=False)
+ccm3.to_sql('ccm3', sql, index=False)
 crsp_d.to_sql('crsp_d', sql, index=False)
 
 qry = """select a.*, b.date, b.abrd 
-              from comp_temp a left join crsp_d b 
+              from ccm3 a left join crsp_d b 
               on a.permno=b.permno 
               and a.minus10d<=b.date 
               and b.date<=a.plus5d 
@@ -169,31 +170,31 @@ df = df[df['abrd'].notna()]
 
 # count
 df.sort_values(by=['permno', 'rdq_trad', 'date'], inplace=True)
-condlist = [df['date']==df['rdq_trad'],
-            df['date']>df['rdq_trad'],
-            df['date']<df['rdq_trad']]
+condlist = [df['date'] == df['rdq_trad'],
+            df['date'] > df['rdq_trad'],
+            df['date'] < df['rdq_trad']]
 choicelist = [0, 1, -1]
 df['c_1'] = np.select(condlist, choicelist, default=np.nan)
 
 # trading days before rdq_trad
-df_before = df[df['c_1']==-1]
+df_before = df[df['c_1'] == -1]
 df_before['count'] = (df_before.groupby(['permno', 'rdq_trad'])['date'].cumcount(ascending=False) + 1) * -1
 
 # trading days after rdq_trad
-df_after = df[df['c_1']>=0]
+df_after = df[df['c_1'] >= 0]
 df_after['count'] = df_after.groupby(['permno', 'rdq_trad'])['date'].cumcount()
 
 df = pd.concat([df_before, df_after])
 
 # calculate abr as the group sum
-df = df[(df['count']>=-2) & (df['count']<=1)]
+df = df[(df['count'] >= -2) & (df['count'] <= 1)]
 
 df_temp = df.groupby(['permno', 'rdq_trad'])['abrd'].sum()
 df_temp = pd.DataFrame(df_temp)
 df_temp.reset_index(inplace=True)
 df_temp.rename(columns={'abrd': 'abr'}, inplace=True)
 df = pd.merge(df, df_temp, how='left', on=['permno', 'rdq_trad'], copy=False)  # add abr back to df
-df = df[df['count']==1]
+df = df[df['count'] == 1]
 df.rename(columns={'date': 'rdq_plus_1d'}, inplace=True)
 df = df[['gvkey', 'permno', 'datadate', 'rdq', 'rdq_plus_1d', 'abr']]
 
@@ -232,6 +233,7 @@ df['datadate'] = pd.to_datetime(df['datadate'])
 df['rdq'] = pd.to_datetime(df['rdq'])
 df['rdq_plus_1d'] = pd.to_datetime(df['rdq_plus_1d'])
 df = df[['gvkey', 'permno', 'datadate', 'rdq', 'rdq_plus_1d', 'abr', 'date']]
+df = df.dropna(subset=['date'])  # some firm will have records that report date is far away from actual datadate
 
 with open('abr.feather', 'wb') as f:
     feather.write_feather(df, f)
