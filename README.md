@@ -13,10 +13,10 @@ For financial researches, we need equity characteristics. This repository is a t
 
 ## Files
 
-- [Characteristics list](https://github.com/ericma4/EquityCharacteristics/blob/master/Chars60_description.csv)
+- [Characteristics list](https://github.com/Feng-CityUHK/EquityCharacteristics/blob/master/chars60_summary.csv)
 
 ### Main Files
-- accounting.py  -- most annual, quarterly and monthly frequency characteristics
+- accounting_60_hxz.py  -- most annual, quarterly and monthly frequency characteristics
 - functions.py -- impute and rank functions
 - merge_chars.py -- merge all the characteristics from different pickle file into one pickle file
 - impute_rank_output_bchmk.py -- impute the missing values and standardize raw data
@@ -39,10 +39,10 @@ For financial researches, we need equity characteristics. This repository is a t
 
 ## How to use
 
-1. run accounting.py
+1. run accounting_60_hxz.py
 2. run all the single characteristic files
 3. run merge_chars.py
-4. run impute_rank_output_bckmk.py (you may want to commen the part of sp1500 in this file if you just need the all stocks version)
+4. run impute_rank_output_bckmk.py (you may want to comment the part of sp1500 in this file if you just need the all stocks version)
 
 ## Outputs
 
