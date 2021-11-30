@@ -1,6 +1,6 @@
 ### Contact
 
-- [Xin He](https://www.xinhesean.com)
+- [Sean (Xin He)](https://www.xinhesean.com)
 
 ### Version
 
