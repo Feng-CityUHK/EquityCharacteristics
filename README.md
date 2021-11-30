@@ -1,7 +1,7 @@
 ### Contact
 
-- Gavin Feng https://www.gavinfeng702.com
-- Xin He https://www.xinhesean.com
+- [Gavin Feng](https://www.gavinfeng702.com)
+- [Xin He](https://www.xinhesean.com)
 
 ### Version
 
