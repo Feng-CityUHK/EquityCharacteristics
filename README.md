@@ -1,3 +1,9 @@
+### Contact
+
+- [Sean (Xin He)](https://www.xinhesean.com)
+
+### Version
+
 - All in Python
 - The SAS version is here [EquityCharacteristicsSAS](https://feng-cityuhk.github.io/EquityCharacteristicsSAS/)
 
@@ -98,7 +104,7 @@ Many papers contribute a lot to this repository. I am very sorry for only listin
   - [sas code from Green's website](https://drive.google.com/file/d/0BwwEXkCgXEdRQWZreUpKOHBXOUU/view)
 - **Replicating Anormalies** by [Hou Xue Zhang 2018 RFS](https://doi.org/10.1093/rfs/hhy131)
   - [Anormaly Portfolios by Zhang's website](http://global-q.org/index.html)
- 
+
 ### Codes
 
 - Calculate equity characteristics with SAS code, mainly refering to [SAS code by Green Hand Zhang](https://drive.google.com/file/d/0BwwEXkCgXEdRQWZreUpKOHBXOUU/view).
@@ -106,4 +112,3 @@ Many papers contribute a lot to this repository. I am very sorry for only listin
 - DGTW code refers to [this python code](https://wrds-www.wharton.upenn.edu/pages/support/applications/python-replications/characteristic-based-benchmarks-daniel-grinblatt-titman-and-wermers-1997-python-version/) or [this SAS code](https://wrds-www.wharton.upenn.edu/pages/support/applications/portfolio-construction-and-market-anomalies/characteristic-based-benchmarks-daniel-grinblatt-titman-and-wermers-1997/)
 
 **All comments are welcome.**
-

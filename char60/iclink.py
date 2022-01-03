@@ -6,6 +6,7 @@ from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
 from pandasql import *
 from fuzzywuzzy import fuzz
+import pyarrow.feather as feather
 
 # reference: https://wrds-www.wharton.upenn.edu/pages/support/applications/python-replications/linking-ibes-and-crsp-data-python/
 #####################################
@@ -237,5 +238,5 @@ iclink = _link1_2.append(_link2_3)
 # Storing iclink for other program usage
 import pickle as pkl
 
-with open('iclink.pkl', 'wb') as f:
-    pkl.dump(iclink, f)
+with open('iclink.feather', 'wb') as f:
+    feather.write_feather(iclink, f)

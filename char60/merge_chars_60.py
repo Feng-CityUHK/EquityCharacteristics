@@ -14,7 +14,7 @@ chars_a[['permno', 'gvkey']] = chars_a[['permno', 'gvkey']].astype(int)
 chars_a['jdate'] = pd.to_datetime(chars_a['jdate'])
 chars_a = chars_a.drop_duplicates(['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/beta.feather', 'rb') as f:
+with open('beta.feather', 'rb') as f:
     beta = feather.read_feather(f)
 
 beta['permno'] = beta['permno'].astype(int)
@@ -24,7 +24,7 @@ beta = beta.drop_duplicates(['permno', 'jdate'])
 
 chars_a = pd.merge(chars_a, beta, how='left', on=['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/rvar_capm.feather', 'rb') as f:
+with open('rvar_capm.feather', 'rb') as f:
     rvar_capm = feather.read_feather(f)
 
 rvar_capm['permno'] = rvar_capm['permno'].astype(int)
@@ -34,7 +34,7 @@ rvar_capm = rvar_capm.drop_duplicates(['permno', 'jdate'])
 
 chars_a = pd.merge(chars_a, rvar_capm, how='left', on=['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/rvar_mean.feather', 'rb') as f:
+with open('rvar_mean.feather', 'rb') as f:
     rvar_mean = feather.read_feather(f)
 
 rvar_mean['permno'] = rvar_mean['permno'].astype(int)
@@ -44,7 +44,7 @@ rvar_mean = rvar_mean.drop_duplicates(['permno', 'jdate'])
 
 chars_a = pd.merge(chars_a, rvar_mean, how='left', on=['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/rvar_ff3.feather', 'rb') as f:
+with open('rvar_ff3.feather', 'rb') as f:
     rvar_ff3 = feather.read_feather(f)
 
 rvar_ff3['permno'] = rvar_ff3['permno'].astype(int)
@@ -54,7 +54,7 @@ rvar_ff3 = rvar_ff3.drop_duplicates(['permno', 'jdate'])
 
 chars_a = pd.merge(chars_a, rvar_ff3, how='left', on=['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/sue.feather', 'rb') as f:
+with open('sue.feather', 'rb') as f:
     sue = feather.read_feather(f)
 
 sue['permno'] = sue['permno'].astype(int)
@@ -64,7 +64,7 @@ sue = sue.drop_duplicates(['permno', 'jdate'])
 
 chars_a = pd.merge(chars_a, sue, how='left', on=['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/re.feather', 'rb') as f:
+with open('myre.feather', 'rb') as f:
     re = feather.read_feather(f)
 
 re['permno'] = re['permno'].astype(int)
@@ -74,7 +74,7 @@ re = re.drop_duplicates(['permno', 'jdate'])
 
 chars_a = pd.merge(chars_a, re, how='left', on=['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/abr.feather', 'rb') as f:
+with open('abr.feather', 'rb') as f:
     abr = feather.read_feather(f)
 
 abr['permno'] = abr['permno'].astype(int)
@@ -160,7 +160,7 @@ chars_q[['permno', 'gvkey']] = chars_q[['permno', 'gvkey']].astype(int)
 chars_q['jdate'] = pd.to_datetime(chars_q['jdate'])
 chars_q = chars_q.drop_duplicates(['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/beta.feather', 'rb') as f:
+with open('beta.feather', 'rb') as f:
     beta = feather.read_feather(f)
 
 beta['permno'] = beta['permno'].astype(int)
@@ -170,7 +170,7 @@ beta = beta.drop_duplicates(['permno', 'jdate'])
 
 chars_q = pd.merge(chars_q, beta, how='left', on=['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/rvar_capm.feather', 'rb') as f:
+with open('rvar_capm.feather', 'rb') as f:
     rvar_capm = feather.read_feather(f)
 
 rvar_capm['permno'] = rvar_capm['permno'].astype(int)
@@ -180,7 +180,7 @@ rvar_capm = rvar_capm.drop_duplicates(['permno', 'jdate'])
 
 chars_q = pd.merge(chars_q, rvar_capm, how='left', on=['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/rvar_mean.feather', 'rb') as f:
+with open('rvar_mean.feather', 'rb') as f:
     rvar_mean = feather.read_feather(f)
 
 rvar_mean['permno'] = rvar_mean['permno'].astype(int)
@@ -190,7 +190,7 @@ rvar_mean = rvar_mean.drop_duplicates(['permno', 'jdate'])
 
 chars_q = pd.merge(chars_q, rvar_mean, how='left', on=['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/rvar_ff3.feather', 'rb') as f:
+with open('rvar_ff3.feather', 'rb') as f:
     rvar_ff3 = feather.read_feather(f)
 
 rvar_ff3['permno'] = rvar_ff3['permno'].astype(int)
@@ -200,7 +200,7 @@ rvar_ff3 = rvar_ff3.drop_duplicates(['permno', 'jdate'])
 
 chars_q = pd.merge(chars_q, rvar_ff3, how='left', on=['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/sue.feather', 'rb') as f:
+with open('sue.feather', 'rb') as f:
     sue = feather.read_feather(f)
 
 sue['permno'] = sue['permno'].astype(int)
@@ -210,7 +210,7 @@ sue = sue.drop_duplicates(['permno', 'jdate'])
 
 chars_q = pd.merge(chars_q, sue, how='left', on=['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/re.feather', 'rb') as f:
+with open('myre.feather', 'rb') as f:
     re = feather.read_feather(f)
 
 re['permno'] = re['permno'].astype(int)
@@ -220,7 +220,7 @@ re = re.drop_duplicates(['permno', 'jdate'])
 
 chars_q = pd.merge(chars_q, re, how='left', on=['permno', 'jdate'])
 
-with open('/home/jianxinma/chars/data/abr.feather', 'rb') as f:
+with open('abr.feather', 'rb') as f:
     abr = feather.read_feather(f)
 
 abr['permno'] = abr['permno'].astype(int)
