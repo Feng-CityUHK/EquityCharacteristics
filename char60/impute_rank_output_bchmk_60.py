@@ -90,6 +90,7 @@ df['ret'] = df.groupby(['permno'])['ret'].shift(-1)  # we shift return in t peri
 df['date'] = df.groupby(['permno'])['jdate'].shift(-1)  # date is return date, jdate is predictor date
 df = df.drop(['jdate'], axis=1)  # now we only keep the date of return
 df = df.dropna(subset=['ret']).reset_index(drop=True)
+df.replace([-np.inf, np.inf], np.nan, inplace=True)
 
 # save raw data
 with open('chars60_raw_no_impute.feather', 'wb') as f:
