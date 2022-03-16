@@ -1116,13 +1116,13 @@ data_rawa['bm'] = data_rawa['be'] / data_rawa['me']
 df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['bm'].mean()
 df_temp = df_temp.rename(columns={'bm': 'bm_ind'})
 data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49'])
-data_rawa['bm_ia'] = data_rawa['bm']/data_rawa['bm_ind']
+data_rawa['bm_ia'] = data_rawa['bm'] - data_rawa['bm_ind']
 
 # me_ia
 df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['me'].mean()
 df_temp = df_temp.rename(columns={'me': 'me_ind'})
 data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49'])
-data_rawa['me_ia'] = data_rawa['me']/data_rawa['me_ind']
+data_rawa['me_ia'] = data_rawa['me'] - data_rawa['me_ind']
 
 # cfp
 condlist = [data_rawa['dp'].isnull(),
