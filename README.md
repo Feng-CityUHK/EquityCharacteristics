@@ -34,7 +34,7 @@ For financial researches, we need equity characteristics. This repository is a t
 - rvar_capm.py, rvar_ff3.py -- residual variance of CAPM and fama french 3 factors model, rolling window is 3 months
 - rvar_mean.py -- variance of return, rolling window is 3 months
 - abr.py -- cumulative abnormal returns around earnings announcement dates
-- re.py -- revisions in analysts’ earnings forecasts
+- myre.py -- revisions in analysts’ earnings forecasts
 - sue.py -- unexpected quarterly earnings
 - ill.py -- illiquidity, rolling window is 3 months
 - maxret_d.py -- maximum daily returns, rolling window is 3 months
@@ -46,7 +46,7 @@ For financial researches, we need equity characteristics. This repository is a t
 ## How to use
 
 1. run accounting_60_hxz.py
-2. run all the single characteristic files
+2. run all the single characteristic files (you can run them in parallel)
 3. run merge_chars.py
 4. run impute_rank_output_bckmk.py (you may want to comment the part of sp1500 in this file if you just need the all stocks version)
 
