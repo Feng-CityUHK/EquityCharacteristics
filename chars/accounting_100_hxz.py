@@ -1310,6 +1310,12 @@ choicelist = [data_rawa['ib']/data_rawa['me'],
               np.nan]
 data_rawa['cfp'] = np.select(condlist, choicelist, default=(data_rawa['ib']+data_rawa['dp'])/data_rawa['me'])
 
+# cfp_ia
+df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['cfp'].mean()
+df_temp = df_temp.rename(columns={'cfp': 'cfp_ind'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49'])
+data_rawa['cfp_ia'] = data_rawa['cfp'] - data_rawa['cfp_ind']
+
 # ep
 data_rawa['ep'] = data_rawa['ib']/data_rawa['me']
 
@@ -1335,6 +1341,10 @@ data_rawa['dy'] = data_rawa['dvt']/data_rawa['me']
 # cashpr
 data_rawa['cashpr'] = ((data_rawa['me'] + data_rawa['dltt'] - data_rawa['at']) / data_rawa['che'])
 
+# indmom
+df_temp = data_rawa.groupby(['date', 'ffi49'], as_index=False)['mom12m'].mean().rename(columns={'mom12m': 'indmom'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['date', 'ffi49'])
+
 # Annual Accounting Variables
 chars_a = data_rawa[['cusip', 'ncusip', 'gvkey', 'permno', 'exchcd', 'shrcd', 'datadate', 'jdate',
                      'sic', 'ret', 'retx', 'retadj', 'acc', 'agr', 'bm', 'cfp', 'ep', 'ni', 'op',
@@ -1347,7 +1357,7 @@ chars_a = data_rawa[['cusip', 'ncusip', 'gvkey', 'permno', 'exchcd', 'shrcd', 'd
                      'conv', 'chdrc', 'rdbias', 'operprof', 'capxint', 'xadint', 'chpm', 'ala', 'alm',
                      'mom1m', 'mom6m', 'mom12m', 'mom60m', 'mom36m', 'seas1a', 'me', 'hire', 'herf', 'bm_ia',
                      'me_ia', 'turn', 'dolvol', 'absacc', 'age', 'cashpr', 'chatoia', 'chempia', 'chmom', 'chpmia',
-                     'convind', 'divi', 'divo', 'secured', 'securedind', 'sin',
+                     'convind', 'divi', 'divo', 'secured', 'securedind', 'sin', 'cfp_ia', 'indmom', 'pchcapx_ia',
                      'tang', 'tb', 'm1', 'm2', 'm3', 'm4', 'm5', 'm6']]
 chars_a.reset_index(drop=True, inplace=True)
 
@@ -1356,6 +1366,18 @@ chars_a.reset_index(drop=True, inplace=True)
 ########################################
 # bm
 data_rawq['bm'] = data_rawq['beq']/data_rawq['me']
+
+# bm_ia
+df_temp = data_rawq.groupby(['datadate', 'ffi49'], as_index=False)['bm'].mean()
+df_temp = df_temp.rename(columns={'bm': 'bm_ind'})
+data_rawq = pd.merge(data_rawq, df_temp, how='left', on=['datadate', 'ffi49'])
+data_rawq['bm_ia'] = data_rawq['bm'] - data_rawq['bm_ind']
+
+# me_ia
+df_temp = data_rawq.groupby(['datadate', 'ffi49'], as_index=False)['me'].mean()
+df_temp = df_temp.rename(columns={'me': 'me_ind'})
+data_rawq = pd.merge(data_rawq, df_temp, how='left', on=['datadate', 'ffi49'])
+data_rawq['me_ia'] = data_rawq['me'] - data_rawq['me_ind']
 
 # cfp
 data_rawq['cfp'] = np.where(data_rawq['dpq'].isnull(),
@@ -1415,6 +1437,7 @@ chars_q = data_rawq[['gvkey', 'permno', 'datadate', 'jdate', 'sic', 'exchcd', 's
                      'chato', 'chpm', 'chtx', 'noa', 'rna', 'pm', 'ato', 'stdcf',
                      'grltnoa', 'ala', 'alm', 'rsup', 'stdacc', 'sgrvol', 'roavol', 'scf', 'cinvest',
                      'mom1m', 'mom6m', 'mom12m', 'mom60m', 'mom36m', 'seas1a', 'me', 'pscore', 'nincr',
+                     'cfp_ia', 'bm_ia', 'me_ia', 'chatoia',
                      'turn', 'dolvol', 'cashpr', 'indmom', 'm7', 'm8']]
 chars_q.reset_index(drop=True, inplace=True)
 

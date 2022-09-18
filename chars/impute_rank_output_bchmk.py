@@ -29,20 +29,29 @@ obs_var_list = ['gvkey', 'permno', 'jdate', 'sic', 'ret', 'retx', 'retadj', 'exc
 # characteristics with quarterly and annual frequency at the same time
 accounting_var_list = ['datadate', 'acc', 'bm', 'agr', 'alm', 'ato',  'cash', 'cashdebt', 'cfp', 'chcsho', 'chpm',
                        'chtx', 'depr', 'ep', 'gma', 'grltnoa', 'lev', 'lgr', 'ni', 'noa', 'op', 'pctacc', 'pm',
-                       'rd_sale', 'rdm', 'rna', 'roa', 'roe', 'rsup', 'sgr', 'sp']
+                       'rd_sale', 'rdm', 'rna', 'roa', 'roe', 'rsup', 'sgr', 'sp', 'me_ia', 'bm_ia',
+                       # add on 2022.09.17
+                        'cashpr', 'cfp_ia', 'chatoia', 'egr', 'invest']
 a_var_list = ['a_'+i for i in accounting_var_list]
 q_var_list = ['q_'+i for i in accounting_var_list]
 # annual frequency only list
-a_only_list = ['adm', 'bm_ia', 'herf', 'hire', 'me_ia']
+a_only_list = ['adm',  'herf', 'hire',
+               # add on 2022.09.17
+               'absacc', 'age', 'chempia', 'chinv', 'convind', 'currat', 'divi', 'divo', 'grcapx', 'operprof',
+               'pchcapx_ia', 'pchcurrat', 'pchdepr', 'pchgm_pchsale', 'pchquick', 'pchsale_pchinvt', 'pchsale_pchrect',
+               'pchsale_pchxsga', 'pchsaleinv', 'quick', 'realestate', 'roic', 'salecash', 'salerec', 'saleinv',
+               'secured', 'securedind', 'sin', 'tang', 'tb']
 # quarterly frequency only list
 q_only_list = ['abr', 'sue', 'cinvest', 'nincr', 'pscore',
                # 'turn', 'dolvol'
-               ]
+               # add on 2022.09.17
+               'roavol', 'stdacc', 'stdcf']
 # monthly frequency only list
 m_var_list = ['baspread', 'beta', 'ill', 'maxret', 'mom12m', 'mom1m', 'mom36m', 'mom60m', 'mom6m', 're', 'rvar_capm',
               'rvar_ff3', 'rvar_mean', 'seas1a', 'std_dolvol', 'std_turn', 'zerotrade', 'me', 'dy',
-              'turn', 'dolvol' # need to rerun the accounting to put them in to char_a
-              ]
+              'turn', 'dolvol', # need to rerun the accounting to put them in to char_a
+              # add on 2022.09.17
+              'indmom']
 
 df_a = chars_a[obs_var_list + accounting_var_list + a_only_list + m_var_list]
 df_a.columns = obs_var_list + a_var_list + a_only_list + m_var_list
