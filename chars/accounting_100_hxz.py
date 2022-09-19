@@ -1146,15 +1146,49 @@ data_rawq = data_rawq.drop(['p_temp1', 'p_temp2', 'p_temp3', 'p_temp4', 'p_temp5
 #######################################################################################################################
 #                                                       Momentum                                                      #
 #######################################################################################################################
-crsp_mom = conn.raw_sql("""
-                        select permno, date, ret, retx, prc, shrout, vol
-                        from crsp.msf
-                        where date >= '01/01/1925'
-                        """)
+crsp = conn.raw_sql("""
+                    select a.prc, a.ret, a.retx, a.shrout, a.vol, a.date, a.permno, a.permco
+                    from crsp.msf as a
+                    left join crsp.msenames as b
+                    on a.permno=b.permno
+                    and b.namedt<=a.date
+                    and a.date<=b.nameendt
+                    where a.date >= '01/01/1925'
+                    and b.exchcd between 1 and 3
+                    """)
 
-crsp_mom['permno'] = crsp_mom['permno'].astype(int)
-crsp_mom['jdate'] = pd.to_datetime(crsp_mom['date']) + MonthEnd(0)
-crsp_mom = crsp_mom.dropna(subset=['ret', 'retx', 'prc'])
+crsp = crsp.dropna(subset=['ret', 'retx', 'prc'])
+
+# change variable format to int
+crsp[['permco', 'permno']] = crsp[['permco', 'permno']].astype(int)
+
+# Line up date to be end of month
+crsp['date'] = pd.to_datetime(crsp['date'])
+crsp['jdate'] = crsp['date'] + MonthEnd(0)  # set all the date to the standard end date of month
+
+crsp = crsp.dropna(subset=['prc'])
+crsp['me'] = crsp['prc'].abs() * crsp['shrout']  # calculate market equity
+
+# Aggregate Market Cap
+'''
+There are cases when the same firm (permco) has two or more securities (permno) at same date.
+For the purpose of ME for the firm, we aggregated all ME for a given permco, date.
+This aggregated ME will be assigned to the permno with the largest ME.
+'''
+# sum of me across different permno belonging to same permco a given date
+crsp_summe = crsp.groupby(['jdate', 'permco'])['me'].sum().reset_index()
+# largest mktcap within a permco/date
+crsp_maxme = crsp.groupby(['jdate', 'permco'])['me'].max().reset_index()
+# join by monthend/maxme to find the permno
+crsp1 = pd.merge(crsp, crsp_maxme, how='inner', on=['jdate', 'permco', 'me'])
+# drop me column and replace with the sum me
+crsp1 = crsp1.drop(['me'], axis=1)
+# join with sum of me to get the correct market cap info
+crsp2 = pd.merge(crsp1, crsp_summe, how='inner', on=['jdate', 'permco'])
+# sort by permno and date and also drop duplicates
+crsp2 = crsp2.sort_values(by=['permno', 'jdate']).drop_duplicates()
+
+crsp_mom = crsp2.copy()
 crsp_mom = crsp_mom.sort_values(by=['permno', 'date'])
 
 # add delisting return
@@ -1172,7 +1206,6 @@ crsp_mom = pd.merge(crsp_mom, dlret, how='left', on=['permno', 'jdate'])
 crsp_mom['dlret'] = crsp_mom['dlret'].fillna(0)
 crsp_mom['ret'] = crsp_mom['ret'].fillna(0)
 crsp_mom['retadj'] = (1 + crsp_mom['ret']) * (1 + crsp_mom['dlret']) - 1
-crsp_mom['me'] = crsp_mom['prc'].abs() * crsp_mom['shrout']  # calculate market equity
 
 
 def mom(start, end, df):
