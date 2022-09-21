@@ -12,7 +12,7 @@ with open('chars_q_raw.feather', 'rb') as f:
     chars_q = feather.read_feather(f)
 
 chars_q = chars_q.dropna(subset=['permno'])
-chars_q[['permno', 'gvkey']] = chars_q[['permno', 'gvkey']].astype(int)
+chars_q['permno'] = chars_q['permno'].astype(int)
 chars_q['jdate'] = pd.to_datetime(chars_q['jdate'])
 chars_q = chars_q.drop_duplicates(['permno', 'jdate'])
 
@@ -20,7 +20,7 @@ with open('chars_a_raw.feather', 'rb') as f:
     chars_a = feather.read_feather(f)
 
 chars_a = chars_a.dropna(subset=['permno'])
-chars_a[['permno', 'gvkey']] = chars_a[['permno', 'gvkey']].astype(int)
+chars_a['permno'] = chars_a['permno'].astype(int)
 chars_a['jdate'] = pd.to_datetime(chars_a['jdate'])
 chars_a = chars_a.drop_duplicates(['permno', 'jdate'])
 
@@ -101,13 +101,17 @@ df = df.drop(['jdate'], axis=1)  # now we only keep the date of return
 df = df.dropna(subset=['ret']).reset_index(drop=True)
 df.replace([-np.inf, np.inf], np.nan, inplace=True)
 
+# fill industry information
+df['sic'] = df.groupby(['permno'])['sic'].fillna(method='ffill')
+df['sic'] = df['sic'].fillna(0)  # na in sic will be converted to 'other' in industry label
+df['sic'] = df['sic'].astype(int)
+
 # save raw data
 with open('chars60_raw_no_impute.feather', 'wb') as f:
     feather.write_feather(df, f)
 
 # impute missing values, you can choose different func form functions.py, such as ffi49/ffi10
 df_impute = df.copy()
-df_impute['sic'] = df_impute['sic'].astype(int)
 df_impute['date'] = pd.to_datetime(df_impute['date'])
 
 df_impute['ffi49'] = ffi49(df_impute)
@@ -120,9 +124,9 @@ df_impute = fillna_ind(df_impute, method='median', ffi=49)
 df_impute = fillna_all(df_impute, method='median')
 df_impute['re'] = df_impute['re'].fillna(0)  # re use IBES database, there are lots of missing data
 
-df_impute['year'] = df_impute['date'].dt.year
-df_impute = df_impute[df_impute['year'] >= 1972]
-df_impute = df_impute.drop(['year'], axis=1)
+# df_impute['year'] = df_impute['date'].dt.year
+# df_impute = df_impute[df_impute['year'] >= 1972]
+# df_impute = df_impute.drop(['year'], axis=1)
 
 with open('chars60_raw_imputed.feather', 'wb') as f:
     feather.write_feather(df_impute, f)
@@ -132,10 +136,11 @@ df_rank = df.copy()
 df_rank['lag_me'] = df_rank['me']
 df_rank['bm'] = np.where(df_rank['bm']<0,np.nan,df_rank['bm']) # if bm<0 then bm=nan and rank_bm=0
 df_rank = standardize(df_rank)
-df_rank['year'] = df_rank['date'].dt.year
-df_rank = df_rank[df_rank['year'] >= 1972]
-df_rank = df_rank.drop(['year'], axis=1)
+# df_rank['year'] = df_rank['date'].dt.year
+# df_rank = df_rank[df_rank['year'] >= 1972]
+# df_rank = df_rank.drop(['year'], axis=1)
 df_rank['log_me'] = np.log(df_rank['lag_me'])
+df_rank.replace([-np.inf, np.inf], 0, inplace=True)  # some firm does not have me
 
 with open('chars60_rank_no_impute.feather', 'wb') as f:
     feather.write_feather(df_rank, f)
@@ -144,10 +149,11 @@ with open('chars60_rank_no_impute.feather', 'wb') as f:
 df_rank = df_impute.copy()
 df_rank['lag_me'] = df_rank['me']
 df_rank = standardize(df_rank)
-df_rank['year'] = df_rank['date'].dt.year
-df_rank = df_rank[df_rank['year'] >= 1972]
-df_rank = df_rank.drop(['year'], axis=1)
+# df_rank['year'] = df_rank['date'].dt.year
+# df_rank = df_rank[df_rank['year'] >= 1972]
+# df_rank = df_rank.drop(['year'], axis=1)
 df_rank['log_me'] = np.log(df_rank['lag_me'])
+df_rank.replace([-np.inf, np.inf], 0, inplace=True)
 
 with open('chars60_rank_imputed.feather', 'wb') as f:
     feather.write_feather(df_rank, f)
