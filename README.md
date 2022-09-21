@@ -56,7 +56,7 @@ For financial researches, we need equity characteristics. This repository is a t
 
 The date range is 1926 to 2021. The stock universe is top 3 exchanges (NYSE/AMEX/NASDAQ) in US.
 
-The currant time of data is $ret_t = chars_{t-1}$
+The currant time of data is $ret_t = \mathbf{X}_{t-1}$
 
 1. chars_raw_no_impute.feather (all data with original missing value)
 2. chars_raw_imputed.feather (impute missing value with industry median/mean value)
