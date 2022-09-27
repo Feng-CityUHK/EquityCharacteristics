@@ -95,6 +95,7 @@ df = df.drop(['a_datadate', 'q_datadate'], axis=1)
 # drop optional variables, you can adjust it by your selection
 df = df.drop(['ret', 'retx'], axis=1)
 df = df.rename(columns={'retadj': 'ret'})  # retadj is return adjusted by dividend
+df = df.sort_values(by=['permno', 'jdate'])
 df['ret'] = df.groupby(['permno'])['ret'].shift(-1)  # we shift return in t period to t+1 for prediction
 df['date'] = df.groupby(['permno'])['jdate'].shift(-1)  # date is return date, jdate is predictor date
 df = df.drop(['jdate'], axis=1)  # now we only keep the date of return
@@ -107,7 +108,7 @@ df['sic'] = df['sic'].fillna(0)  # na in sic will be converted to 'other' in ind
 df['sic'] = df['sic'].astype(int)
 
 # save raw data
-with open('chars60_raw_no_impute.feather', 'wb') as f:
+with open('chars_raw_no_impute.feather', 'wb') as f:
     feather.write_feather(df, f)
 
 # impute missing values, you can choose different func form functions.py, such as ffi49/ffi10
@@ -128,7 +129,7 @@ df_impute['re'] = df_impute['re'].fillna(0)  # re use IBES database, there are l
 # df_impute = df_impute[df_impute['year'] >= 1972]
 # df_impute = df_impute.drop(['year'], axis=1)
 
-with open('chars60_raw_imputed.feather', 'wb') as f:
+with open('chars_raw_imputed.feather', 'wb') as f:
     feather.write_feather(df_impute, f)
 
 # standardize raw data
@@ -142,7 +143,7 @@ df_rank = standardize(df_rank)
 df_rank['log_me'] = np.log(df_rank['lag_me'])
 df_rank.replace([-np.inf, np.inf], 0, inplace=True)  # some firm does not have me
 
-with open('chars60_rank_no_impute.feather', 'wb') as f:
+with open('chars_rank_no_impute.feather', 'wb') as f:
     feather.write_feather(df_rank, f)
 
 # standardize imputed data
@@ -155,7 +156,7 @@ df_rank = standardize(df_rank)
 df_rank['log_me'] = np.log(df_rank['lag_me'])
 df_rank.replace([-np.inf, np.inf], 0, inplace=True)
 
-with open('chars60_rank_imputed.feather', 'wb') as f:
+with open('chars_rank_imputed.feather', 'wb') as f:
     feather.write_feather(df_rank, f)
 
 
