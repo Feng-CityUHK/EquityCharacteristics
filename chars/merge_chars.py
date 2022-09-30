@@ -81,7 +81,7 @@ crsp = crsp[['permno', 'jdate', 'ret', 'retx', 'retadj', 'me', 'shrcd', 'exchcd'
 crsp.columns = ['permno', 'jdate', 'ret_fill', 'retx_fill', 'retadj_fill', 'me_fill', 'shrcd_fill', 'exchcd_fill']
 ######################################################################
 
-with open('chars_a_60.feather', 'rb') as f:
+with open('chars_a_accounting.feather', 'rb') as f:
     chars_a = feather.read_feather(f)
 
 chars_a = chars_a.dropna(subset=['permno'])
@@ -240,7 +240,7 @@ with open('chars_a_raw.feather', 'wb') as f:
 #     In order to keep the naming tidy, we need to make another chars_q_raw, which is just a temporary dataframe       #
 ########################################################################################################################
 
-with open('chars_q_60.feather', 'rb') as f:
+with open('chars_q_accounting.feather', 'rb') as f:
     chars_q = feather.read_feather(f)
 
 chars_q = chars_q.dropna(subset=['permno'])

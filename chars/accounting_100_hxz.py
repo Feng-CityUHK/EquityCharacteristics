@@ -1470,12 +1470,12 @@ chars_q = data_rawq[['gvkey', 'permno', 'datadate', 'jdate', 'sic', 'exchcd', 's
                      'chato', 'chpm', 'chtx', 'noa', 'rna', 'pm', 'ato', 'stdcf',
                      'grltnoa', 'ala', 'alm', 'rsup', 'stdacc', 'sgrvol', 'roavol', 'scf', 'cinvest',
                      'mom1m', 'mom6m', 'mom12m', 'mom60m', 'mom36m', 'seas1a', 'me', 'pscore', 'nincr',
-                     'cfp_ia', 'bm_ia', 'me_ia', 'chatoia',
+                     'cfp_ia', 'bm_ia', 'me_ia', 'chatoia', 'chmom',
                      'turn', 'dolvol', 'cashpr', 'indmom', 'm7', 'm8']]
 chars_q.reset_index(drop=True, inplace=True)
 
-with open('chars_a_60.feather', 'wb') as f:
+with open('chars_a_accounting.feather', 'wb') as f:
     feather.write_feather(chars_a, f)
 
-with open('chars_q_60.feather', 'wb') as f:
+with open('chars_q_accounting.feather', 'wb') as f:
     feather.write_feather(chars_q, f)
