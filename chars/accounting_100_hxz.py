@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import wrds
 from pandas.tseries.offsets import *
-import pickle as pkl
 import pyarrow.feather as feather
 from functions import *
 
@@ -40,8 +39,8 @@ def ttm12(series, df):
     lag = pd.DataFrame()
     for i in range(1, 12):
         lag['%(series)s%(lag)s' % {'series': series, 'lag': i}] = df.groupby('permno')['%s' % series].shift(i)
-    result = df['%s' % series] + lag['%s1' % series] + lag['%s2' % series] + lag['%s3' % series] +\
-             lag['%s4' % series] + lag['%s5' % series] + lag['%s6' % series] + lag['%s7' % series] +\
+    result = df['%s' % series] + lag['%s1' % series] + lag['%s2' % series] + lag['%s3' % series] + \
+             lag['%s4' % series] + lag['%s5' % series] + lag['%s6' % series] + lag['%s7' % series] + \
              lag['%s8' % series] + lag['%s9' % series] + lag['%s10' % series] + lag['%s11' % series]
     return result
 
@@ -212,13 +211,13 @@ data_rawa = pd.merge(crsp2, ccm2, how='inner', on=['permno', 'jdate'])
 
 # filter exchcd & shrcd
 data_rawa = data_rawa[((data_rawa['exchcd'] == 1) | (data_rawa['exchcd'] == 2) | (data_rawa['exchcd'] == 3)) &
-                   ((data_rawa['shrcd'] == 10) | (data_rawa['shrcd'] == 11))]
+                      ((data_rawa['shrcd'] == 10) | (data_rawa['shrcd'] == 11))]
 
 # process Market Equity
 '''
 Note: me is CRSP market equity, mve_f is Compustat market equity. Please choose the me below.
 '''
-data_rawa['me'] = data_rawa['me']/1000  # CRSP ME
+data_rawa['me'] = data_rawa['me'] / 1000  # CRSP ME
 # data_rawa['me'] = data_rawa['mve_f']  # Compustat ME
 
 # there are some ME equal to zero since this company do not have price or shares data, we drop these observations
@@ -236,6 +235,11 @@ data_rawa = data_rawa[data_rawa['temp'].notna()]
 
 data_rawa = data_rawa.sort_values(by=['permno', 'jdate'])
 
+# fama-french 49 industry
+data_rawa['sic'] = data_rawa['sic'].astype(int)
+data_rawa['ffi49'] = ffi49(data_rawa)
+data_rawa['ffi49'] = data_rawa['ffi49'].fillna(49)
+data_rawa['ffi49'] = data_rawa['ffi49'].astype(int)
 #######################################################################################################################
 #                                                  Annual Variables                                                   #
 #######################################################################################################################
@@ -584,10 +588,6 @@ data_rawa['hire'] = (data_rawa['emp'] - data_rawa['emp_l1'])/data_rawa['emp_l1']
 data_rawa['hire'] = np.where((data_rawa['emp'].isnull()) | (data_rawa['emp_l1'].isnull()), 0, data_rawa['hire'])
 
 # herf
-data_rawa['sic'] = data_rawa['sic'].astype(int)
-data_rawa['ffi49'] = ffi49(data_rawa)
-data_rawa['ffi49'] = data_rawa['ffi49'].fillna(49)
-data_rawa['ffi49'] = data_rawa['ffi49'].astype(int)
 df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['sale'].sum()
 df_temp = df_temp.rename(columns={'sale': 'indsale'})
 data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49'])
@@ -779,13 +779,13 @@ data_rawq = pd.merge(crsp2, ccm2, how='inner', on=['permno', 'jdate'])
 
 # filter exchcd & shrcd
 data_rawq = data_rawq[((data_rawq['exchcd'] == 1) | (data_rawq['exchcd'] == 2) | (data_rawq['exchcd'] == 3)) &
-                   ((data_rawq['shrcd'] == 10) | (data_rawq['shrcd'] == 11))]
+                      ((data_rawq['shrcd'] == 10) | (data_rawq['shrcd'] == 11))]
 
 # process Market Equity
 '''
 Note: me is CRSP market equity, mveq_f is Compustat market equity. Please choose the me below.
 '''
-data_rawq['me'] = data_rawq['me']/1000  # CRSP ME
+data_rawq['me'] = data_rawq['me'] / 1000  # CRSP ME
 # data_rawq['me'] = data_rawq['mveq_f']  # Compustat ME
 
 # there are some ME equal to zero since this company do not have price or shares data, we drop these observations
@@ -1030,7 +1030,6 @@ data_rawq['sacc'] = ((data_rawq['actq']-data_rawq['actq_l1'] - (data_rawq['cheq'
                      -((data_rawq['lctq']-data_rawq['lctq_l1'])-(data_rawq['dlcq']-data_rawq['dlcq_l1'])))/data_rawq['saleq']
 data_rawq['sacc'] = np.where(data_rawq['saleq']<=0, ((data_rawq['actq']-data_rawq['actq_l1'] - (data_rawq['cheq']-data_rawq['cheq_l1']))
                      -((data_rawq['lctq']-data_rawq['lctq_l1'])-(data_rawq['dlcq']-data_rawq['dlcq_l1'])))/0.01, data_rawq['sacc'])
-
 
 def chars_std(start, end, df, chars):
     """
@@ -1306,7 +1305,7 @@ data_rawa = data_rawa[((data_rawa['exchcd'] == 1) | (data_rawa['exchcd'] == 2) |
 # data_rawq
 data_rawq = data_rawq.drop(['date', 'ret', 'retx', 'me'], axis=1)
 data_rawq = pd.merge(crsp_mom, data_rawq, how='left', on=['permno', 'jdate'])
-data_rawa = data_rawa.sort_values(by=['permno', 'jdate'])
+data_rawq = data_rawq.sort_values(by=['permno', 'jdate'])
 data_rawq['datadate'] = data_rawq.groupby(['permno'])['datadate'].fillna(method='ffill')
 data_rawq[['permno1', 'datadate1']] = data_rawq[['permno', 'datadate']]  # avoid the bug of 'groupby' for py 3.8
 data_rawq = data_rawq.groupby(['permno1', 'datadate1'], as_index=False).fillna(method='ffill')
