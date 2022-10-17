@@ -19,7 +19,7 @@ For financial researches, we need equity characteristics. This repository is a t
 
 ## Files
 
-- [Characteristics list](https://github.com/Feng-CityUHK/EquityCharacteristics/blob/master/chars60_summary.csv)
+- [Characteristics list](https://github.com/ericma4/EquityCharacteristics/blob/master/chars_summary.csv)
 
 ### Main Files
 - accounting_100_hxz.py  -- most annual, quarterly and monthly frequency characteristics
