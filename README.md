@@ -7,6 +7,9 @@
 - All in Python
 - The SAS version is here [EquityCharacteristicsSAS](https://feng-cityuhk.github.io/EquityCharacteristicsSAS/)
 
+- Extension to [China A Share Market](https://github.com/Quantactix/ChinaAShareEquityCharacteristics)
+- Extension to [Factors and Portfolios in China Market](https://github.com/mlfina/China-A-Sort)
+
 ## Academic Background
 
 For financial researches, we need equity characteristics. This repository is a toolkit to calculate asset characteristics in individual equity level and portfolio level.
