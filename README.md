@@ -1,8 +1,8 @@
 ### Contact
 
-- [Xin He](https://www.xinhesean.com)
+- Xin He
 - xinhe9701@gmail.com
-- www.xinhesean.com
+- [www.xinhesean.com](https://www.xinhesean.com)
 
 ### Version
 
