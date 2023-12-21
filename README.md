@@ -1,6 +1,8 @@
 ### Contact
 
 - [Sean (Xin He)](https://www.xinhesean.com)
+- xinhe9701@gmail.com
+- www.xinhesean.com
 
 ### Version
 
