@@ -24,10 +24,10 @@ For financial researches, we need equity characteristics. This repository is a t
 
 ## Files
 
-- [Characteristics list](https://github.com/Feng-CityUHK/EquityCharacteristics/blob/master/chars60_summary.csv)
+- [Characteristics list](https://github.com/ericma4/EquityCharacteristics/blob/master/chars_summary.csv)
 
 ### Main Files
-- accounting_60_hxz.py  -- most annual, quarterly and monthly frequency characteristics
+- accounting_100_hxz.py  -- most annual, quarterly and monthly frequency characteristics
 - functions.py -- impute and rank functions
 - merge_chars.py -- merge all the characteristics from different pickle file into one pickle file
 - impute_rank_output_bchmk.py -- impute the missing values and standardize raw data
@@ -50,7 +50,7 @@ For financial researches, we need equity characteristics. This repository is a t
 
 ## How to use
 
-1. run accounting_60_hxz.py
+1. run accounting_100_hxz.py
 2. run all the single characteristic files (you can run them in parallel)
 3. run merge_chars.py
 4. run impute_rank_output_bckmk.py (you may want to comment the part of sp1500 in this file if you just need the all stocks version)
@@ -59,9 +59,9 @@ For financial researches, we need equity characteristics. This repository is a t
 
 ### Data
 
-The date range is 1972 to 2019. The stock universe is top 3 exchanges (NYSE/AMEX/NASDAQ) in US.
+The date range is 1926 to 2021. The stock universe is top 3 exchanges (NYSE/AMEX/NASDAQ) in US.
 
-The currant time of data is $ret_t = chars_{t-1}$
+The currant time of data is $ret_t = \mathbf{X}_{t-1}$
 
 1. chars_raw_no_impute.feather (all data with original missing value)
 2. chars_raw_imputed.feather (impute missing value with industry median/mean value)

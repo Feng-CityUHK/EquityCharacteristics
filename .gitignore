@@ -1,5 +1,2 @@
-.vscode
-*.DS_Store
-*.feather
-*.pkl
-./running
+
+.DS_Store

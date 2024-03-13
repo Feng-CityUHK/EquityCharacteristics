@@ -26,7 +26,7 @@ comp = conn.raw_sql("""
                         and datafmt = 'STD'
                         and popsrc = 'D'
                         and consol = 'C'
-                        and datadate >= '01/01/1959'
+                        and datadate >= '01/01/1925'
                         """)
 
 comp['datadate'] = pd.to_datetime(comp['datadate'])
@@ -86,7 +86,7 @@ ccm2['sue'] = (ccm2['eps'] - ccm2['e4'])/ccm2['sue_std']
 crsp_msf = conn.raw_sql("""
                         select distinct date
                         from crsp.msf
-                        where date >= '01/01/1959'
+                        where date >= '01/01/1925'
                         """)
 
 ccm2['datadate'] = pd.to_datetime(ccm2['datadate'])
