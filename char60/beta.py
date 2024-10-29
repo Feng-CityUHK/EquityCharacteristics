@@ -18,80 +18,90 @@ import pickle as pkl
 import pyarrow.feather as feather
 import multiprocessing as mp
 
-###################
-# Connect to WRDS #
-###################
-conn = wrds.Connection()
+OUT_DIR = './'
+# Number of CPU cores to use. Maybe 3/4 of your total cores for a single run. Use 1 for debugging
+CPU_CORE_COUNT = 20
+# Start date for data as month, day, year.
+DATA_START_DATE = '01/01/1959'  
+# I suggest current year minues one for quick debug cycles.
 
-# CRSP Block
-crsp = conn.raw_sql("""
-                      select a.permno, a.date, a.ret, b.rf, b.mktrf, b.smb, b.hml
-                      from crsp.dsf as a
-                      left join ff.factors_daily as b
-                      on a.date=b.date
-                      where a.date > '01/01/1959'
-                      """)
+if __name__ == '__main__':
+    
+    ###################
+    # Connect to WRDS #
+    ###################
+    conn = wrds.Connection()
+    
+    # CRSP Block
+    crsp = conn.raw_sql(f"""
+                        select a.permno, a.date, a.ret, b.rf, b.mktrf, b.smb, b.hml
+                        from crsp.dsf as a
+                        left join ff.factors_daily as b
+                        on a.date=b.date
+                        where a.date >= \'{DATA_START_DATE}\'
+                        """)
 
-# sort variables by permno and date
-crsp = crsp.sort_values(by=['permno', 'date'])
+    # sort variables by permno and date
+    crsp = crsp.sort_values(by=['permno', 'date'])
 
-# change variable format to int
-crsp['permno'] = crsp['permno'].astype(int)
+    # change variable format to int
+    crsp['permno'] = crsp['permno'].astype(int)
 
-# Line up date to be end of month
-crsp['date'] = pd.to_datetime(crsp['date'])
+    # Line up date to be end of month
+    crsp['date'] = pd.to_datetime(crsp['date'])
 
-# add delisting return
-dlret = conn.raw_sql("""
-                     select permno, dlret, dlstdt 
-                     from crsp.dsedelist
-                     """)
+    # add delisting return
+    dlret = conn.raw_sql("""
+                        select permno, dlret, dlstdt 
+                        from crsp.dsedelist
+                        """)
+    conn.close()
 
-dlret.permno = dlret.permno.astype(int)
-dlret['dlstdt'] = pd.to_datetime(dlret['dlstdt'])
-dlret['date'] = dlret['dlstdt']
+    dlret.permno = dlret.permno.astype(int)
+    dlret['dlstdt'] = pd.to_datetime(dlret['dlstdt'])
+    dlret['date'] = dlret['dlstdt']
 
-# merge delisting return to crsp return
-crsp = pd.merge(crsp, dlret, how='left', on=['permno', 'date'])
-crsp['dlret'] = crsp['dlret'].fillna(0)
-crsp['ret'] = crsp['ret'].fillna(0)
-crsp['retadj'] = (1 + crsp['ret']) * (1 + crsp['dlret']) - 1
-crsp['exret'] = crsp['retadj'] - crsp['rf']
+    # merge delisting return to crsp return
+    crsp = pd.merge(crsp, dlret, how='left', on=['permno', 'date'])
+    crsp['dlret'] = crsp['dlret'].fillna(0)
+    crsp['ret'] = crsp['ret'].fillna(0)
+    crsp['retadj'] = (1 + crsp['ret']) * (1 + crsp['dlret']) - 1
+    crsp['exret'] = crsp['retadj'] - crsp['rf']
 
-# find the closest trading day to the end of the month
-crsp['monthend'] = crsp['date'] + MonthEnd(0)
-crsp['date_diff'] = crsp['monthend'] - crsp['date']
-date_temp = crsp.groupby(['permno', 'monthend'])['date_diff'].min()
-date_temp = pd.DataFrame(date_temp)  # convert Series to DataFrame
-date_temp.reset_index(inplace=True)
-date_temp.rename(columns={'date_diff': 'min_diff'}, inplace=True)
-crsp = pd.merge(crsp, date_temp, how='left', on=['permno', 'monthend'])
-crsp['sig'] = np.where(crsp['date_diff'] == crsp['min_diff'], 1, np.nan)
+    # find the closest trading day to the end of the month
+    crsp['monthend'] = crsp['date'] + MonthEnd(0)
+    crsp['date_diff'] = crsp['monthend'] - crsp['date']
+    date_temp = crsp.groupby(['permno', 'monthend'])['date_diff'].min()
+    date_temp = pd.DataFrame(date_temp)  # convert Series to DataFrame
+    date_temp.reset_index(inplace=True)
+    date_temp.rename(columns={'date_diff': 'min_diff'}, inplace=True)
+    crsp = pd.merge(crsp, date_temp, how='left', on=['permno', 'monthend'])
+    crsp['sig'] = np.where(crsp['date_diff'] == crsp['min_diff'], 1, np.nan)
 
-# label every date of month end
-crsp['month_count'] = crsp[crsp['sig'] == 1].groupby(['permno']).cumcount()
+    # label every date of month end
+    crsp['month_count'] = crsp[crsp['sig'] == 1].groupby(['permno']).cumcount()
 
-# label numbers of months for a firm
-month_num = crsp[crsp['sig'] == 1].groupby(['permno'])['month_count'].tail(1)
-month_num = month_num.astype(int)
-month_num = month_num.reset_index(drop=True)
+    # label numbers of months for a firm
+    month_num = crsp[crsp['sig'] == 1].groupby(['permno'])['month_count'].tail(1)
+    month_num = month_num.astype(int)
+    month_num = month_num.reset_index(drop=True)
 
-# mark the number of each month to each day of this month
-crsp['month_count'] = crsp.groupby(['permno'])['month_count'].fillna(method='bfill')
+    # mark the number of each month to each day of this month
+    crsp['month_count'] = crsp.groupby(['permno'])['month_count'].fillna(method='bfill')
 
-# crate a firm list
-df_firm = crsp.drop_duplicates(['permno'])
-df_firm = df_firm[['permno']]
-df_firm['permno'] = df_firm['permno'].astype(int)
-df_firm = df_firm.reset_index(drop=True)
-df_firm = df_firm.reset_index()
-df_firm = df_firm.rename(columns={'index': 'count'})
-df_firm['month_num'] = month_num
+    # crate a firm list
+    df_firm = crsp.drop_duplicates(['permno'])
+    df_firm = df_firm[['permno']]
+    df_firm['permno'] = df_firm['permno'].astype(int)
+    df_firm = df_firm.reset_index(drop=True)
+    df_firm = df_firm.reset_index()
+    df_firm = df_firm.rename(columns={'index': 'count'})
+    df_firm['month_num'] = month_num
+
 
 ######################
 # Calculate the beta #
 ######################
-
 
 def get_beta(df, firm_list):
     """
@@ -100,9 +110,13 @@ def get_beta(df, firm_list):
     :param firm_list: list of firms matching stock dataframe
     :return: dataframe with variance of residual
     """
+
+    pid = mp.current_process().pid
+    print(f"Starting PID: {pid}")
+
     for firm, count, prog in zip(firm_list['permno'], firm_list['month_num'], range(firm_list['permno'].count()+1)):
         prog = prog + 1
-        print('processing permno %s' % firm, '/', 'finished', '%.2f%%' % ((prog/firm_list['permno'].count())*100))
+        print('%s:\tprocessing permno %s' % (pid, firm), '/', 'finished', '%.2f%%' % ((prog/firm_list['permno'].count())*100))
         for i in range(count + 1):
             # if you want to change the rolling window, please change here: i - 2 means 3 months is a window.
             temp = df[(df['permno'] == firm) & (i - 2 <= df['month_count']) & (df['month_count'] <= i)]
@@ -131,7 +145,7 @@ def sub_df(start, end, step):
     """
     # we use dict to store different sub dataframe
     temp = {}
-    for i, h in zip(np.arange(start, end, step), range(int((end-start)/step))):
+    for i, h in zip(np.arange(start, end, step), range(CPU_CORE_COUNT)):
         print('processing splitting dataframe:', round(i, 2), 'to', round(i + step, 2))
         if i == 0:  # to get the left point
             temp['firm' + str(h)] = df_firm[df_firm['count'] <= df_firm['count'].quantile(i + step)]
@@ -153,8 +167,8 @@ def main(start, end, step):
     :param step: quantile step
     :return: a dataframe with calculated variance of residual
     """
-    df = sub_df(start, end, step)
-    pool = mp.Pool()
+    df = sub_df(start, end, 1/CPU_CORE_COUNT)
+    pool = mp.Pool(CPU_CORE_COUNT)
     p_dict = {}
     for i in range(int((end-start)/step)):
         p_dict['p' + str(i)] = pool.apply_async(get_beta, (df['crsp%s' % i], df['firm%s' % i],))
@@ -162,7 +176,7 @@ def main(start, end, step):
     pool.join()
     result = pd.DataFrame()
     print('processing pd.concat')
-    for h in range(int((end-start)/step)):
+    for h in range(CPU_CORE_COUNT):
         result = pd.concat([result, p_dict['p%s' % h].get()])
     return result
 
@@ -171,12 +185,12 @@ def main(start, end, step):
 # Note: please split dataframe according to your CPU situation. For example, we split dataframe to (1-0)/0.05 = 20 sub
 # dataframes here, so the function will use 20 cores to calculate variance of residual.
 if __name__ == '__main__':
-    crsp = main(0, 1, 0.05)
+    crsp = main(0, 1, 1/CPU_CORE_COUNT)
 
-# process dataframe
-crsp = crsp.dropna(subset=['beta'])  # drop NA due to rolling
-crsp = crsp.reset_index(drop=True)
-crsp = crsp[['permno', 'date', 'beta']]
+    # process dataframe
+    crsp = crsp.dropna(subset=['beta'])  # drop NA due to rolling
+    crsp = crsp.reset_index(drop=True)
+    crsp = crsp[['permno', 'date', 'beta']]
 
-with open('beta.feather', 'wb') as f:
-    feather.write_feather(crsp, f)
+    with open(OUT_DIR + 'beta.feather', 'wb') as f:
+        feather.write_feather(crsp, f)

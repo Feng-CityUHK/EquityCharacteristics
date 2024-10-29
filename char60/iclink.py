@@ -233,7 +233,9 @@ _link2_3 = _link2_3[['ticker','permno','cname','comnam','score']].drop_duplicate
 #####################################
 # Combine the output from both linking procedures. Store the output data for future usage
 
-iclink = _link1_2.append(_link2_3)
+# NOTE: As of Pandas version 2.0, the Pandas append() function is deprecated. Use the Pandas pd.concat() function instead
+#iclink = _link1_2.append(_link2_3) 
+iclink = pd.concat([_link1_2, _link2_3])
 
 # Storing iclink for other program usage
 import pickle as pkl
