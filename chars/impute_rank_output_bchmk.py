@@ -12,7 +12,7 @@ with open('chars_q_raw.feather', 'rb') as f:
     chars_q = feather.read_feather(f)
 
 chars_q = chars_q.dropna(subset=['permno'])
-chars_q[['permno', 'gvkey']] = chars_q[['permno', 'gvkey']].astype(int)
+chars_q['permno'] = chars_q['permno'].astype(int)
 chars_q['jdate'] = pd.to_datetime(chars_q['jdate'])
 chars_q = chars_q.drop_duplicates(['permno', 'jdate'])
 
@@ -20,29 +20,38 @@ with open('chars_a_raw.feather', 'rb') as f:
     chars_a = feather.read_feather(f)
 
 chars_a = chars_a.dropna(subset=['permno'])
-chars_a[['permno', 'gvkey']] = chars_a[['permno', 'gvkey']].astype(int)
+chars_a['permno'] = chars_a['permno'].astype(int)
 chars_a['jdate'] = pd.to_datetime(chars_a['jdate'])
 chars_a = chars_a.drop_duplicates(['permno', 'jdate'])
 
 # information list
-obs_var_list = ['gvkey', 'permno', 'jdate', 'sic', 'ret', 'retx', 'retadj', 'exchcd', 'shrcd']
+obs_var_list = ['gvkey', 'permno', 'jdate', 'ticker', 'conm', 'comnam', 'sic', 'ret', 'retx', 'retadj', 'exchcd', 'shrcd', 'prc', 'shrout']
 # characteristics with quarterly and annual frequency at the same time
-accounting_var_list = ['datadate', 'acc', 'bm', 'agr', 'alm', 'ato',  'cash', 'cashdebt', 'cfp', 'chcsho', 'chpm',
+accounting_var_list = ['datadate', 'acc', 'bm', 'agr', 'alm', 'ato',  'cash', 'cashdebt', 'cfp', 'chcsho',
                        'chtx', 'depr', 'ep', 'gma', 'grltnoa', 'lev', 'lgr', 'ni', 'noa', 'op', 'pctacc', 'pm',
-                       'rd_sale', 'rdm', 'rna', 'roa', 'roe', 'rsup', 'sgr', 'sp']
+                       'rd_sale', 'rdm', 'rna', 'roa', 'roe', 'rsup', 'sgr', 'sp', 'me_ia', 'bm_ia',
+                       # add on 2022.09.17
+                        'cashpr', 'cfp_ia', 'chatoia', 'egr', 'invest', 'chmom', 'rd']
 a_var_list = ['a_'+i for i in accounting_var_list]
 q_var_list = ['q_'+i for i in accounting_var_list]
 # annual frequency only list
-a_only_list = ['adm', 'bm_ia', 'herf', 'hire', 'me_ia']
+a_only_list = ['adm',  'herf', 'hire',
+               # add on 2022.09.17
+               'absacc', 'age', 'chempia', 'chinv', 'convind', 'currat', 'divi', 'divo', 'grcapx',
+               'pchcapx_ia', 'pchcurrat', 'pchdepr', 'pchgm_pchsale', 'pchquick', 'pchsale_pchinvt', 'pchsale_pchrect',
+               'pchsale_pchxsga', 'pchsaleinv', 'quick', 'realestate', 'roic', 'salecash', 'salerec', 'saleinv',
+               'secured', 'securedind', 'sin', 'tang', 'tb', 'chpmia']
 # quarterly frequency only list
 q_only_list = ['abr', 'sue', 'cinvest', 'nincr', 'pscore',
                # 'turn', 'dolvol'
-               ]
+               # add on 2022.09.17
+               'roavol', 'stdacc', 'stdcf']
 # monthly frequency only list
 m_var_list = ['baspread', 'beta', 'ill', 'maxret', 'mom12m', 'mom1m', 'mom36m', 'mom60m', 'mom6m', 're', 'rvar_capm',
               'rvar_ff3', 'rvar_mean', 'seas1a', 'std_dolvol', 'std_turn', 'zerotrade', 'me', 'dy',
-              'turn', 'dolvol' # need to rerun the accounting to put them in to char_a
-              ]
+              'turn', 'dolvol', # need to rerun the accounting to put them in to char_a
+              # add on 2022.09.17
+              'indmom']
 
 df_a = chars_a[obs_var_list + accounting_var_list + a_only_list + m_var_list]
 df_a.columns = obs_var_list + a_var_list + a_only_list + m_var_list
@@ -51,7 +60,7 @@ df_a = df_a.sort_values(obs_var_list)
 df_q = chars_q[obs_var_list + accounting_var_list + q_only_list]
 df_q.columns = obs_var_list + q_var_list + q_only_list
 # drop the same information columns for merging
-df_q = df_q.drop(['sic', 'ret', 'retx', 'retadj', 'exchcd', 'shrcd'], axis=1)
+df_q = df_q.drop(['sic', 'ret', 'retx', 'retadj', 'exchcd', 'shrcd', 'ticker', 'conm', 'comnam', 'prc', 'shrout'], axis=1)
 
 df = df_a.merge(df_q, how='left', on=['gvkey', 'jdate', 'permno'])
 
@@ -86,36 +95,43 @@ df = df.drop(['a_datadate', 'q_datadate'], axis=1)
 # drop optional variables, you can adjust it by your selection
 df = df.drop(['ret', 'retx'], axis=1)
 df = df.rename(columns={'retadj': 'ret'})  # retadj is return adjusted by dividend
+df = df.sort_values(by=['permno', 'jdate'])
 df['ret'] = df.groupby(['permno'])['ret'].shift(-1)  # we shift return in t period to t+1 for prediction
 df['date'] = df.groupby(['permno'])['jdate'].shift(-1)  # date is return date, jdate is predictor date
 df = df.drop(['jdate'], axis=1)  # now we only keep the date of return
 df = df.dropna(subset=['ret']).reset_index(drop=True)
 df.replace([-np.inf, np.inf], np.nan, inplace=True)
 
+# fill industry information
+df['sic'] = df.groupby(['permno'])['sic'].fillna(method='ffill')
+df['sic'] = df['sic'].fillna(0)  # na in sic will be converted to 'other' in industry label
+df['sic'] = df['sic'].astype(int)
+
 # save raw data
-with open('chars60_raw_no_impute.feather', 'wb') as f:
+with open('chars_raw_no_impute.feather', 'wb') as f:
     feather.write_feather(df, f)
 
 # impute missing values, you can choose different func form functions.py, such as ffi49/ffi10
 df_impute = df.copy()
-df_impute['sic'] = df_impute['sic'].astype(int)
 df_impute['date'] = pd.to_datetime(df_impute['date'])
 
 df_impute['ffi49'] = ffi49(df_impute)
 df_impute['ffi49'] = df_impute['ffi49'].fillna(49)  # we treat na in ffi49 as 'other'
 df_impute['ffi49'] = df_impute['ffi49'].astype(int)
 
-# there are two ways to impute: industrial median or mean
-df_impute = fillna_ind(df_impute, method='median', ffi=49)
+df_impute.replace([-np.inf, np.inf], np.nan, inplace=True)
 
-df_impute = fillna_all(df_impute, method='median')
+# there are two ways to impute: industrial median or mean
+df_impute = fillna_ind(df_impute, method='median', ffi=49, not_fill_col=obs_var_list)
+
+df_impute = fillna_all(df_impute, method='median', not_fill_col=obs_var_list)
 df_impute['re'] = df_impute['re'].fillna(0)  # re use IBES database, there are lots of missing data
 
-df_impute['year'] = df_impute['date'].dt.year
-df_impute = df_impute[df_impute['year'] >= 1972]
-df_impute = df_impute.drop(['year'], axis=1)
+# df_impute['year'] = df_impute['date'].dt.year
+# df_impute = df_impute[df_impute['year'] >= 1972]
+# df_impute = df_impute.drop(['year'], axis=1)
 
-with open('chars60_raw_imputed.feather', 'wb') as f:
+with open('chars_raw_imputed.feather', 'wb') as f:
     feather.write_feather(df_impute, f)
 
 # standardize raw data
@@ -123,24 +139,31 @@ df_rank = df.copy()
 df_rank['lag_me'] = df_rank['me']
 df_rank['bm'] = np.where(df_rank['bm']<0,np.nan,df_rank['bm']) # if bm<0 then bm=nan and rank_bm=0
 df_rank = standardize(df_rank)
-df_rank['year'] = df_rank['date'].dt.year
-df_rank = df_rank[df_rank['year'] >= 1972]
-df_rank = df_rank.drop(['year'], axis=1)
+# df_rank['year'] = df_rank['date'].dt.year
+# df_rank = df_rank[df_rank['year'] >= 1972]
+# df_rank = df_rank.drop(['year'], axis=1)
 df_rank['log_me'] = np.log(df_rank['lag_me'])
+df_rank.replace([-np.inf, np.inf], 0, inplace=True)  # some firm does not have me
 
-with open('chars60_rank_no_impute.feather', 'wb') as f:
+with open('chars_rank_no_impute.feather', 'wb') as f:
     feather.write_feather(df_rank, f)
 
 # standardize imputed data
-df_rank = df_impute.copy()
-df_rank['lag_me'] = df_rank['me']
-df_rank = standardize(df_rank)
-df_rank['year'] = df_rank['date'].dt.year
-df_rank = df_rank[df_rank['year'] >= 1972]
-df_rank = df_rank.drop(['year'], axis=1)
-df_rank['log_me'] = np.log(df_rank['lag_me'])
+# df_rank = df_impute.copy()
 
-with open('chars60_rank_imputed.feather', 'wb') as f:
+# df_rank['lag_me'] = df_rank['me']
+# df_rank = standardize(df_rank)
+# # df_rank['year'] = df_rank['date'].dt.year
+# # df_rank = df_rank[df_rank['year'] >= 1972]
+# # df_rank = df_rank.drop(['year'], axis=1)
+# df_rank['log_me'] = np.log(df_rank['lag_me'])
+# df_rank.replace([-np.inf, np.inf], 0, inplace=True)
+# df_rank = pd.read_feather("chars_rank_no_impute.feather")
+
+char_list = [i for i in df_rank.columns if i.startswith("rank_")]
+df_rank[char_list] = df_rank[char_list].fillna(0)
+
+with open('chars_rank_imputed.feather', 'wb') as f:
     feather.write_feather(df_rank, f)
 
 

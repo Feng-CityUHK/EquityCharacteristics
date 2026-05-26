@@ -1,17 +1,15 @@
 import pandas as pd
 import numpy as np
-import datetime as dt
 import wrds
-from dateutil.relativedelta import *
 from pandas.tseries.offsets import *
-import pickle as pkl
+import pyarrow.feather as feather
 from functions import *
 
 ###################
 # Connect to WRDS #
 ###################
 conn = wrds.Connection()
-
+print(f"Connected to WRDS successfully!")
 #######################################################################################################################
 #                                                    TTM functions                                                    #
 #######################################################################################################################
@@ -26,7 +24,7 @@ def ttm4(series, df):
     """
     lag = pd.DataFrame()
     for i in range(1, 4):
-        lag['%(series)s%(lag)s' % {'series': series, 'lag': i}] = df.groupby('gvkey')['%s' % series].shift(i)
+        lag['%(series)s%(lag)s' % {'series': series, 'lag': i}] = df.groupby('permno')['%s' % series].shift(i)
     result = df['%s' % series] + lag['%s1' % series] + lag['%s2' % series] + lag['%s3' % series]
     return result
 
@@ -41,12 +39,12 @@ def ttm12(series, df):
     lag = pd.DataFrame()
     for i in range(1, 12):
         lag['%(series)s%(lag)s' % {'series': series, 'lag': i}] = df.groupby('permno')['%s' % series].shift(i)
-    result = df['%s' % series] + lag['%s1' % series] + lag['%s2' % series] + lag['%s3' % series] +\
-             lag['%s4' % series] + lag['%s5' % series] + lag['%s6' % series] + lag['%s7' % series] +\
+    result = df['%s' % series] + lag['%s1' % series] + lag['%s2' % series] + lag['%s3' % series] + \
+             lag['%s4' % series] + lag['%s5' % series] + lag['%s6' % series] + lag['%s7' % series] + \
              lag['%s8' % series] + lag['%s9' % series] + lag['%s10' % series] + lag['%s11' % series]
     return result
 
-print('TTM')
+
 #######################################################################################################################
 #                                                  Compustat Block                                                    #
 #######################################################################################################################
@@ -57,24 +55,23 @@ comp = conn.raw_sql("""
                     /*firm variables*/
                     /*income statement*/
                     f.sale, f.revt, f.cogs, f.xsga, f.dp, f.xrd, f.xad, f.ib, f.ebitda,
-                    f.ebit, f.nopi, f.spi, f.pi, f.txp, f.ni, f.txfed, f.txfo, f.txt, f.xint, f.xpp, f.xacc,
+                    f.ebit, f.nopi, f.spi, f.pi, f.txp, f.ni, f.txfed, f.txfo, f.txt, f.xint,
                     
                     /*CF statement and others*/
-                    f.capx, f.oancf, f.dvt, f.ob, f.gdwlia, f.gdwlip, f.gwo, f.mib, f.oiadp, f.ivao, f.ivst,
+                    f.capx, f.oancf, f.dvt, f.ob, f.gdwlia, f.gdwlip, f.gwo, f.mib, f.oiadp, f.ivao, f.xpp, f.xacc,
                     
                     /*assets*/
                     f.rect, f.act, f.che, f.ppegt, f.invt, f.at, f.aco, f.intan, f.ao, f.ppent, f.gdwl, f.fatb, f.fatl,
                     
                     /*liabilities*/
                     f.lct, f.dlc, f.dltt, f.lt, f.dm, f.dcvt, f.cshrc, 
-                    f.dcpstk, f.pstk, f.ap, f.lco, f.lo, f.drc, f.drlt, f.txdi, f.dltis, f.dltr, f.dlcch,
+                    f.dcpstk, f.pstk, f.ap, f.lco, f.lo, f.drc, f.drlt, f.txdi,
                     
                     /*equity and other*/
-                    f.ceq, f.scstkc, f.emp, f.csho, f.seq, f.txditc, f.pstkrv, f.pstkl, f.np, f.txdc, 
-                    f.dpc, f.ajex, f.tstkp, f.oibdp, f.capxv, f.dvpa, f.epspx,
+                    f.ceq, f.scstkc, f.emp, f.csho, f.seq, f.txditc, f.pstkrv, f.pstkl, f.np, f.txdc, f.dpc, f.ajex, f.conm,
                     
                     /*market*/
-                    abs(f.prcc_f) as prcc_f, abs(f.prcc_c) as prcc_c, f.dvc, f.prstkc, f.sstk, f.fopt, f.wcap
+                    abs(f.prcc_f) as prcc_f
                     
                     from comp.funda as f
                     left join comp.company as c
@@ -85,14 +82,14 @@ comp = conn.raw_sql("""
                     and f.datafmt = 'STD'
                     and f.popsrc = 'D'
                     and f.consol = 'C'
-                    and f.datadate >= '01/01/1959'
+                    and f.datadate >= '01/01/1925'
                     """)
 
 # convert datadate to date fmt
 comp['datadate'] = pd.to_datetime(comp['datadate'])
 
 # sort and clean up
-comp = comp.sort_values(by=['gvkey', 'datadate']).drop_duplicates()
+comp = comp.sort_values(by=['gvkey', 'datadate']).drop_duplicates().reset_index(drop=True)
 
 # clean up csho
 comp['csho'] = np.where(comp['csho'] == 0, np.nan, comp['csho'])
@@ -104,25 +101,25 @@ comp['mve_f'] = comp['csho'] * comp['prcc_f']
 condlist = [comp['drc'].notna() & comp['drlt'].notna(),
             comp['drc'].notna() & comp['drlt'].isnull(),
             comp['drlt'].notna() & comp['drc'].isnull()]
-choicelist = [comp['drc']+comp['drlt'],
+choicelist = [comp['drc'] + comp['drlt'],
               comp['drc'],
               comp['drlt']]
 comp['dr'] = np.select(condlist, choicelist, default=np.nan)
 
 condlist = [comp['dcvt'].isnull() & comp['dcpstk'].notna() & comp['pstk'].notna() & comp['dcpstk'] > comp['pstk'],
             comp['dcvt'].isnull() & comp['dcpstk'].notna() & comp['pstk'].isnull()]
-choicelist = [comp['dcpstk']-comp['pstk'],
+choicelist = [comp['dcpstk'] - comp['pstk'],
               comp['dcpstk']]
 comp['dc'] = np.select(condlist, choicelist, default=np.nan)
 comp['dc'] = np.where(comp['dc'].isnull(), comp['dcvt'], comp['dc'])
 
 comp['xint0'] = np.where(comp['xint'].isnull(), 0, comp['xint'])
-comp['xsga0'] = np.where(comp['xsga'].isnull, 0, 0)
+# comp['xsga0'] = np.where(comp['xsga'].isnull, 0, 0)
 
 comp['ceq'] = np.where(comp['ceq'] == 0, np.nan, comp['ceq'])
 comp['at'] = np.where(comp['at'] == 0, np.nan, comp['at'])
-comp = comp.dropna(subset=['at'])
-print('compustat')
+comp = comp.dropna(subset=['at']).reset_index(drop=True)
+
 #######################################################################################################################
 #                                                       CRSP Block                                                    #
 #######################################################################################################################
@@ -131,13 +128,13 @@ print('compustat')
 # Select variables from the CRSP monthly stock and event datasets
 crsp = conn.raw_sql("""
                       select a.prc, a.ret, a.retx, a.shrout, a.vol, a.cfacpr, a.cfacshr, a.date, a.permno, a.permco,
-                      b.ticker, b.ncusip, b.shrcd, b.exchcd
+                      b.ticker, b.ncusip, b.shrcd, b.exchcd, b.comnam
                       from crsp.msf as a
                       left join crsp.msenames as b
                       on a.permno=b.permno
                       and b.namedt<=a.date
                       and a.date<=b.nameendt
-                      where a.date >= '01/01/1959'
+                      where a.date >= '01/01/1925'
                       and b.exchcd between 1 and 3
                       """)
 
@@ -148,15 +145,15 @@ crsp[['permco', 'permno', 'shrcd', 'exchcd']] = crsp[['permco', 'permno', 'shrcd
 crsp['date'] = pd.to_datetime(crsp['date'])
 crsp['monthend'] = crsp['date'] + MonthEnd(0)  # set all the date to the standard end date of month
 
-crsp = crsp.dropna(subset=['prc'])
-crsp['me'] = crsp['prc'].abs() * crsp['shrout']  # calculate market equity 
+crsp = crsp.dropna(subset=['prc']).reset_index(drop=True)
+crsp['me'] = crsp['prc'].abs() * crsp['shrout']  # calculate market equity
 
 # if Market Equity is Nan then let return equals to 0
 crsp['ret'] = np.where(crsp['me'].isnull(), 0, crsp['ret'])
 crsp['retx'] = np.where(crsp['me'].isnull(), 0, crsp['retx'])
 
 # impute me
-crsp = crsp.sort_values(by=['permno', 'date']).drop_duplicates()
+crsp = crsp.sort_values(by=['permno', 'date']).drop_duplicates().reset_index(drop=True)
 crsp['me'] = np.where(crsp['permno'] == crsp['permno'].shift(1), crsp['me'].fillna(method='ffill'), crsp['me'])
 
 # Aggregate Market Cap
@@ -170,14 +167,14 @@ crsp_summe = crsp.groupby(['monthend', 'permco'])['me'].sum().reset_index()
 # largest mktcap within a permco/date
 crsp_maxme = crsp.groupby(['monthend', 'permco'])['me'].max().reset_index()
 # join by monthend/maxme to find the permno
-crsp1 = pd.merge(crsp, crsp_maxme, how='inner', on=['monthend', 'permco', 'me'])
+crsp1 = pd.merge(crsp, crsp_maxme, how='inner', on=['monthend', 'permco', 'me']).reset_index(drop=True)
 # drop me column and replace with the sum me
 crsp1 = crsp1.drop(['me'], axis=1)
 # join with sum of me to get the correct market cap info
-crsp2 = pd.merge(crsp1, crsp_summe, how='inner', on=['monthend', 'permco'])
+crsp2 = pd.merge(crsp1, crsp_summe, how='inner', on=['monthend', 'permco']).reset_index(drop=True)
 # sort by permno and date and also drop duplicates
-crsp2 = crsp2.sort_values(by=['permno', 'monthend']).drop_duplicates()
-print('crsp')
+crsp2 = crsp2.sort_values(by=['permno', 'monthend']).drop_duplicates().reset_index(drop=True)
+
 #######################################################################################################################
 #                                                        CCM Block                                                    #
 #######################################################################################################################
@@ -201,56 +198,58 @@ ccm['linkenddt'] = ccm['linkenddt'].fillna(pd.to_datetime('today'))
 ccm1 = pd.merge(comp, ccm, how='left', on=['gvkey'])
 
 # we can only get the accounting data after the firm public their report
-# for annual data, we use 5 or 6 months lagged data
+# for annual data, we use 4, 5 or 6 months lagged data, now we follow Hou, Xue and Zhang (2015) use 4 months lag
 ccm1['yearend'] = ccm1['datadate'] + YearEnd(0)
 ccm1['jdate'] = ccm1['datadate'] + MonthEnd(4)
 
 # set link date bounds
-ccm2 = ccm1[(ccm1['jdate'] >= ccm1['linkdt']) & (ccm1['jdate'] <= ccm1['linkenddt'])]
+ccm2 = ccm1[(ccm1['jdate'] >= ccm1['linkdt']) & (ccm1['jdate'] <= ccm1['linkenddt'])].reset_index(drop=True)
 
 # link comp and crsp
 crsp2 = crsp2.rename(columns={'monthend': 'jdate'})
 data_rawa = pd.merge(crsp2, ccm2, how='inner', on=['permno', 'jdate'])
 
-# filter exchcd & shrcd
+# filter exchcd & shrcd and at least more than 1 year data
 data_rawa = data_rawa[((data_rawa['exchcd'] == 1) | (data_rawa['exchcd'] == 2) | (data_rawa['exchcd'] == 3)) &
-                   ((data_rawa['shrcd'] == 10) | (data_rawa['shrcd'] == 11))]
+                      ((data_rawa['shrcd'] == 10) | (data_rawa['shrcd'] == 11))].reset_index(drop=True)
 
 # process Market Equity
 '''
 Note: me is CRSP market equity, mve_f is Compustat market equity. Please choose the me below.
 '''
-data_rawa['me'] = data_rawa['me']/1000  # CRSP ME
+data_rawa['me'] = data_rawa['me'] / 1000  # CRSP ME
 # data_rawa['me'] = data_rawa['mve_f']  # Compustat ME
 
 # there are some ME equal to zero since this company do not have price or shares data, we drop these observations
 data_rawa['me'] = np.where(data_rawa['me'] == 0, np.nan, data_rawa['me'])
-data_rawa = data_rawa.dropna(subset=['me'])
+data_rawa = data_rawa.dropna(subset=['me']).reset_index(drop=True)
 
 # count single stock years
-# data_rawa['count'] = data_rawa.groupby(['gvkey']).cumcount()
+data_rawa['count'] = data_rawa.groupby(['gvkey']).cumcount() + 1
 
 # deal with the duplicates
 data_rawa.loc[data_rawa.groupby(['datadate', 'permno', 'linkprim'], as_index=False).nth([0]).index, 'temp'] = 1
-data_rawa = data_rawa[data_rawa['temp'].notna()]
-data_rawa.loc[data_rawa.groupby(['permno', 'yearend', 'datadate'], as_index=False).nth([-1]).index, 'temp'] = 1
-data_rawa = data_rawa[data_rawa['temp'].notna()]
+data_rawa = data_rawa[data_rawa['temp'].notna()].reset_index(drop=True)
 
-data_rawa = data_rawa.sort_values(by=['permno', 'jdate'])
-print('ccm')
+data_rawa.loc[data_rawa.groupby(['permno', 'yearend', 'datadate'], as_index=False).nth([-1]).index, 'temp'] = 1
+data_rawa = data_rawa[data_rawa['temp'].notna()].reset_index(drop=True)
+
+data_rawa = data_rawa.sort_values(by=['permno', 'jdate']).reset_index(drop=True)
+
+# fama-french 49 industry
+data_rawa['sic'] = data_rawa['sic'].astype(int)
+data_rawa['ffi49'] = ffi49(data_rawa)
+data_rawa['ffi49'] = data_rawa['ffi49'].fillna(49)
+data_rawa['ffi49'] = data_rawa['ffi49'].astype(int)
 #######################################################################################################################
 #                                                  Annual Variables                                                   #
 #######################################################################################################################
-# stockholders' equity 
-data_rawa['se'] = np.where(data_rawa['seq'].isnull(), data_rawa['ceq']+data_rawa['pstk'], data_rawa['seq'])
-data_rawa['se'] = np.where(data_rawa['se'].isnull(), data_rawa['at']-data_rawa['lt'], data_rawa['se'])
-
-data_rawa['txditc'] = data_rawa['txditc'].fillna(0)
-
 # preferrerd stock
 data_rawa['ps'] = np.where(data_rawa['pstkrv'].isnull(), data_rawa['pstkl'], data_rawa['pstkrv'])
 data_rawa['ps'] = np.where(data_rawa['ps'].isnull(), data_rawa['pstk'], data_rawa['ps'])
 data_rawa['ps'] = np.where(data_rawa['ps'].isnull(), 0, data_rawa['ps'])
+
+data_rawa['txditc'] = data_rawa['txditc'].fillna(0)
 
 # book equity
 data_rawa['be'] = data_rawa['seq'] + data_rawa['txditc'] - data_rawa['ps']
@@ -259,19 +258,36 @@ data_rawa['be'] = np.where(data_rawa['be'] > 0, data_rawa['be'], np.nan)
 # acc
 data_rawa['act_l1'] = data_rawa.groupby(['permno'])['act'].shift(1)
 data_rawa['lct_l1'] = data_rawa.groupby(['permno'])['lct'].shift(1)
+data_rawa['at_l1'] = data_rawa.groupby(['permno'])['at'].shift(1)
 
-condlist = [data_rawa['np'].isnull(),
-          data_rawa['act'].isnull() | data_rawa['lct'].isnull()]
-choicelist = [((data_rawa['act']-data_rawa['lct'])-(data_rawa['act_l1']-data_rawa['lct_l1'])/(10*data_rawa['be'])),
-              (data_rawa['ib']-data_rawa['oancf'])/(10*data_rawa['be'])]
-data_rawa['acc'] = np.select(condlist,
-                            choicelist,
-                            default=((data_rawa['act']-data_rawa['lct']+data_rawa['np'])-
-                                     (data_rawa['act_l1']-data_rawa['lct_l1']+data_rawa['np'].shift(1)))/(10*data_rawa['be']))
+# #################### Add np lag (also fixed row 272 below) on 2025.02.23 ####################
+# data_rawa['np_l1'] = data_rawa.groupby(['permno'])['np'].shift(1) 
+
+# condlist = [data_rawa['np'].isnull(),
+#             data_rawa['act'].isnull() | data_rawa['lct'].isnull()]
+# choicelist = [((data_rawa['act'] - data_rawa['lct']) - (data_rawa['act_l1'] - data_rawa['lct_l1']) / (data_rawa['be'])),
+#               (data_rawa['ib'] - data_rawa['oancf']) / (data_rawa['be'])] ##### Delete "10*" on 2025.02.26 #####
+# data_rawa['acc'] = np.select(condlist,
+#                              choicelist,
+#                              default=((data_rawa['act'] - data_rawa['lct'] + data_rawa['np']) -
+#                                       (data_rawa['act_l1'] - data_rawa['lct_l1'] + data_rawa['np_l1'])) / (data_rawa['be']))
+
+#################### Add Sloan(1996) or HXZ and GHZ operating accruals on 2025.02.28 ####################
+data_rawa['che_l1'] = data_rawa.groupby(['permno'])['che'].shift(1)
+data_rawa['dlc_l1'] = data_rawa.groupby(['permno'])['dlc'].shift(1)
+data_rawa['txp_l1'] = data_rawa.groupby(['permno'])['txp'].shift(1)
+
+data_rawa['acc'] = np.where(data_rawa['oancf'].isnull(),
+                            ((data_rawa['act'] - data_rawa['act_l1']) - (data_rawa['che'] - data_rawa['che_l1']) -
+                            (data_rawa['lct'] - data_rawa['lct_l1']) + (data_rawa['dlc'] - data_rawa['dlc_l1']) +
+                            (data_rawa['txp'] - data_rawa['txp_l1']).fillna(0) - data_rawa['dp']) / ((data_rawa['at'] + data_rawa['at_l1']) / 2),
+                            (data_rawa['ib'] - data_rawa['oancf']) / ((data_rawa['at'] + data_rawa['at_l1']) / 2))
+
+# absacc
+data_rawa['absacc'] = abs(data_rawa['acc'])
 
 # agr
-data_rawa['at_l1'] = data_rawa.groupby(['permno'])['at'].shift(1)
-data_rawa['agr'] = (data_rawa['at']-data_rawa['at_l1'])/data_rawa['at_l1']
+data_rawa['agr'] = (data_rawa['at'] - data_rawa['at_l1']) / data_rawa['at_l1']
 
 # bm
 # data_rawa['bm'] = data_rawa['be'] / data_rawa['me']
@@ -283,19 +299,18 @@ data_rawa['agr'] = (data_rawa['at']-data_rawa['at_l1'])/data_rawa['at_l1']
 #               np.nan]
 # data_rawa['cfp'] = np.select(condlist, choicelist, default=(data_rawa['ib']+data_rawa['dp'])/data_rawa['me'])
 
-# ep, checked from Hou and change 'ME' from compustat to crsp
-#data_rawa['ep'] = data_rawa['ib']/data_rawa['me']
-#data_rawa['ep_n'] = data_rawa['ib']
+# ep
+# data_rawa['ep'] = data_rawa['ib']/data_rawa['me']
 
 # ni
 data_rawa['csho_l1'] = data_rawa.groupby(['permno'])['csho'].shift(1)
 data_rawa['ajex_l1'] = data_rawa.groupby(['permno'])['ajex'].shift(1)
 data_rawa['ni'] = np.where(data_rawa['gvkey'] != data_rawa['gvkey'].shift(1),
                            np.nan,
-                           np.log(data_rawa['csho']*data_rawa['ajex']).replace(-np.inf, 0)-
-                           np.log(data_rawa['csho_l1']*data_rawa['ajex_l1']).replace(-np.inf, 0))
+                           np.log(data_rawa['csho'] * data_rawa['ajex']).replace(-np.inf, 0) -
+                           np.log(data_rawa['csho_l1'] * data_rawa['ajex_l1']).replace(-np.inf, 0))
 
-# op: the formula seems different from Hou Page 74?
+# op
 data_rawa['cogs0'] = np.where(data_rawa['cogs'].isnull(), 0, data_rawa['cogs'])
 data_rawa['xint0'] = np.where(data_rawa['xint'].isnull(), 0, data_rawa['xint'])
 data_rawa['xsga0'] = np.where(data_rawa['xsga'].isnull(), 0, data_rawa['xsga'])
@@ -303,117 +318,113 @@ data_rawa['xsga0'] = np.where(data_rawa['xsga'].isnull(), 0, data_rawa['xsga'])
 condlist = [data_rawa['revt'].isnull(), data_rawa['be'].isnull()]
 choicelist = [np.nan, np.nan]
 data_rawa['op'] = np.select(condlist, choicelist,
-                          default=(data_rawa['revt'] - data_rawa['cogs0'] - data_rawa['xsga0'] - data_rawa['xint0'])/data_rawa['be'])
-
-
+                            default=(data_rawa['revt'] - data_rawa['cogs0'] - data_rawa['xsga0'] - data_rawa['xint0']) / data_rawa['be'])
 
 # rsup
 data_rawa['sale_l1'] = data_rawa.groupby(['permno'])['sale'].shift(1)
 # data_rawa['rsup'] = (data_rawa['sale']-data_rawa['sale_l1'])/data_rawa['me']
 
 # cash
-data_rawa['cash'] = data_rawa['che']/data_rawa['at']
+data_rawa['cash'] = data_rawa['che'] / data_rawa['at']
 
 # lev
 # data_rawa['lev'] = data_rawa['lt']/data_rawa['me']
 
-# sp, checked
+# sp
 # data_rawa['sp'] = data_rawa['sale']/data_rawa['me']
-#data_rawa['sp_n'] = data_rawa['sale']
 
 # rd_sale
-data_rawa['rd_sale'] = data_rawa['xrd']/data_rawa['sale']
+data_rawa['xrd0'] = np.where(data_rawa['xrd'].isnull(), 0, data_rawa['xrd'])
+data_rawa['rd_sale'] = data_rawa['xrd0']/data_rawa['sale']
 
 # rdm
 # data_rawa['rdm'] = data_rawa['xrd']/data_rawa['me']
 
-# adm hxz adm, checked
+# adm hxz adm
 # data_rawa['adm'] = data_rawa['xad']/data_rawa['me']
 
 # gma
-data_rawa['gma'] = (data_rawa['revt']-data_rawa['cogs'])/data_rawa['at_l1']
+data_rawa['gma'] = (data_rawa['revt'] - data_rawa['cogs']) / data_rawa['at_l1']
 
 # chcsho
-data_rawa['chcsho'] = (data_rawa['csho']/data_rawa['csho_l1'])-1
+data_rawa['chcsho'] = (data_rawa['csho'] / data_rawa['csho_l1']) - 1
 
 # lgr
 data_rawa['lt_l1'] = data_rawa.groupby(['permno'])['lt'].shift(1)
-data_rawa['lgr'] = (data_rawa['lt']/data_rawa['lt_l1'])-1
+data_rawa['lgr'] = (data_rawa['lt'] / data_rawa['lt_l1']) - 1
 
+#################### Follow Hafzalla, Lundholm, and Van Winkle (2011) and GHZ on 2025.02.28 ####################
 # pctacc
-data_rawa['che_l1'] = data_rawa.groupby(['permno'])['che'].shift(1)
-data_rawa['dlc_l1'] = data_rawa.groupby(['permno'])['dlc'].shift(1)
-data_rawa['txp_l1'] = data_rawa.groupby(['permno'])['txp'].shift(1)
-
-condlist = [data_rawa['ib']==0,
+condlist = [data_rawa['ib'] == 0,
             data_rawa['oancf'].isnull(),
-            data_rawa['oancf'].isnull() & data_rawa['ib']==0]
-choicelist = [(data_rawa['ib']-data_rawa['oancf'])/0.01,
-              ((data_rawa['act'] - data_rawa['act_l1']) - (data_rawa['che'] - data_rawa['che_l1']))-
-              ((data_rawa['lct'] - data_rawa['lct_l1']) - (data_rawa['dlc']) - data_rawa['dlc_l1']-
-               ((data_rawa['txp'] - data_rawa['txp_l1']) - data_rawa['dp']))/data_rawa['ib'].abs(),
+            data_rawa['oancf'].isnull() & data_rawa['ib'] == 0]
+choicelist = [(data_rawa['ib'] - data_rawa['oancf']) / 0.01,
               ((data_rawa['act'] - data_rawa['act_l1']) - (data_rawa['che'] - data_rawa['che_l1'])) -
               ((data_rawa['lct'] - data_rawa['lct_l1']) - (data_rawa['dlc']) - data_rawa['dlc_l1'] -
-               ((data_rawa['txp'] - data_rawa['txp_l1']) - data_rawa['dp']))]
-data_rawa['pctacc'] = np.select(condlist, choicelist, default=(data_rawa['ib']-data_rawa['oancf'])/data_rawa['ib'].abs())
+               ((data_rawa['txp'] - data_rawa['txp_l1']).fillna(0) - data_rawa['dp'])) / data_rawa['ib'].abs(),
+              ((data_rawa['act'] - data_rawa['act_l1']) - (data_rawa['che'] - data_rawa['che_l1'])) -
+              ((data_rawa['lct'] - data_rawa['lct_l1']) - (data_rawa['dlc']) - data_rawa['dlc_l1'] -
+               ((data_rawa['txp'] - data_rawa['txp_l1']).fillna(0) - data_rawa['dp'])) / 0.01]
+data_rawa['pctacc'] = np.select(condlist, choicelist,
+                                default=(data_rawa['ib'] - data_rawa['oancf']) / data_rawa['ib'].abs())
 
 # sgr
-data_rawa['sgr'] = (data_rawa['sale']/data_rawa['sale_l1'])-1
+data_rawa['sgr'] = (data_rawa['sale'] / data_rawa['sale_l1']) - 1
 
 # chato
 data_rawa['at_l2'] = data_rawa.groupby(['permno'])['at'].shift(2)
-data_rawa['chato'] = (data_rawa['sale']/((data_rawa['at']+data_rawa['at_l1'])/2))-\
-                     (data_rawa['sale_l1']/((data_rawa['at']+data_rawa['at_l2'])/2))
+data_rawa['chato'] = (data_rawa['sale'] / ((data_rawa['at'] + data_rawa['at_l1']) / 2)) - \
+                     (data_rawa['sale_l1'] / ((data_rawa['at'] + data_rawa['at_l2']) / 2))
 
 # chtx
 data_rawa['txt_l1'] = data_rawa.groupby(['permno'])['txt'].shift(1)
-data_rawa['chtx'] = (data_rawa['txt']-data_rawa['txt_l1'])/data_rawa['at_l1']
+data_rawa['chtx'] = (data_rawa['txt'] - data_rawa['txt_l1']) / data_rawa['at_l1']
 
-# noa,checked
-data_rawa['noa'] = ((data_rawa['at']-data_rawa['che']-data_rawa['ivao'].fillna(0))-
-                  (data_rawa['at']-data_rawa['dlc'].fillna(0)-data_rawa['dltt'].fillna(0)-data_rawa['mib'].fillna(0)
-                   -data_rawa['pstk'].fillna(0)-data_rawa['ceq'])/data_rawa['at_l1'])
+# noa
+data_rawa['noa'] = ((data_rawa['at'] - data_rawa['che'] - data_rawa['ivao'].fillna(0)) -
+                    (data_rawa['at'] - data_rawa['dlc'].fillna(0) - data_rawa['dltt'].fillna(0) - data_rawa['mib'].fillna(0)
+                     - data_rawa['pstk'].fillna(0) - data_rawa['ceq']) / data_rawa['at_l1'])
 
 # rna
 data_rawa['noa_l1'] = data_rawa.groupby(['permno'])['noa'].shift(1)
-data_rawa['rna'] = data_rawa['oiadp']/data_rawa['noa_l1']
+data_rawa['rna'] = data_rawa['oiadp'] / data_rawa['noa_l1']
 
 # pm
-data_rawa['pm'] = data_rawa['oiadp']/data_rawa['sale']
+data_rawa['pm'] = data_rawa['oiadp'] / data_rawa['sale']
 
 # ato
-data_rawa['ato'] = data_rawa['sale']/data_rawa['noa_l1']
+data_rawa['ato'] = data_rawa['sale'] / data_rawa['noa_l1']
 
 # depr
-data_rawa['depr'] = data_rawa['dp']/data_rawa['ppent']
+data_rawa['depr'] = data_rawa['dp'] / data_rawa['ppent']
 
 # invest
 data_rawa['ppent_l1'] = data_rawa.groupby(['permno'])['ppent'].shift(1)
 data_rawa['invt_l1'] = data_rawa.groupby(['permno'])['invt'].shift(1)
 
-data_rawa['invest'] = np.where(data_rawa['ppegt'].isnull(), ((data_rawa['ppent']-data_rawa['ppent_l1'])+
-                                                             (data_rawa['invt']-data_rawa['invt_l1']))/data_rawa['at_l1'],
-                             ((data_rawa['ppegt']-data_rawa['ppent_l1'])+(data_rawa['invt']-data_rawa['invt_l1']))/data_rawa['at_l1'])
+data_rawa['invest'] = np.where(data_rawa['ppegt'].isnull(), ((data_rawa['ppent'] - data_rawa['ppent_l1']) +
+                                                             (data_rawa['invt'] - data_rawa['invt_l1'])) / data_rawa['at_l1'],
+                               ((data_rawa['ppegt'] - data_rawa['ppent_l1']) + (data_rawa['invt'] - data_rawa['invt_l1'])) / data_rawa['at_l1'])
 
 # egr
 data_rawa['ceq_l1'] = data_rawa.groupby(['permno'])['ceq'].shift(1)
-data_rawa['egr'] = ((data_rawa['ceq']-data_rawa['ceq_l1'])/data_rawa['ceq_l1'])
+data_rawa['egr'] = ((data_rawa['ceq'] - data_rawa['ceq_l1']) / data_rawa['ceq_l1'])
 
 # cashdebt
-data_rawa['cashdebt'] = (data_rawa['ib']+data_rawa['dp'])/((data_rawa['lt']+data_rawa['lt_l1'])/2)
+data_rawa['cashdebt'] = (data_rawa['ib'] + data_rawa['dp']) / ((data_rawa['lt'] + data_rawa['lt_l1']) / 2)
 
 # rd
 # if ((xrd/at)-(lag(xrd/lag(at))))/(lag(xrd/lag(at))) >.05 then rd=1 else rd=0
-data_rawa['xrd/at_l1'] = data_rawa['xrd']/data_rawa['at_l1']
+data_rawa['xrd/at_l1'] = data_rawa['xrd0']/data_rawa['at_l1']
 data_rawa['xrd/at_l1_l1'] = data_rawa.groupby(['permno'])['xrd/at_l1'].shift(1)
-data_rawa['rd'] = np.where(((data_rawa['xrd']/data_rawa['at'])-
+data_rawa['rd'] = np.where(((data_rawa['xrd0']/data_rawa['at'])-
                             (data_rawa['xrd/at_l1_l1']))/data_rawa['xrd/at_l1_l1']>0.05, 1, 0)
 
 # roa
-data_rawa['roa'] = data_rawa['ni']/((data_rawa['at']+data_rawa['at_l1'])/2)
+data_rawa['roa'] = data_rawa['ib'] / data_rawa['at_l1'] ##### Debug on 2025.02.23 #####
 
 # roe
-data_rawa['roe'] = data_rawa['ib']/data_rawa['ceq_l1']
+data_rawa['roe'] = data_rawa['ib'] / data_rawa['ceq_l1']
 
 # dy
 # data_rawa['dy'] = data_rawa['dvt']/data_rawa['me']
@@ -421,36 +432,36 @@ data_rawa['roe'] = data_rawa['ib']/data_rawa['ceq_l1']
 ################## Added on 2020.07.28 ##################
 
 # roic
-data_rawa['roic'] = (data_rawa['ebit'] - data_rawa['nopi'])/(data_rawa['ceq'] + data_rawa['lt'] - data_rawa['che'])
+data_rawa['roic'] = (data_rawa['ebit'] - data_rawa['nopi']) / (data_rawa['ceq'] + data_rawa['lt'] - data_rawa['che'])
 
 # chinv
-data_rawa['chinv'] = (data_rawa['invt'] - data_rawa['invt_l1'])/((data_rawa['at'] + data_rawa['at_l2'])/2)
+data_rawa['chinv'] = (data_rawa['invt'] - data_rawa['invt_l1']) / ((data_rawa['at'] + data_rawa['at_l2']) / 2)
 
 # pchsale_pchinvt
-data_rawa['pchsale_pchinvt'] = ((data_rawa['sale'] - data_rawa['sale_l1'])/data_rawa['sale_l1'])\
-                               - ((data_rawa['invt']-data_rawa['invt_l1'])/data_rawa['invt_l1'])
+data_rawa['pchsale_pchinvt'] = ((data_rawa['sale'] - data_rawa['sale_l1']) / data_rawa['sale_l1']) \
+                               - ((data_rawa['invt'] - data_rawa['invt_l1']) / data_rawa['invt_l1'])
 
 # pchsale_pchrect
 data_rawa['rect_l1'] = data_rawa.groupby(['permno'])['rect'].shift(1)
-data_rawa['pchsale_pchrect'] = ((data_rawa['sale']-data_rawa['sale_l1'])/data_rawa['sale_l1'])\
-                               - ((data_rawa['rect']-data_rawa['rect_l1'])/data_rawa['rect_l1'])
+data_rawa['pchsale_pchrect'] = ((data_rawa['sale'] - data_rawa['sale_l1']) / data_rawa['sale_l1']) \
+                               - ((data_rawa['rect'] - data_rawa['rect_l1']) / data_rawa['rect_l1'])
 
 # pchgm_pchsale
 data_rawa['cogs_l1'] = data_rawa.groupby(['permno'])['cogs'].shift(1)
-data_rawa['pchgm_pchsale'] = (((data_rawa['sale']-data_rawa['cogs'])
-                               - (data_rawa['sale_l1']-data_rawa['cogs_l1']))/(data_rawa['sale_l1']-data_rawa['cogs_l1']))\
-                             - ((data_rawa['sale']-data_rawa['sale_l1'])/data_rawa['sale'])
+data_rawa['pchgm_pchsale'] = (((data_rawa['sale'] - data_rawa['cogs'])
+                               - (data_rawa['sale_l1'] - data_rawa['cogs_l1'])) / (data_rawa['sale_l1'] - data_rawa['cogs_l1'])) \
+                             - ((data_rawa['sale'] - data_rawa['sale_l1']) / data_rawa['sale'])
 
 # pchsale_pchxsga
 data_rawa['xsga_l1'] = data_rawa.groupby(['permno'])['xsga'].shift(1)
-data_rawa['pchsale_pchxsga'] = ((data_rawa['sale']-data_rawa['sale_l1'])/data_rawa['sale_l1'])\
-                               - ((data_rawa['xsga']-data_rawa['xsga_l1'])/data_rawa['xsga_l1'])
+data_rawa['pchsale_pchxsga'] = ((data_rawa['sale'] - data_rawa['sale_l1']) / data_rawa['sale_l1']) \
+                               - ((data_rawa['xsga'] - data_rawa['xsga_l1']) / data_rawa['xsga_l1'])
 
 # pchdepr
 data_rawa['dp_l1'] = data_rawa.groupby(['permno'])['dp'].shift(1)
-data_rawa['pchdepr'] = ((data_rawa['dp']/data_rawa['ppent'])-(data_rawa['dp_l1']
-                                                              /data_rawa['ppent_l1']))\
-                       / (data_rawa['dp_l1']/data_rawa['ppent'])
+data_rawa['pchdepr'] = ((data_rawa['dp'] / data_rawa['ppent']) - (data_rawa['dp_l1']
+                                                                  / data_rawa['ppent_l1'])) \
+                       / (data_rawa['dp_l1'] / data_rawa['ppent'])
 
 # chadv
 data_rawa['xad_l1'] = data_rawa.groupby(['permno'])['xad'].shift(1)
@@ -458,59 +469,59 @@ data_rawa['chadv'] = np.log(data_rawa['xad'] + 1) - np.log(data_rawa['xad_l1'] +
 
 # pchcapx
 data_rawa['capx_l1'] = data_rawa.groupby(['permno'])['capx'].shift(1)
-data_rawa['pchcapx'] = (data_rawa['capx']-data_rawa['capx_l1'])/data_rawa['capx_l1']
+data_rawa['pchcapx'] = (data_rawa['capx'] - data_rawa['capx_l1']) / data_rawa['capx_l1']
 
 # grcapx
 data_rawa['capx_l2'] = data_rawa.groupby(['permno'])['capx'].shift(2)
-data_rawa['grcapx'] = (data_rawa['capx']-data_rawa['capx_l2'])/data_rawa['capx_l2']
+data_rawa['grcapx'] = (data_rawa['capx'] - data_rawa['capx_l2']) / data_rawa['capx_l2']
 
 # grGW
 data_rawa['gdwl_l1'] = data_rawa.groupby(['permno'])['gdwl'].shift(1)
-data_rawa['grGW'] = (data_rawa['gdwl']-data_rawa['gdwl_l1'])/data_rawa['gdwl']
-condlist = [(data_rawa['gdwl']==0) | (data_rawa['gdwl'].isnull()),
+data_rawa['grGW'] = (data_rawa['gdwl'] - data_rawa['gdwl_l1']) / data_rawa['gdwl']
+condlist = [(data_rawa['gdwl'] == 0) | (data_rawa['gdwl'].isnull()),
             (data_rawa['gdwl'].notna()) & (data_rawa['gdwl'] != 0) & (data_rawa['grGW'].isnull())]
 choicelist = [0, 1]
 data_rawa['grGW'] = np.select(condlist, choicelist, default=data_rawa['grGW'])
 
 # currat
-data_rawa['currat'] = data_rawa['act']/data_rawa['lct']
+data_rawa['currat'] = data_rawa['act'] / data_rawa['lct']
 
 # pchcurrat
-data_rawa['pchcurrat'] = ((data_rawa['act']/data_rawa['lct'])-(data_rawa['act_l1']/data_rawa['lct_l1']))\
-                         /(data_rawa['act_l1']/data_rawa['lct_l1'])
+data_rawa['pchcurrat'] = ((data_rawa['act'] / data_rawa['lct']) - (data_rawa['act_l1'] / data_rawa['lct_l1'])) \
+                         / (data_rawa['act_l1'] / data_rawa['lct_l1'])
 
 # quick
-data_rawa['quick'] = (data_rawa['act']-data_rawa['invt'])/data_rawa['lct']
+data_rawa['quick'] = (data_rawa['act'] - data_rawa['invt']) / data_rawa['lct']
 
 # pchquick
-data_rawa['pchquick'] = ((data_rawa['act']-data_rawa['invt'])/data_rawa['lct']
-                         -(data_rawa['act_l1']-data_rawa['invt_l1'])/data_rawa['lct_l1'])\
-                        /((data_rawa['act_l1']-data_rawa['invt_l1'])/data_rawa['lct_l1'])
+data_rawa['pchquick'] = ((data_rawa['act'] - data_rawa['invt']) / data_rawa['lct']
+                         - (data_rawa['act_l1'] - data_rawa['invt_l1']) / data_rawa['lct_l1']) \
+                        / ((data_rawa['act_l1'] - data_rawa['invt_l1']) / data_rawa['lct_l1'])
 
 # salecash
-data_rawa['salecash'] = data_rawa['sale']/data_rawa['che']
+data_rawa['salecash'] = data_rawa['sale'] / data_rawa['che']
 
 # salerec
-data_rawa['salerec']= data_rawa['sale']/data_rawa['rect']
+data_rawa['salerec'] = data_rawa['sale'] / data_rawa['rect']
 
 # saleinv
-data_rawa['saleinv'] = data_rawa['sale']/data_rawa['invt']
+data_rawa['saleinv'] = data_rawa['sale'] / data_rawa['invt']
 
 # pchsaleinv
-data_rawa['pchsaleinv'] = ((data_rawa['sale']/data_rawa['invt'])-(data_rawa['sale_l1']/data_rawa['invt_l1']))\
-                          /(data_rawa['sale_l1']/data_rawa['invt_l1'])
+data_rawa['pchsaleinv'] = ((data_rawa['sale'] / data_rawa['invt']) - (data_rawa['sale_l1'] / data_rawa['invt_l1'])) \
+                          / (data_rawa['sale_l1'] / data_rawa['invt_l1'])
 
 # realestate
-data_rawa['realestate'] = (data_rawa['fatb']+data_rawa['fatl'])/data_rawa['ppegt']
+data_rawa['realestate'] = (data_rawa['fatb'] + data_rawa['fatl']) / data_rawa['ppegt']
 data_rawa['realestate'] = np.where(data_rawa['ppegt'].isnull(),
-                                  (data_rawa['fatb']+data_rawa['fatl'])/data_rawa['ppent'], data_rawa['realestate'])
+                                   (data_rawa['fatb'] + data_rawa['fatl']) / data_rawa['ppent'], data_rawa['realestate'])
 
 # obklg
-data_rawa['obklg'] = data_rawa['ob']/((data_rawa['at']+data_rawa['at_l1'])/2)
+data_rawa['obklg'] = data_rawa['ob'] / ((data_rawa['at'] + data_rawa['at_l1']) / 2)
 
 # chobklg
 data_rawa['ob_l1'] = data_rawa.groupby(['permno'])['ob'].shift(1)
-data_rawa['chobklg'] = (data_rawa['ob'] - data_rawa['ob_l1'])/((data_rawa['at']+data_rawa['at_l1'])/2)
+data_rawa['chobklg'] = (data_rawa['ob'] - data_rawa['ob_l1']) / ((data_rawa['at'] + data_rawa['at_l1']) / 2)
 
 # grltnoa
 data_rawa['aco_l1'] = data_rawa.groupby(['permno'])['aco'].shift(1)
@@ -534,13 +545,16 @@ data_rawa['grltnoa'] = ((data_rawa['rect']+data_rawa['invt']+data_rawa['ppent']+
 # conv
 data_rawa['conv'] = data_rawa['dc']/data_rawa['dltt']
 
+# convind
+data_rawa['convind'] = np.where(((data_rawa['dc'].notna()) & (data_rawa['dc'] != 0)) | ((data_rawa['cshrc'].notna()) & (data_rawa['cshrc'] != 0)), 1, 0)
+
 # chdrc
 data_rawa['dr_l1'] = data_rawa.groupby(['permno'])['dr'].shift(1)
 data_rawa['chdrc'] = (data_rawa['dr']-data_rawa['dr_l1'])/((data_rawa['at']+data_rawa['at_l1'])/2)
 
 # rdbias
-data_rawa['xrd_l1'] = data_rawa.groupby(['permno'])['xrd'].shift(1)
-data_rawa['rdbias'] = (data_rawa['xrd']/data_rawa['xrd_l1'])-1-data_rawa['ib']/data_rawa['ceq_l1']
+data_rawa['xrd_l1'] = data_rawa.groupby(['permno'])['xrd0'].shift(1)
+data_rawa['rdbias'] = (data_rawa['xrd0']/data_rawa['xrd_l1'])-1-data_rawa['ib']/data_rawa['ceq_l1']
 
 # operprof
 data_rawa['operprof'] = (data_rawa['revt']-data_rawa['cogs']-data_rawa['xsga0']-data_rawa['xint0'])/data_rawa['ceq_l1']
@@ -552,7 +566,7 @@ data_rawa['cfroa'] = np.where(data_rawa['oancf'].isnull(),
                               data_rawa['cfroa'])
 
 # xrdint
-data_rawa['xrdint'] = data_rawa['xrd']/((data_rawa['at']+data_rawa['at_l1'])/2)
+data_rawa['xrdint'] = data_rawa['xrd0']/((data_rawa['at']+data_rawa['at_l1'])/2)
 
 # capxint
 data_rawa['capxint'] = data_rawa['capx']/((data_rawa['at']+data_rawa['at_l1'])/2)
@@ -565,6 +579,8 @@ data_rawa['ib_l1'] = data_rawa.groupby(['permno'])['ib'].shift(1)
 data_rawa['chpm'] = (data_rawa['ib']/data_rawa['sale'])-(data_rawa['ib_l1']/data_rawa['sale_l1'])
 
 # ala
+data_rawa['gdwl'] = np.where(data_rawa['gdwl'].isnull(), 0, data_rawa['gdwl'])
+data_rawa['intan'] = np.where(data_rawa['intan'].isnull(), 0, data_rawa['intan'])
 data_rawa['ala'] = data_rawa['che']+0.75*(data_rawa['act']-data_rawa['che'])-\
                    0.5*(data_rawa['at']-data_rawa['act']-data_rawa['gdwl']-data_rawa['intan'])
 
@@ -577,297 +593,142 @@ data_rawa['hire'] = (data_rawa['emp'] - data_rawa['emp_l1'])/data_rawa['emp_l1']
 data_rawa['hire'] = np.where((data_rawa['emp'].isnull()) | (data_rawa['emp_l1'].isnull()), 0, data_rawa['hire'])
 
 # herf
-data_rawa['sic'] = data_rawa['sic'].astype(int)
-data_rawa['ffi49'] = ffi49(data_rawa)
-data_rawa['ffi49'] = data_rawa['ffi49'].fillna(49)
-data_rawa['ffi49'] = data_rawa['ffi49'].astype(int)
 df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['sale'].sum()
 df_temp = df_temp.rename(columns={'sale': 'indsale'})
-data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49'])
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49']).reset_index(drop=True)
 data_rawa['herf'] = (data_rawa['sale']/data_rawa['indsale'])*(data_rawa['sale']/data_rawa['indsale'])
 df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['herf'].sum()
 data_rawa = data_rawa.drop(['herf'], axis=1)
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49']).reset_index(drop=True)
+
+################## Added on 2022.09.06 ##################
+# age
+data_rawa['age'] = data_rawa['count'].copy()
+
+# cashpr
+# data_rawa['cashpr'] = ((data_rawa['me'] + data_rawa['dltt'] - data_rawa['at']) / data_rawa['che'])
+
+# chempia
+df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['hire'].mean()
+df_temp = df_temp.rename(columns={'hire': 'hire_ind'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49']).reset_index(drop=True)
+data_rawa['chempia'] = data_rawa['hire'] - data_rawa['hire_ind']
+
+# chpmia
+df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['chpm'].mean()
+df_temp = df_temp.rename(columns={'chpm': 'chpm_ind'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49']).reset_index(drop=True)
+data_rawa['chpmia'] = data_rawa['chpm'] - data_rawa['chpm_ind']
+
+# chatoia
+df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['chato'].mean()
+df_temp = df_temp.rename(columns={'chato': 'chato_ind'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49']).reset_index(drop=True)
+data_rawa['chatoia'] = data_rawa['chato'] - data_rawa['chato_ind']
+
+# divi
+data_rawa['dvt_l1'] = data_rawa.groupby(['permno'])['dvt'].shift(1)
+data_rawa['divi'] = np.where(((data_rawa['dvt'].notna()) & (data_rawa['dvt'] > 0) & ((data_rawa['dvt_l1'] == 0) | (data_rawa['dvt_l1'].isnull()))), 1, 0)
+
+# divo
+data_rawa['divo'] = np.where(((data_rawa['dvt'].isnull()) | (data_rawa['dvt'] == 0) & ((data_rawa['dvt_l1'] > 0) | (data_rawa['dvt_l1'].notna()))), 1, 0)
+
+# Mohanram (2005) score (Annual Related)
+df_temp = data_rawa.groupby(['fyear', 'ffi49'], as_index=False)['roa'].median().rename(columns={'roa': 'md_roa'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['fyear', 'ffi49']).reset_index(drop=True)
+
+df_temp = data_rawa.groupby(['fyear', 'ffi49'], as_index=False)['cfroa'].median().rename(columns={'cfroa': 'md_cfroa'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['fyear', 'ffi49']).reset_index(drop=True)
+
+df_temp = data_rawa.groupby(['fyear', 'ffi49'], as_index=False)['oancf'].median().rename(columns={'oancf': 'md_oancf'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['fyear', 'ffi49']).reset_index(drop=True)
+
+df_temp = data_rawa.groupby(['fyear', 'ffi49'], as_index=False)['xrdint'].median().rename(columns={'xrdint': 'md_xrdint'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['fyear', 'ffi49']).reset_index(drop=True)
+
+df_temp = data_rawa.groupby(['fyear', 'ffi49'], as_index=False)['capxint'].median().rename(columns={'capxint': 'md_capxint'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['fyear', 'ffi49']).reset_index(drop=True)
+
+df_temp = data_rawa.groupby(['fyear', 'ffi49'], as_index=False)['xadint'].median().rename(columns={'xadint': 'md_xadint'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['fyear', 'ffi49']).reset_index(drop=True)
+
+data_rawa['m1'] = np.where(data_rawa['roa'] > data_rawa['md_roa'], 1, 0)
+data_rawa['m2'] = np.where(data_rawa['cfroa'] > data_rawa['md_cfroa'], 1, 0)
+data_rawa['m3'] = np.where(data_rawa['oancf'] > data_rawa['md_oancf'], 1, 0)
+data_rawa['m4'] = np.where(data_rawa['xrdint'] > data_rawa['md_xrdint'], 1, 0)
+data_rawa['m5'] = np.where(data_rawa['capxint'] > data_rawa['md_capxint'], 1, 0)
+data_rawa['m6'] = np.where(data_rawa['xadint'] > data_rawa['md_xadint'], 1, 0)
+
+# pchcapx_ia
+df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['pchcapx'].mean()
+df_temp = df_temp.rename(columns={'pchcapx': 'pchcapx_ind'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49']).reset_index(drop=True)
+data_rawa['pchcapx_ia'] = data_rawa['pchcapx'] - data_rawa['pchcapx_ind']
+
+# secured
+data_rawa['secured'] = data_rawa['dm'] / data_rawa['dltt']
+
+# securedind
+data_rawa['securedind'] = np.where((data_rawa['dm'].notna()) & (data_rawa['dm'] != 0), 1, 0)
+
+# sin
+data_rawa['sin'] = np.where(((2100 <= data_rawa['sic']) & (data_rawa['sic'] <= 2199)) |
+                            ((2080 <= data_rawa['sic']) & (data_rawa['sic'] <= 2085)) |
+                            (data_rawa['naics'] == '7132') |
+                            (data_rawa['naics'] == '71312') |
+                            (data_rawa['naics'] == '713210') |
+                            (data_rawa['naics'] == '71329') |
+                            (data_rawa['naics'] == '713290') |
+                            (data_rawa['naics'] == '72112') |
+                            (data_rawa['naics'] == '721120'), 1, 0)
+
+# tang
+data_rawa['tang'] = (data_rawa['che'] + data_rawa['rect'] * 0.715 + data_rawa['invt'] * 0.547 + data_rawa['ppent'] * 0.535) / data_rawa['at']
+
+# tb, Lev and Nissim (2004)
+condlist = [data_rawa['fyear'] <= 1978,
+            (1979 <= data_rawa['fyear']) & (data_rawa['fyear'] <= 1986),
+            data_rawa['fyear'] == 1987,
+            (1988 <= data_rawa['fyear']) & (data_rawa['fyear'] <= 1992),
+            1993 <= data_rawa['fyear']]
+choicelist = [0.48, 0.46, 0.4, 0.34, 0.35]
+data_rawa['tr'] = np.select(condlist, choicelist, np.nan)
+
+data_rawa['tb_1'] = ((data_rawa['txfo'] + data_rawa['txfed']) / data_rawa['tr']) / data_rawa['ib']
+data_rawa['tb_1'] = np.where((data_rawa['txfo'].isnull()) | (data_rawa['txfed'].isnull()),
+                             ((data_rawa['txt'] - data_rawa['txdi']) / data_rawa['tr']) / data_rawa['ib'],
+                             data_rawa['tb_1'])
+data_rawa['tb_1'] = np.where((((data_rawa['txfo'] + data_rawa['txfed'] > 0) | (data_rawa['txt'] > data_rawa['txdi'])) & data_rawa['ib'] <= 0), 1, data_rawa['tb_1'])
+
+df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['tb_1'].mean()
+df_temp = df_temp.rename(columns={'tb_1': 'tb_1_ind'})
 data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49'])
+data_rawa['tb'] = data_rawa['tb_1'] - data_rawa['tb_1_ind']
+
+print("Finish Annual Variables Calculation! \n")
+
+################## Added on 2024.03.12 ##################
+# opa from Ball el al. (2016)
+condlist = [data_rawa['revt'].isnull(), data_rawa['at'].isnull()]
+choicelist = [np.nan, np.nan]
+data_rawa['opa'] = np.select(condlist, choicelist,
+                          default=(data_rawa['revt'] - data_rawa['cogs0'] - data_rawa['xsga0'] + data_rawa['xrd0'])/data_rawa['at'])
+
+# cop from Ball el al. (2016)
+data_rawa['xpp_l1'] = data_rawa.groupby(['permno'])['xpp'].shift(1)
+data_rawa['xacc_l1'] = data_rawa.groupby(['permno'])['xacc'].shift(1)
+
+condlist = [data_rawa['revt'].isnull(), data_rawa['at'].isnull()]
+choicelist = [np.nan, np.nan]
+data_rawa['cop'] = np.select(condlist, choicelist,
+                          default=(data_rawa['opa']
+                                   - (data_rawa['rect']-data_rawa['rect_l1']) 
+                                   - (data_rawa['invt']-data_rawa['invt_l1'])
+                                   - (data_rawa['xpp']-data_rawa['xpp_l1'])
+                                   + (data_rawa['drc']+data_rawa['drlt'])
+                                   + (data_rawa['ap'] - data_rawa['ap_l1'])
+                                   + (data_rawa['xacc']-data_rawa['xacc_l1']))/data_rawa['at'])
 
-################################## Added on 2020.10.29 ##################################
-# Bmj
-data_rawa['be_per'] = data_rawa['be'] / data_rawa['csho']
-data_rawa['bmj'] = data_rawa['be_per'] / data_rawa['prc'] 
-############### *Q*: used prc as  share price  from crsp ##########
-
-# Cp
-data_rawa['cf'] = data_rawa['ib'] + data_rawa['dp']
-#data_rawa['cp'] = data_rawa['cf'] / data_rawa['me']
-
-# Dp
-###### *Q* difference return with without divident
-
-# Dur
-# me = data_rawa['me_comp']
-
-
-# Ebp
-data_rawa['dvpa'] = np.where(data_rawa['dvpa'].isnull(), 0, data_rawa['dvpa'])
-data_rawa['tstkp'] = np.where(data_rawa['tstkp'].isnull(), 0, data_rawa['tstkp'])
-data_rawa['f_liab'] = data_rawa['dltt'] + data_rawa['dlc'] + data_rawa['pstk'] + data_rawa['dvpa'] - data_rawa['tstkp']
-data_rawa['f_asse'] = data_rawa['che']
-# net debt : = ﬁnancial liabilities - ﬁnancial assets.
-data_rawa['n_debt'] = data_rawa['f_liab'] - data_rawa['f_asse']
-data_rawa['ber'] = data_rawa['ceq'] + data_rawa['tstkp'] - data_rawa['dvpa']
-#data_rawa['ebp'] = (data_rawa['n_debt']+data_rawa['ber']) / (data_rawa['n_debt']+data_rawa['me'])
-
-
-# Em
-#data_rawa['enteprs_v'] = data_rawa['me'] + data_rawa['dlc'] + data_rawa['dltt'] + data_rawa['pstkrv'] - data_rawa['che']
-#data_rawa['em'] = data_rawa['enteprs_v'] / data_rawa['oibdp']
-
-############### Investment ###############
-# Aci
-data_rawa['ce'] = data_rawa['capx'] / data_rawa['sale']
-data_rawa['ce1'] = data_rawa['ce'].shift(1)
-data_rawa['ce2'] = data_rawa['ce'].shift(2)
-data_rawa['ce3'] = data_rawa['ce'].shift(3)
-data_rawa['aci'] = data_rawa['ce']/ (data_rawa['ce1']+data_rawa['ce2']+data_rawa['ce3'])-1
-
-# Cei
-#data_rawa['lg_me'] = np.log(data_rawa['me']/data_rawa['me'].shift(6))
-#data_rawa['lg_ret'] =  np.log(data_rawa['ret']*data_rawa['ret'].shift(1)*data_rawa['ret'].shift(2)*data_rawa['ret'].shift(3)*data_rawa['ret'].shift(5)*data_rawa['ret'].shift(6)) 
-#data_rawa['cei'] = data_rawa['lg_me'] - data_rawa['lg_ret']
-
-
-# Dac
-
-
-
-# dCoa
-data_rawa['coa'] = data_rawa['act'] - data_rawa['che']
-data_rawa['dcoa'] = (data_rawa['coa']-data_rawa['coa'].shift(1)) / data_rawa['at'].shift(1)
-
-
-# dBe
-data_rawa['dBe'] = (data_rawa['ceq'] - data_rawa['ceq'].shift(1)) / data_rawa['at'].shift(1)
-
-
-# dFnl & dFin
-data_rawa['fna'] = data_rawa['ivst'] + data_rawa['ivao']
-data_rawa['fnl'] = data_rawa['dltt'] + data_rawa['dlc'] + data_rawa['pstk']
-
-data_rawa['d_dlc'] = data_rawa['dlc'] - data_rawa['dlc'].shift(1)
-data_rawa['d_dlc'] = np.where(data_rawa['d_dlc'].isnull(), 0, data_rawa['d_dlc'])
-data_rawa['d_pstk'] = data_rawa['pstk'] - data_rawa['pstk'].shift(1)
-data_rawa['d_pstk'] = np.where(data_rawa['d_pstk'].isnull(), 0, data_rawa['d_pstk'])
-
-data_rawa['dfnl'] = (data_rawa['dltt']-data_rawa['dltt'].shift(1)) + data_rawa['d_dlc'] + data_rawa['d_pstk']
-
-data_rawa['d_ivst'] = data_rawa['ivst'] - data_rawa['ivst'].shift(1)
-data_rawa['d_ivst'] = np.where(data_rawa['d_ivst'].isnull(), 0, data_rawa['d_ivst'])
-data_rawa['d_ivao'] = data_rawa['ivao'] - data_rawa['ivao'].shift(1)
-data_rawa['d_ivao'] = np.where(data_rawa['d_ivao'].isnull(), 0, data_rawa['d_ivao'])
-
-data_rawa['dfna'] = data_rawa['d_ivst'] + data_rawa['d_ivao']
-data_rawa['dfin'] = data_rawa['dfna'] - data_rawa['dfnl']
-
-data_rawa['dfin'] = data_rawa['dfin'] / data_rawa['at'].shift(1)
-data_rawa['dfnl'] = data_rawa['dfnl'] / data_rawa['at'].shift(1)
-
-
-
-
-# dIi
-data_rawa['e_invt'] = (data_rawa['capxv'] + data_rawa['capxv'].shift(1))/2
-data_rawa['dinvt'] = (data_rawa['capxv'] - data_rawa['e_invt']) / data_rawa['e_invt']
-
-data_rawa['ind'] = data_rawa['capxv']
-s = data_rawa.groupby(['jdate', 'sic2'])['ind'].sum()
-data_rawa = pd.merge(data_rawa, s, on=['jdate', 'sic2'])
-# new industry investment will be named as ind_y, cause it's been grouped by ind
-data_rawa['e_ind'] = (data_rawa['ind_y'] + data_rawa['ind_y'].shift(1))/2
-data_rawa['dind'] = (data_rawa['ind_y']-data_rawa['e_ind']) / data_rawa['e_ind']
-data_rawa['dIi'] = data_rawa['dinvt'] - data_rawa['dind']
-
-# dLno
-data_rawa['dlno'] = (data_rawa['ppent']-data_rawa['ppent'].shift(1)) + (data_rawa['intan']-data_rawa['intan'].shift(1)) + (data_rawa['ao']-data_rawa['ao'].shift(1)) - (data_rawa['lo']-data_rawa['lo'].shift(1)) + data_rawa['dp'] 
-avg_at = []
-for i in range(data_rawa.shape[0]):
-  avg_at.append(data_rawa.loc[0:i, 'at'].mean())
-data_rawa['avg_at'] = pd.DataFrame(avg_at)
-data_rawa['dlno'] = data_rawa['dlno'] / data_rawa['avg_at']
-
-
-# dNco
-data_rawa['nca'] = data_rawa['at'] - data_rawa['act'] - data_rawa['ivao']
-data_rawa['ncl'] = data_rawa['lt'] - data_rawa['lct'] - data_rawa['dltt'] 
-data_rawa['nco'] = data_rawa['nca'] - data_rawa['ncl']
-data_rawa['dnco'] = data_rawa['nco'] - data_rawa['nco'].shift(1)
-
-
-# dNca
-data_rawa['ivao_0'] = np.where(data_rawa['ivao'].isnull(), 0, data_rawa['ivao'])
-data_rawa['dltt_0'] = np.where(data_rawa['dltt'].isnull(), 0, data_rawa['dltt'])
-
-data_rawa['nca'] = data_rawa['at'] - data_rawa['act'] - data_rawa['ivao_0']
-data_rawa['ncl'] = data_rawa['lt'] - data_rawa['lct'] - data_rawa['dltt_0'] 
-data_rawa['nco'] = data_rawa['nca'] - data_rawa['ncl']
-data_rawa['dnca'] = data_rawa['nco'] - data_rawa['nco'].shift(1)
-
-
-
-# dNoa
-data_rawa['dlc_0'] = np.where(data_rawa['dlc'].isnull(), 0, data_rawa['dlc'])
-data_rawa['mib_0'] = np.where(data_rawa['mib'].isnull(), 0, data_rawa['mib'])
-data_rawa['pstk_0'] = np.where(data_rawa['pstk'].isnull(), 0, data_rawa['pstk'])
-
-data_rawa['op_at'] = data_rawa['at'] - data_rawa['che']
-data_rawa['op_lia'] = data_rawa['at'] - data_rawa['dlc_0'] - data_rawa['dltt_0'] - data_rawa['mib_0'] - data_rawa['pstk_0'] - data_rawa['ceq']
-data_rawa['net_op'] = data_rawa['op_at'] - data_rawa['op_lia']
-data_rawa['dnoa'] = (data_rawa['net_op']-data_rawa['net_op'].shift(1))/ data_rawa['at'].shift(1)
-
-
-# dPia
-data_rawa['c_propty'] = data_rawa['ppegt'] - data_rawa['ppegt'].shift(1)
-data_rawa['c_invt'] = data_rawa['invt'] - data_rawa['invt'].shift(1)
-data_rawa['dpia'] = (data_rawa['c_propty'] + data_rawa['c_invt']) / data_rawa['at'].shift(1)
-
-
-
-
-
-######### Profitability ##########
-# Ato,repeated
-#data_rawa['op_at'] = data_rawa['at'] - data_rawa['che'] - data_rawa['ivao_0']
-#data_rawa['op_lia'] = data_rawa['dlc_0'] - data_rawa['dltt_0'] - data_rawa['mib_0'] - data_rawa['pstk_0'] - data_rawa['ceq']
-#data_rawa['noa'] = data_rawa['op_at'] - data_rawa['op_lia']
-#data_rawa['ato'] = data_rawa['sale'] / data_rawa['noa'].shift(1)
-
-
-# Cla
-data_rawa['d_rect'] = data_rawa['rect'] - data_rawa['rect'].shift(1)
-data_rawa['d_invt'] = data_rawa['invt'] - data_rawa['invt'].shift(1)
-data_rawa['d_xpp'] = data_rawa['xpp'] - data_rawa['xpp'].shift(1)
-data_rawa['d_dr'] = (data_rawa['drc']-data_rawa['drc'].shift(1)) + (data_rawa['drlt']-data_rawa['drlt'].shift(1))
-data_rawa['d_ap'] = data_rawa['ap'] - data_rawa['ap'].shift(1)
-data_rawa['d_xacc'] = data_rawa['xacc'] - data_rawa['xacc'].shift(1)
-
-data_rawa['xrd_0'] = np.where(data_rawa['xrd'].isnull(), 0, data_rawa['xrd'])
-data_rawa['d_rect_0'] = np.where(data_rawa['d_rect'].isnull(), 0, data_rawa['d_rect'])
-data_rawa['d_invt_0'] = np.where(data_rawa['d_invt'].isnull(), 0, data_rawa['d_invt'])
-data_rawa['d_xpp_0'] = np.where(data_rawa['d_xpp'].isnull(), 0, data_rawa['d_xpp'])
-data_rawa['d_dr_0'] = np.where(data_rawa['d_dr'].isnull(), 0, data_rawa['d_dr'])
-data_rawa['d_ap_0'] = np.where(data_rawa['d_ap'].isnull(), 0, data_rawa['d_ap'])
-data_rawa['d_xacc_0'] = np.where(data_rawa['d_xacc'].isnull(), 0, data_rawa['d_xacc'])
-
-data_rawa['cla'] = data_rawa['revt'] - data_rawa['cogs'] - data_rawa['xsga'] + data_rawa['xrd_0']\
-                 - data_rawa['d_rect_0'] - data_rawa['d_invt_0'] - data_rawa['d_xpp_0']\
-                 + data_rawa['d_dr_0'] + data_rawa['d_ap_0'] + data_rawa['d_xacc_0']
-data_rawa['cla'] = data_rawa['cla'] / data_rawa['at'].shift(1)
-
-
-# Cop
-data_rawa['cop'] = data_rawa['revt'] - data_rawa['cogs'] - data_rawa['xsga'] + data_rawa['xrd_0']\
-                 - data_rawa['d_rect_0'] - data_rawa['d_invt_0'] - data_rawa['d_xpp_0']\
-                 + data_rawa['d_dr_0'] + data_rawa['d_ap_0'] + data_rawa['d_xacc_0']
-data_rawa['cop'] = data_rawa['cop'] / data_rawa['at'] 
-
-
-# Cto
-data_rawa['cto'] = data_rawa['sale'] / data_rawa['at'].shift(1)
-
-#ir
-'''
-#First calculate r(t-5,t). Then rb(t-5,t) and use Bm to perform linear regression and get residue
-'''
-#r(t-5,t):sum ret from t-5 to t (which is calendar year t-6 to t-1)
-lag = pd.DataFrame()
-for i in range(1,6):
-        lag['ret%s' % i] = data_rawa.groupby(['permno'])['ret'].shift(i)
-
-data_rawa['ret5'] = lag['ret1']+lag['ret2']+lag['ret3']+lag['ret4']+lag['ret5']
-
-#bm_t-5 (bm of year t-5)
-#data_rawa['bm5'] = data_rawa.groupby(['permno'])['bm'].shift(5)
-
-#rB (five year log book return)
-#Reference: jf_06 page8 by KENT DANIEL
-#data_rawa['rB'] = data_rawa['bm'] - data_rawa['bm5'] + data_rawa['ret5']
-
-#Regression and get ir
-#First get unique datelist
-#datelist = data_rawa['jdate'].unique()
-#for date in datelist:
-#    temp = data_rawa['jdate' == date]
-#    n_row = temp.shape[0]
-#    index = temp.index
-#    X = pd.DataFrame()
-#    X['bm5'] = temp['bm5']
-#    X['rB'] = temp['rB']
-#    X['intercept'] = 1
-#    X = X[['intercept','rB','bm5']]
-#    X = np.mat(X)
-#    Y = np.mat(temp[['ret5']])
-    #These are residuals on one date
-#    res = (np.identity(n_row) - X.dot(X.T.dot(X).I).dot(X.T)).dot(Y)
-#    #put residuals back into data_rawa
-#    data_rawa.loc[index,'ir'] = res
-
-#nop
-#data_rawa['net_p'] = data_rawa['dvc'] + data_rawa['prstkc'] + 2*data_rawa['pstkrv'] - data_rawa['sstk']
-#data_rawa['nop'] = data_rawa['net_p'] / data_rawa['me']
-#data_rawa['nop'] = np.where(data_rawa['nop']<=0, np.nan, data_rawa['nop'] )
-
-#ocp
-#data_rawa['ocy'] = np.where(data_rawa['jdate'] < '1988-06-30', data_rawa['fopt'] - data_rawa['wcap'], data_rawa['fopt'] - data_rawa['oancf'])
-#data_rawa['ocp'] = data_rawa['ocy'] / data_rawa['me']
-#data_rawa['ocp'] = np.where(data_rawa['ocp']<=0, np.nan, data_rawa['ocp'] )
-
-#dwc
-data_rawa['dwc'] = (data_rawa['act'] - data_rawa['che']) - (data_rawa['lct'] - data_rawa['dlc'])
-#data_rawa['dwc'] = data_rawa['dwc']/data_rawa['at_l1']
-
-#I/A
-data_rawa['ia'] = (data_rawa['at']/data_rawa['at_l1'])-1
-
-#Ig
-data_rawa['capx_l1'] = data_rawa.groupby('permno')['capx'].shift(1)
-data_rawa['ig'] = data_rawa['capx']/data_rawa['capx_l1']
-
-#2Ig
-data_rawa['capx_l2'] = data_rawa.groupby('permno')['capx'].shift(2)
-data_rawa['2ig'] = data_rawa['capx']/data_rawa['capx_l2']
-
-#Ivc
-data_rawa['atAvg'] = (data_rawa['at']+data_rawa['at_l1'])/2
-data_rawa['ivc'] = data_rawa['invt'] / data_rawa['atAvg']
-
-#Ndf
-data_rawa['ndf'] = data_rawa['dltis'] - data_rawa['dltr'] + data_rawa['dlcch'] 
-
-#nsi
-data_rawa['sps'] = data_rawa['csho'] * data_rawa['ajex']
-data_rawa['sps_l1'] = data_rawa.groupby('permno')['sps'].shift(1)
-data_rawa['nsi'] = np.log(data_rawa['sps']/data_rawa['sps_l1'])
-
-#oa
-data_rawa['txp'] = np.where(data_rawa['txp'].isnull(), 0, data_rawa['txp'])
-data_rawa['oa'] = (data_rawa['act'] - data_rawa['che']) - (data_rawa['lct'] - data_rawa['dlc'] - data_rawa['txp']) - data_rawa['dp']
-
-#Poa
-data_rawa['poa'] = data_rawa['oa']/data_rawa['ni']
-
-#Ta
-data_rawa['ta'] = data_rawa['dwc'] + data_rawa['dnco'] + data_rawa['dfin']
-
-#Ol
-data_rawa['ol'] = (data_rawa['cogs'] + data_rawa['xsga'])/data_rawa['at']
-
-#etr
-data_rawa['txtpi'] = data_rawa['txt'] / data_rawa['pi']
-data_rawa['txtpi_l1'] = data_rawa.groupby('permno')['txtpi'].shift(1)
-data_rawa['txtpi_l2'] = data_rawa.groupby('permno')['txtpi'].shift(2)
-data_rawa['txtpi_l3'] = data_rawa.groupby('permno')['txtpi'].shift(3)
-data_rawa['deps'] = data_rawa['epspx']/(data_rawa['ajex'] * data_rawa['prcc_f'])
-data_rawa['etr'] = (data_rawa['txtpi'] - (data_rawa['txtpi_l1'] + data_rawa['txtpi_l2'] + data_rawa['txtpi_l3'])/3) * data_rawa['deps']
-
-print('annual')
 #######################################################################################################################
 #                                              Compustat Quarterly Raw Info                                           #
 #######################################################################################################################
@@ -879,11 +740,11 @@ comp = conn.raw_sql("""
                     f.ibq, f.saleq, f.txtq, f.revtq, f.cogsq, f.xsgaq, f.revty, f.cogsy, f.saley,
 
                     /*balance sheet items*/
-                    f.atq, f.actq, f.cheq, f.lctq, f.dlcq, f.ppentq, f.ppegtq,
+                    f.atq, f.actq, f.cheq, f.lctq, f.dlcq, f.ppentq, f.ppegtq, f.txpq, f.drcq, f.drltq, f.xaccq,
 
                     /*others*/
                     abs(f.prccq) as prccq, abs(f.prccq)*f.cshoq as mveq_f, f.ceqq, f.seqq, f.pstkq, f.ltq,
-                    f.pstkrq, f.gdwlq, f.intanq, f.mibq, f.oiadpq, f.ivaoq,
+                    f.pstkrq, f.gdwlq, f.intanq, f.mibq, f.oiadpq, f.ivaoq, f.conm,
                     
                     /* v3 my formula add*/
                     f.ajexq, f.cshoq, f.txditcq, f.npq, f.xrdy, f.xrdq, f.dpq, f.xintq, f.invtq, f.scstkcy, f.niq,
@@ -898,61 +759,82 @@ comp = conn.raw_sql("""
                     and f.datafmt = 'STD'
                     and f.popsrc = 'D'
                     and f.consol = 'C'
-                    and f.datadate >= '01/01/1959'
+                    and f.datadate >= '01/01/1925'
                     """)
 
 # comp['cusip6'] = comp['cusip'].str.strip().str[0:6]
-comp = comp.dropna(subset=['ibq'])
+comp = comp.dropna(subset=['ibq']).reset_index(drop=True)
 
 # sort and clean up
-comp = comp.sort_values(by=['gvkey', 'datadate']).drop_duplicates()
+comp = comp.sort_values(by=['gvkey', 'datadate']).drop_duplicates().reset_index(drop=True)
 comp['cshoq'] = np.where(comp['cshoq'] == 0, np.nan, comp['cshoq'])
 comp['ceqq'] = np.where(comp['ceqq'] == 0, np.nan, comp['ceqq'])
 comp['atq'] = np.where(comp['atq'] == 0, np.nan, comp['atq'])
-comp = comp.dropna(subset=['atq'])
+comp = comp.dropna(subset=['atq']).reset_index(drop=True)
 
 # convert datadate to date fmt
 comp['datadate'] = pd.to_datetime(comp['datadate'])
 
 # merge ccm and comp
-ccm1 = pd.merge(comp, ccm, how='left', on=['gvkey'])
+# Lag rule: Following Hou, Xue and Zhang (2015), We use earnings immediately after the announcement day
+# For those data with missing announcement date record, we straightly let the data available after 4 month
+ccm1 = pd.merge(comp, ccm, how='left', on=['gvkey']).reset_index(drop=True)
 ccm1['yearend'] = ccm1['datadate'] + YearEnd(0)
-ccm1['jdate'] = ccm1['datadate'] + MonthEnd(3)  # we change quarterly lag here
-# ccm1['jdate'] = ccm1['datadate']+MonthEnd(4)
+ccm1['jdate'] = ccm1['datadate'] + MonthEnd(4)  # we change quarterly lag here
+
+# deal with ibq to make it as up-to-date as possible
+ccm1['rdq'] = pd.to_datetime(ccm1['rdq']) + MonthEnd(0)
+ccm1['rdq'] = np.where(ccm1['rdq'].isnull(), ccm1['jdate'], ccm1['rdq'])
+ccm1['rdq_temp'] = ccm1.groupby(['permno'])['rdq'].shift(-1)  # compare next quarter's announcement date with jdate
+ccm1['rdq_temp'] = np.where(ccm1['rdq_temp'].isnull(), ccm1['jdate'], ccm1['rdq_temp'])  # if rdq is NaN, let it be jdate
+ccm1['ibq_diff'] = ccm1['jdate'] - ccm1['rdq_temp']  # compare next quarter's announcement date with jdate
+ccm1['ibq_diff'] = ccm1['ibq_diff'].dt.days
+ccm1['ibq_new'] = ccm1.groupby(['permno'])['ibq'].shift(-1)  # next quarter's ibq
+ccm1 = ccm1.rename(columns={'ibq': 'ibq_old'})  # original ibq
+'''
+if the announcement date is same or in front of jdate, we can use the up-to-date ibq.
+otherwise, we consider the up-to-date ibq is not available and still use the lag-4-months ibq
+'''
+ccm1['ibq'] = np.where(ccm1['ibq_diff'] >= 0, ccm1['ibq_new'], ccm1['ibq_old'])
+ccm1['ibq'] = np.where(ccm1['ibq'].isnull(), ccm1['ibq_old'], ccm1['ibq'])  # for most recent record we can only use the lag-4-months ibq
 
 # set link date bounds
-ccm2 = ccm1[(ccm1['jdate'] >= ccm1['linkdt']) & (ccm1['jdate'] <= ccm1['linkenddt'])]
+ccm2 = ccm1[(ccm1['jdate'] >= ccm1['linkdt']) & (ccm1['jdate'] <= ccm1['linkenddt'])].reset_index(drop=True)
 
 # merge ccm2 and crsp2
 # crsp2['jdate'] = crsp2['monthend']
-data_rawq = pd.merge(crsp2, ccm2, how='inner', on=['permno', 'jdate'])
+data_rawq = pd.merge(crsp2, ccm2, how='inner', on=['permno', 'jdate']).reset_index(drop=True)
 
-# filter exchcd & shrcd
+# filter exchcd & shrcd and at least one year data after the IPO
 data_rawq = data_rawq[((data_rawq['exchcd'] == 1) | (data_rawq['exchcd'] == 2) | (data_rawq['exchcd'] == 3)) &
-                   ((data_rawq['shrcd'] == 10) | (data_rawq['shrcd'] == 11))]
+                      ((data_rawq['shrcd'] == 10) | (data_rawq['shrcd'] == 11))].reset_index(drop=True)
 
 # process Market Equity
 '''
 Note: me is CRSP market equity, mveq_f is Compustat market equity. Please choose the me below.
 '''
-data_rawq['me'] = data_rawq['me']/1000  # CRSP ME
+data_rawq['me'] = data_rawq['me'] / 1000  # CRSP ME
 # data_rawq['me'] = data_rawq['mveq_f']  # Compustat ME
 
 # there are some ME equal to zero since this company do not have price or shares data, we drop these observations
 data_rawq['me'] = np.where(data_rawq['me'] == 0, np.nan, data_rawq['me'])
-data_rawq = data_rawq.dropna(subset=['me'])
-
-# count single stock years
-# data_rawq['count'] = data_rawq.groupby(['gvkey']).cumcount()
+data_rawq = data_rawq.dropna(subset=['me']).reset_index(drop=True)
 
 # deal with the duplicates
 data_rawq.loc[data_rawq.groupby(['datadate', 'permno', 'linkprim'], as_index=False).nth([0]).index, 'temp'] = 1
-data_rawq = data_rawq[data_rawq['temp'].notna()]
-data_rawq.loc[data_rawq.groupby(['permno', 'yearend', 'datadate'], as_index=False).nth([-1]).index, 'temp'] = 1
-data_rawq = data_rawq[data_rawq['temp'].notna()]
+data_rawq = data_rawq[data_rawq['temp'].notna()].reset_index(drop=True)
 
-data_rawq = data_rawq.sort_values(by=['permno', 'jdate'])
-print('quarterly raw')
+data_rawq.loc[data_rawq.groupby(['permno', 'yearend', 'datadate'], as_index=False).nth([-1]).index, 'temp'] = 1
+data_rawq = data_rawq[data_rawq['temp'].notna()].reset_index(drop=True)
+
+data_rawq = data_rawq.sort_values(by=['permno', 'jdate']).reset_index(drop=True)
+
+# add industry code for quarterly data
+data_rawq = data_rawq.dropna(subset=['sic']).reset_index(drop=True)  # gvkey 039750 does not have sic
+data_rawq['sic'] = data_rawq['sic'].astype(int)
+data_rawq['ffi49'] = ffi49(data_rawq)
+data_rawq['ffi49'] = data_rawq['ffi49'].fillna(49)
+data_rawq['ffi49'] = data_rawq['ffi49'].astype(int)
 #######################################################################################################################
 #                                                   Quarterly Variables                                               #
 #######################################################################################################################
@@ -982,14 +864,29 @@ data_rawq['cash'] = data_rawq['cheq']/data_rawq['atq']
 # acc
 data_rawq['actq_l4'] = data_rawq.groupby(['permno'])['actq'].shift(4)
 data_rawq['lctq_l4'] = data_rawq.groupby(['permno'])['lctq'].shift(4)
-data_rawq['npq_l4'] = data_rawq.groupby(['permno'])['npq'].shift(4)
-condlist = [data_rawq['npq'].isnull(),
-            data_rawq['actq'].isnull() | data_rawq['lctq'].isnull()]
-choicelist = [((data_rawq['actq']-data_rawq['lctq'])-(data_rawq['actq_l4']-data_rawq['lctq_l4']))/(10*data_rawq['beq']),
-              np.nan]
-data_rawq['acc'] = np.select(condlist, choicelist,
-                          default=((data_rawq['actq']-data_rawq['lctq']+data_rawq['npq'])-
-                                   (data_rawq['actq_l4']-data_rawq['lctq_l4']+data_rawq['npq_l4']))/(10*data_rawq['beq']))
+
+# data_rawq['npq_l4'] = data_rawq.groupby(['permno'])['npq'].shift(4)
+# condlist = [data_rawq['npq'].isnull(),
+#             data_rawq['actq'].isnull() | data_rawq['lctq'].isnull()]
+# choicelist = [((data_rawq['actq']-data_rawq['lctq'])-(data_rawq['actq_l4']-data_rawq['lctq_l4']))/(data_rawq['beq']),
+#               np.nan] ##### Delete "10*" on 2025.02.26 #####
+# data_rawq['acc'] = np.select(condlist, choicelist,
+#                           default=((data_rawq['actq']-data_rawq['lctq']+data_rawq['npq'])-
+#                                    (data_rawq['actq_l4']-data_rawq['lctq_l4']+data_rawq['npq_l4']))/(data_rawq['beq']))
+
+#################### Added Sloan(1996) or HXZ and GHZ operating accruals on 2025.02.28 ####################
+data_rawq['cheq_l4'] = data_rawq.groupby(['permno'])['cheq'].shift(4)
+data_rawq['dlcq_l4'] = data_rawq.groupby(['permno'])['dlcq'].shift(4)
+data_rawq['txpq_l4'] = data_rawq.groupby(['permno'])['txpq'].shift(4)
+
+data_rawq['acc'] = np.where(data_rawq['oancfy'].isnull(),
+                            ((data_rawq['actq'] - data_rawq['actq_l4']) - (data_rawq['cheq'] - data_rawq['cheq_l4']) -
+                            (data_rawq['lctq'] - data_rawq['lctq_l4']) + (data_rawq['dlcq'] - data_rawq['dlcq_l4']) +
+                            (data_rawq['txpq'] - data_rawq['txpq_l4']).fillna(0) - data_rawq['dpq']) / ((data_rawq['atq'] + data_rawq['atq_l4']) / 2),
+                            (data_rawq['ibq'] - data_rawq['oancfy']) / ((data_rawq['atq'] + data_rawq['atq_l4']) / 2))
+
+# absacc
+data_rawq['absacc'] = abs(data_rawq['acc'])
 
 # bm
 # data_rawq['bm'] = data_rawq['beq']/data_rawq['me']
@@ -1013,14 +910,15 @@ data_rawq['ajexq_l4'] = data_rawq.groupby(['permno'])['ajexq'].shift(4)
 data_rawq['ni'] = np.where(data_rawq['cshoq'].isnull(), np.nan,
                          np.log(data_rawq['cshoq']*data_rawq['ajexq']).replace(-np.inf, 0)-np.log(data_rawq['cshoq_l4']*data_rawq['ajexq_l4']))
 
-# op
+# ope
 data_rawq['xintq0'] = np.where(data_rawq['xintq'].isnull(), 0, data_rawq['xintq'])
 data_rawq['xsgaq0'] = np.where(data_rawq['xsgaq'].isnull(), 0, data_rawq['xsgaq'])
+data_rawq['cogsq0'] = np.where(data_rawq['cogsq'].isnull(), 0, data_rawq['cogsq'])
 data_rawq['beq_l4'] = data_rawq.groupby(['permno'])['beq'].shift(4)
 
-data_rawq['op'] = (ttm4('revtq', data_rawq)-ttm4('cogsq', data_rawq)-ttm4('xsgaq0', data_rawq)-ttm4('xintq0', data_rawq))/data_rawq['beq_l4']
+data_rawq['ope'] = (ttm4('revtq', data_rawq)-ttm4('cogsq0', data_rawq)-ttm4('xsgaq0', data_rawq)-ttm4('xintq0', data_rawq))/data_rawq['beq_l4']
 
-# csho
+# chcsho
 data_rawq['chcsho'] = (data_rawq['cshoq']/data_rawq['cshoq_l4'])-1
 
 # cashdebt
@@ -1035,13 +933,28 @@ data_rawq['xrdq4/atq_l4'] = data_rawq['xrdq4']/data_rawq['atq_l4']
 data_rawq['xrdq4/atq_l4_l4'] = data_rawq.groupby(['permno'])['xrdq4/atq_l4'].shift(4)
 data_rawq['rd'] = np.where(((data_rawq['xrdq4']/data_rawq['atq'])-data_rawq['xrdq4/atq_l4_l4'])/data_rawq['xrdq4/atq_l4_l4']>0.05, 1, 0)
 
-# pctacc
-condlist = [data_rawq['npq'].isnull(),
-            data_rawq['actq'].isnull() | data_rawq['lctq'].isnull()]
-choicelist = [((data_rawq['actq']-data_rawq['lctq'])-(data_rawq['actq_l4']-data_rawq['lctq_l4']))/abs(ttm4('ibq', data_rawq)), np.nan]
+#################### Follow Hafzalla, Lundholm, and Van Winkle (2011) and GHZ on 2025.02.28 ####################
+
+# # pctacc
+# condlist = [data_rawq['npq'].isnull(),
+#             data_rawq['actq'].isnull() | data_rawq['lctq'].isnull()]
+# choicelist = [((data_rawq['actq']-data_rawq['lctq'])-(data_rawq['actq_l4']-data_rawq['lctq_l4']))/abs(ttm4('ibq', data_rawq)), np.nan]
+# data_rawq['pctacc'] = np.select(condlist, choicelist,
+#                               default=((data_rawq['actq']-data_rawq['lctq']+data_rawq['npq'])-(data_rawq['actq_l4']-data_rawq['lctq_l4']+data_rawq['npq_l4']))/
+#                                       abs(ttm4('ibq', data_rawq)))
+
+condlist = [data_rawq['ibq'] == 0,
+            data_rawq['oancfy'].isnull(),
+            data_rawq['oancfy'].isnull() & data_rawq['ibq'] == 0]
+choicelist = [(data_rawq['ibq'] - data_rawq['oancfy']) / 0.01,
+              ((data_rawq['actq'] - data_rawq['actq_l4']) - (data_rawq['cheq'] - data_rawq['cheq_l4']) -
+               (data_rawq['lctq'] - data_rawq['lctq_l4']) + (data_rawq['dlcq'] - data_rawq['dlcq_l4']) + 
+               (data_rawq['txpq'] - data_rawq['txpq_l4']).fillna(0) - data_rawq['dpq']) / data_rawq['ibq'].abs(), 
+               ((data_rawq['actq'] - data_rawq['actq_l4']) - (data_rawq['cheq'] - data_rawq['cheq_l4']) -
+               (data_rawq['lctq'] - data_rawq['lctq_l4']) + (data_rawq['dlcq'] - data_rawq['dlcq_l4']) + 
+               (data_rawq['txpq'] - data_rawq['txpq_l4']).fillna(0) - data_rawq['dpq']) / 0.01]
 data_rawq['pctacc'] = np.select(condlist, choicelist,
-                              default=((data_rawq['actq']-data_rawq['lctq']+data_rawq['npq'])-(data_rawq['actq_l4']-data_rawq['lctq_l4']+data_rawq['npq_l4']))/
-                                      abs(ttm4('ibq', data_rawq)))
+                                default=(data_rawq['ibq'] - data_rawq['oancfy']) / data_rawq['ibq'].abs())
 
 # gma
 data_rawq['revtq4'] = ttm4('revtq', data_rawq)
@@ -1096,6 +1009,12 @@ data_rawq['chpm'] = (data_rawq['ibq4']/data_rawq['saleq4'])-(data_rawq['ibq4_l1'
 data_rawq['atq_l8'] = data_rawq.groupby(['permno'])['atq'].shift(8)
 data_rawq['chato'] = (data_rawq['saleq4']/((data_rawq['atq']+data_rawq['atq_l4'])/2))-(data_rawq['saleq4_l4']/((data_rawq['atq_l4']+data_rawq['atq_l8'])/2))
 
+# chatoia
+df_temp = data_rawq.groupby(['datadate', 'ffi49'], as_index=False)['chato'].mean()
+df_temp = df_temp.rename(columns={'chato': 'chato_ind'})
+data_rawq = pd.merge(data_rawq, df_temp, how='left', on=['datadate', 'ffi49']).reset_index(drop=True)
+data_rawq['chatoia'] = data_rawq['chato'] - data_rawq['chato_ind']
+
 # noa
 data_rawq['ivaoq'] = np.where(data_rawq['ivaoq'].isnull(), 0, 1)
 data_rawq['dlcq'] = np.where(data_rawq['dlcq'].isnull(), 0, 1)
@@ -1146,6 +1065,8 @@ data_rawq['grltnoa'] = ((data_rawq['rectq']+data_rawq['invtq']+data_rawq['ppentq
 # data_rawq['scal'] = np.select(condlist, choicelist, default=data_rawq['seqq'])
 
 # ala
+data_rawq['gdwlq'] = np.where(data_rawq['gdwlq'].isnull(), 0, data_rawq['gdwlq'])
+data_rawq['intanq'] = np.where(data_rawq['intanq'].isnull(), 0, data_rawq['intanq'])
 data_rawq['ala'] = data_rawq['cheq'] + 0.75*(data_rawq['actq']-data_rawq['cheq'])+\
                  0.5*(data_rawq['atq']-data_rawq['actq']-data_rawq['gdwlq']-data_rawq['intanq'])
 
@@ -1167,7 +1088,6 @@ data_rawq['sacc'] = ((data_rawq['actq']-data_rawq['actq_l1'] - (data_rawq['cheq'
 data_rawq['sacc'] = np.where(data_rawq['saleq']<=0, ((data_rawq['actq']-data_rawq['actq_l1'] - (data_rawq['cheq']-data_rawq['cheq_l1']))
                      -((data_rawq['lctq']-data_rawq['lctq_l1'])-(data_rawq['dlcq']-data_rawq['dlcq_l1'])))/0.01, data_rawq['sacc'])
 
-
 def chars_std(start, end, df, chars):
     """
 
@@ -1186,9 +1106,6 @@ def chars_std(start, end, df, chars):
     return result
 
 data_rawq['stdacc'] = chars_std(0, 16, data_rawq, 'sacc')
-
-# sgrvol
-# data_rawq['sgrvol'] = chars_std(0, 15, data_rawq, 'rsup')
 
 # roavol
 data_rawq['roavol'] = chars_std(0, 16, data_rawq, 'roa')
@@ -1278,38 +1195,90 @@ data_rawq['pscore'] = data_rawq['p_temp1']+data_rawq['p_temp2']+data_rawq['p_tem
 data_rawq = data_rawq.drop(['p_temp1', 'p_temp2', 'p_temp3', 'p_temp4', 'p_temp5', 'p_temp6', 'p_temp7', 'p_temp8',
                             'p_temp9'], axis=1)
 
-################################## Added on 2020.10.29 ##################################
-#Iaq
-data_rawq['atqlag'] = ttm4('atq',data_rawq)
-data_rawq['iaq'] = (data_rawq['atq']/data_rawq['atqlag'])-1
 
-#Almq
-data_rawq['intanq'] = np.where(data_rawq['intanq'].isnull(), 0, data_rawq['intanq'])
-data_rawq['qal'] = data_rawq['cheq'] + 0.75*(data_rawq['actq']-data_rawq['cheq']) + 0.5*(data_rawq['atq'] - data_rawq['actq'] - data_rawq['intanq'])
-data_rawq['mveqa'] = data_rawq['atq'] + data_rawq['mveq_f'] - data_rawq['ceqq']
-data_rawq['mveqa_1'] = data_rawq.groupby(['permno'])['mveqa'].shift(1)
-data_rawq['almq'] = data_rawq['qal']/data_rawq['mveqa_1']
+################## Added on 2022.09.06 ##################
+# cashpr
+# data_rawq['cashpr'] = ((data_rawq['me'] + data_rawq['dlttq'] - data_rawq['atq']) / data_rawq['cheq'])
+################## Added on 2024.03.12 ##################
+# opa from Ball el al. (2016)
+data_rawq['opa'] = (ttm4('revtq', data_rawq)-ttm4('cogsq0', data_rawq)-ttm4('xsgaq0', data_rawq)+data_rawq['xrdq4'])/data_rawq['atq_l4']
 
-#Olq, needs atq
-data_rawq['olq'] = (data_rawq['cogsq'] + data_rawq['xsgaq'])/data_rawq['atq']
+# cop from Ball el al. (2016)
+# no quarterly xpp, borrow from annual data
+data_rawq['year'] = data_rawq['jdate'].dt.year
+data_rawa['year'] = data_rawa['jdate'].dt.year
+data_rawa['jdate_a'] = data_rawa['jdate'].copy()
+data_rawq = pd.merge(data_rawq, data_rawa[['permno', 'year', 'jdate_a', 'xpp', 'xpp_l1']], how='left', on=['permno', 'year'])
 
-# rds
-data_rawq['rds'] = data_rawq['xrdq4']/data_rawq['saleq']
+# if quarterly jdate is later than annual jdate, use the corresponding xpp, otherwise use the lag-1 xpp (from one year before)
+data_rawq['xpp'] = np.where(data_rawq['jdate'] > data_rawq['jdate_a'], data_rawq['xpp'], data_rawq['xpp_l1'])
 
-print('quarterly variables')
+data_rawq['xpp_l4'] = data_rawq.groupby(['permno'])['xpp'].shift(4)
+data_rawq['xaccq_l4'] = data_rawq.groupby(['permno'])['xaccq'].shift(4)
+
+data_rawq['cop'] = (data_rawq['opa'] - (data_rawq['rectq']-data_rawq['rectq_l4']) 
+                                     - (data_rawq['invtq']-data_rawq['invtq_l4'])
+                                     - (data_rawq['xpp']-data_rawq['xpp_l4'])
+                                     + (data_rawq['drcq']+data_rawq['drltq'])
+                                     + (data_rawq['apq'] - data_rawq['apq_l4'])
+                                     + (data_rawq['xaccq']-data_rawq['xaccq_l4']))/data_rawq['atq']
+
+
 #######################################################################################################################
 #                                                       Momentum                                                      #
 #######################################################################################################################
-crsp_mom = conn.raw_sql("""
-                        select permno, date, ret, retx, prc, shrout, vol
-                        from crsp.msf
-                        where date >= '01/01/1959'
-                        """)
+crsp = conn.raw_sql("""
+                    select a.prc, a.ret, a.retx, a.shrout, a.vol, a.date, a.permno, a.permco
+                    from crsp.msf as a
+                    left join crsp.msenames as b
+                    on a.permno=b.permno
+                    and b.namedt<=a.date
+                    and a.date<=b.nameendt
+                    where a.date >= '01/01/1925'
+                    and b.exchcd between 1 and 3
+                    """)
+
+crsp = crsp.dropna(subset=['ret', 'retx', 'prc']).reset_index(drop=True)
+
+# change variable format to int
+crsp[['permco', 'permno']] = crsp[['permco', 'permno']].astype(int)
+
+# Line up date to be end of month
+crsp['date'] = pd.to_datetime(crsp['date'])
+crsp['jdate'] = crsp['date'] + MonthEnd(0)  # set all the date to the standard end date of month
+
+crsp = crsp.dropna(subset=['prc']).reset_index(drop=True)
+crsp['me'] = crsp['prc'].abs() * crsp['shrout']  # calculate market equity
+
+# Aggregate Market Cap
+'''
+There are cases when the same firm (permco) has two or more securities (permno) at same date.
+For the purpose of ME for the firm, we aggregated all ME for a given permco, date.
+This aggregated ME will be assigned to the permno with the largest ME.
+'''
+# sum of me across different permno belonging to same permco a given date
+crsp_summe = crsp.groupby(['jdate', 'permco'])['me'].sum().reset_index()
+# largest mktcap within a permco/date
+crsp_maxme = crsp.groupby(['jdate', 'permco'])['me'].max().reset_index()
+# join by monthend/maxme to find the permno
+crsp1 = pd.merge(crsp, crsp_maxme, how='inner', on=['jdate', 'permco', 'me']).reset_index(drop=True)
+# drop me column and replace with the sum me
+crsp1 = crsp1.drop(['me'], axis=1)
+# join with sum of me to get the correct market cap info
+crsp2 = pd.merge(crsp1, crsp_summe, how='inner', on=['jdate', 'permco']).reset_index(drop=True)
+# sort by permno and date and also drop duplicates
+crsp2 = crsp2.sort_values(by=['permno', 'jdate']).drop_duplicates().reset_index(drop=True)
+
+################## Added on 2025.02.23 ##################
+crsp2['me'] = crsp2['me']/1000 # CRSP ME in million unit
+
+crsp_mom = crsp2.copy()
+crsp_mom = crsp_mom.sort_values(by=['permno', 'date']).reset_index(drop=True)
 
 crsp_mom['permno'] = crsp_mom['permno'].astype(int)
-crsp_mom['date'] = pd.to_datetime(crsp_mom['date'])
 crsp_mom['jdate'] = pd.to_datetime(crsp_mom['date']) + MonthEnd(0)
 crsp_mom = crsp_mom.dropna(subset=['ret', 'retx', 'prc'])
+crsp_mom = crsp_mom.sort_values(by=['permno', 'date'])
 
 # add delisting return
 dlret = conn.raw_sql("""
@@ -1322,70 +1291,15 @@ dlret['dlstdt'] = pd.to_datetime(dlret['dlstdt'])
 dlret['jdate'] = dlret['dlstdt'] + MonthEnd(0)
 
 # merge delisting return to crsp return
-crsp_mom = pd.merge(crsp_mom, dlret, how='left', on=['permno', 'jdate'])
+crsp_mom = pd.merge(crsp_mom, dlret, how='left', on=['permno', 'jdate']).reset_index(drop=True)
 crsp_mom['dlret'] = crsp_mom['dlret'].fillna(0)
 crsp_mom['ret'] = crsp_mom['ret'].fillna(0)
 crsp_mom['retadj'] = (1 + crsp_mom['ret']) * (1 + crsp_mom['dlret']) - 1
-crsp_mom['me'] = crsp_mom['prc'].abs() * crsp_mom['shrout']  # calculate market equity
-crsp_mom['retx'] = np.where(crsp_mom['me'].isnull(), 0, crsp_mom['retx'])
-crsp_mom = crsp_mom.drop(['dlret', 'dlstdt'], axis=1)#delete prc,shrout
-
-#Seasonality
-
-#Rla
-crsp_mom['rla'] = crsp_mom.groupby(['permno'])['ret'].shift(12)
-
-#Rln
-lag = pd.DataFrame()
-result = 0
-for i in range(1, 12):
-    lag['mom%s' % i] = crsp_mom.groupby(['permno'])['ret'].shift(i)
-    result = result + lag['mom%s' % i]
-crsp_mom['rln'] = result/11
-
-#R[2,5]a
-#R[2,5]n
-lag = pd.DataFrame()
-result = 0
-for i in range(13,61):
-    lag['mom%s' % i] = crsp_mom.groupby(['permno'])['ret'].shift(i)
-    if i not in [24,36,48,60]:
-        result = result + lag['mom%s' % i]
-
-crsp_mom['r25a'] = (lag['mom24']+lag['mom36']+lag['mom48']+lag['mom60'])/4
-crsp_mom['r25n'] = result/44
-
-#R[6,10]a
-#R[6,10]n
-lag = pd.DataFrame()
-result = 0
-for i in range(61,121):
-    lag['mom%s' % i] = crsp_mom.groupby(['permno'])['ret'].shift(i)
-    if i not in [72,84,96,108,120]:
-        result = result + lag['mom%s' % i]
-
-crsp_mom['r610a'] = (lag['mom72']+lag['mom84']+lag['mom96']+lag['mom108']+lag['mom120'])/5
-crsp_mom['r610n'] = result/55
-
-#R[11,15]a
-lag = pd.DataFrame()
-result = 0
-for i in [132,144,156,168,180]:
-    lag['mom%s' % i] = crsp_mom.groupby(['permno'])['ret'].shift(i)
-    result = result + lag['mom%s' % i]
-crsp_mom['r1115a'] = result/5
-
-#R[16,20]a
-lag = pd.DataFrame()
-result = 0
-for i in [192,204,216,228,240]:
-    lag['mom%s' % i] = crsp_mom.groupby(['permno'])['ret'].shift(i)
-    result = result + lag['mom%s' % i]
-crsp_mom['r1620a'] = result/5
 
 
 def mom(start, end, df):
     """
+
     :param start: Order of starting lag
     :param end: Order of ending lag
     :param df: Dataframe
@@ -1400,19 +1314,45 @@ def mom(start, end, df):
     return result
 
 
+def chmom(start, end, df):
+    """
+
+    :param start: Order of starting lag
+    :param end: Order of ending lag
+    :param df: Dataframe
+    :return: Momentum factor
+    """
+    lag = pd.DataFrame()
+    result_first_half = 1
+    result_second_half = 1
+    for i in range(start, end):
+        lag['mom%s' % i] = df.groupby(['permno'])['ret'].shift(i)
+        result_first_half = result_first_half * (1+lag['mom%s' % i])
+    lag = pd.DataFrame()
+    for i in range(start + 6, end + 6):
+        lag['mom%s' % i] = df.groupby(['permno'])['ret'].shift(i)
+        result_second_half = result_second_half * (1 + lag['mom%s' % i])
+    result_first_half = result_first_half - 1
+    result_second_half = result_second_half - 1
+    result = result_first_half - result_second_half
+    return result
+
+
+crsp_mom['chmom'] = chmom(1, 12, crsp_mom)
+
 crsp_mom['mom60m'] = mom(12, 60, crsp_mom)
 crsp_mom['mom12m'] = mom(1, 12, crsp_mom)
 crsp_mom['mom1m'] = crsp_mom['ret']
 crsp_mom['mom6m'] = mom(1, 6, crsp_mom)
-crsp_mom['mom36m'] = mom(1, 36, crsp_mom)
+crsp_mom['mom36m'] = mom(12, 36, crsp_mom)
 crsp_mom['seas1a'] = crsp_mom.groupby(['permno'])['ret'].shift(11)
 
 crsp_mom['vol_l1'] = crsp_mom.groupby(['permno'])['vol'].shift(1)
 crsp_mom['vol_l2'] = crsp_mom.groupby(['permno'])['vol'].shift(2)
 crsp_mom['vol_l3'] = crsp_mom.groupby(['permno'])['vol'].shift(3)
 crsp_mom['prc_l2'] = crsp_mom.groupby(['permno'])['prc'].shift(2)
-crsp_mom['dolvol'] = np.log(crsp_mom['vol_l2']*crsp_mom['prc_l2']).replace([np.inf, -np.inf], np.nan)
-crsp_mom['turn'] = ((crsp_mom['vol_l1']+crsp_mom['vol_l2']+crsp_mom['vol_l3'])/3)/crsp_mom['shrout']
+crsp_mom['dolvol'] = np.log((crsp_mom['vol_l2']*100)*crsp_mom['prc_l2']).replace([np.inf, -np.inf], np.nan) ##### Added "*100" on 2025.02.23 (change "vol" unit from hundreds to one unit) #####
+crsp_mom['turn'] = ((crsp_mom['vol_l1']+crsp_mom['vol_l2']+crsp_mom['vol_l3'])/3/10)/crsp_mom['shrout'] ##### Added "/10" on 2025.02.23 (change "vol" unit from hundreds to thousand unit, same as shrout) #####
 
 # dy
 crsp_mom['me_l1'] = crsp_mom.groupby(['permno'])['me'].shift(1)
@@ -1441,23 +1381,27 @@ crsp_mom['dy'] = ttm12(series='mdivpay', df=crsp_mom)/crsp_mom['me']
 # crsp_mom['moms12m'] = moms(1, 12, crsp_mom)
 
 # populate the chars to monthly
-print('momentum')
+
 # data_rawa
-data_rawa = data_rawa.drop(['date', 'ret', 'retx', 'me'], axis=1)
-data_rawa = pd.merge(crsp_mom, data_rawa, how='left', on=['permno', 'jdate'])
+data_rawa = data_rawa.drop(['date', 'ret', 'retx', 'me', 'prc', 'shrout'], axis=1)
+data_rawa = pd.merge(crsp_mom, data_rawa, how='left', on=['permno', 'jdate']).reset_index(drop=True)
+data_rawa = data_rawa.sort_values(by=['permno', 'jdate']).reset_index(drop=True)
 data_rawa['datadate'] = data_rawa.groupby(['permno'])['datadate'].fillna(method='ffill')
-data_rawa = data_rawa.groupby(['permno', 'datadate'], as_index=False).fillna(method='ffill')
+data_rawa[['permno1', 'datadate1']] = data_rawa[['permno', 'datadate']]  # avoid the bug of 'groupby' for py 3.8
+data_rawa = data_rawa.groupby(['permno1', 'datadate1'], as_index=False).fillna(method='ffill')
 data_rawa = data_rawa[((data_rawa['exchcd'] == 1) | (data_rawa['exchcd'] == 2) | (data_rawa['exchcd'] == 3)) &
-                      ((data_rawa['shrcd'] == 10) | (data_rawa['shrcd'] == 11))]
-print('data_rawa')
+                      ((data_rawa['shrcd'] == 10) | (data_rawa['shrcd'] == 11))].reset_index(drop=True)
+
 # data_rawq
-data_rawq = data_rawq.drop(['date', 'ret', 'retx', 'me'], axis=1)
-data_rawq = pd.merge(crsp_mom, data_rawq, how='left', on=['permno', 'jdate'])
+data_rawq = data_rawq.drop(['date', 'ret', 'retx', 'me', 'prc', 'shrout'], axis=1)
+data_rawq = pd.merge(crsp_mom, data_rawq, how='left', on=['permno', 'jdate']).reset_index(drop=True)
+data_rawq = data_rawq.sort_values(by=['permno', 'jdate']).reset_index(drop=True)
 data_rawq['datadate'] = data_rawq.groupby(['permno'])['datadate'].fillna(method='ffill')
-data_rawq = data_rawq.groupby(['permno', 'datadate'], as_index=False).fillna(method='ffill')
+data_rawq[['permno1', 'datadate1']] = data_rawq[['permno', 'datadate']]  # avoid the bug of 'groupby' for py 3.8
+data_rawq = data_rawq.groupby(['permno1', 'datadate1'], as_index=False).fillna(method='ffill')
 data_rawq = data_rawq[((data_rawq['exchcd'] == 1) | (data_rawq['exchcd'] == 2) | (data_rawq['exchcd'] == 3)) &
-                      ((data_rawq['shrcd'] == 10) | (data_rawq['shrcd'] == 11))]
-print('data_rawq')
+                      ((data_rawq['shrcd'] == 10) | (data_rawq['shrcd'] == 11))].reset_index(drop=True)
+
 #######################################################################################################################
 #                                                    Monthly ME                                                       #
 #######################################################################################################################
@@ -1468,18 +1412,17 @@ print('data_rawq')
 
 # bm
 data_rawa['bm'] = data_rawa['be'] / data_rawa['me']
-#data_rawa['bm_n'] = data_rawa['be']
 
 # bm_ia
 df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['bm'].mean()
 df_temp = df_temp.rename(columns={'bm': 'bm_ind'})
-data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49'])
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49']).reset_index(drop=True)
 data_rawa['bm_ia'] = data_rawa['bm'] - data_rawa['bm_ind']
 
 # me_ia
 df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['me'].mean()
 df_temp = df_temp.rename(columns={'me': 'me_ind'})
-data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49'])
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49']).reset_index(drop=True)
 data_rawa['me_ia'] = data_rawa['me'] - data_rawa['me_ind']
 
 # cfp
@@ -1489,9 +1432,14 @@ choicelist = [data_rawa['ib']/data_rawa['me'],
               np.nan]
 data_rawa['cfp'] = np.select(condlist, choicelist, default=(data_rawa['ib']+data_rawa['dp'])/data_rawa['me'])
 
-# ep, checked from Hou and change 'ME' from compustat to crsp，checked
+# cfp_ia
+df_temp = data_rawa.groupby(['datadate', 'ffi49'], as_index=False)['cfp'].mean()
+df_temp = df_temp.rename(columns={'cfp': 'cfp_ind'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['datadate', 'ffi49']).reset_index(drop=True)
+data_rawa['cfp_ia'] = data_rawa['cfp'] - data_rawa['cfp_ind']
+
+# ep
 data_rawa['ep'] = data_rawa['ib']/data_rawa['me']
-#data_rawa['ep_n'] = data_rawa['ib']
 
 # rsup
 # data_rawa['sale_l1'] = data_rawa.groupby(['permno'])['sale'].shift(1)
@@ -1500,81 +1448,29 @@ data_rawa['rsup'] = (data_rawa['sale']-data_rawa['sale_l1'])/data_rawa['me']
 # lev
 data_rawa['lev'] = data_rawa['lt']/data_rawa['me']
 
-# sp, checked
+# sp
 data_rawa['sp'] = data_rawa['sale']/data_rawa['me']
-#data_rawa['sp_n'] = data_rawa['sale']
 
 # rdm
 data_rawa['rdm'] = data_rawa['xrd']/data_rawa['me']
 
-# adm hxz adm,checked
+# adm hxz adm
 data_rawa['adm'] = data_rawa['xad']/data_rawa['me']
 
 # dy
 data_rawa['dy'] = data_rawa['dvt']/data_rawa['me']
 
-# Cp
-#data_rawa['cf'] = data_rawa['ib'] + data_rawa['dp']
-data_rawa['cp'] = data_rawa['cf'] / data_rawa['me']
+# cashpr
+data_rawa['cashpr'] = ((data_rawa['me'] + data_rawa['dltt'] - data_rawa['at']) / data_rawa['che'])
 
-# Ebp
-#data_rawa['dvpa'] = np.where(data_rawa['dvpa'].isnull(), 0, data_rawa['dvpa'])
-#data_rawa['tstkp'] = np.where(data_rawa['tstkp'].isnull(), 0, data_rawa['tstkp'])
-#data_rawa['f_liab'] = data_rawa['dltt'] + data_rawa['dlc'] + data_rawa['pstk'] + data_rawa['dvpa'] - data_rawa['tstkp']
-#data_rawa['f_asse'] = data_rawa['che']
-# net debt : = ﬁnancial liabilities - ﬁnancial assets.
-#data_rawa['n_debt'] = data_rawa['f_liab'] - data_rawa['f_asse']
-#data_rawa['ber'] = data_rawa['ceq'] + data_rawa['tstkp'] - data_rawa['dvpa']
-data_rawa['ebp'] = (data_rawa['n_debt']+data_rawa['ber']) / (data_rawa['n_debt']+data_rawa['me'])
-
-# Em
-data_rawa['enteprs_v'] = data_rawa['me'] + data_rawa['dlc'] + data_rawa['dltt'] + data_rawa['pstkrv'] - data_rawa['che']
-data_rawa['em'] = data_rawa['enteprs_v'] / data_rawa['oibdp']
-
-# Cei
-data_rawa['lg_me'] = np.log(data_rawa['me']/data_rawa['me'].shift(6))
-data_rawa['lg_ret'] =  np.log(data_rawa['ret']*data_rawa['ret'].shift(1)*data_rawa['ret'].shift(2)*data_rawa['ret'].shift(3)*data_rawa['ret'].shift(5)*data_rawa['ret'].shift(6)) 
-data_rawa['cei'] = data_rawa['lg_me'] - data_rawa['lg_ret']
-
-#nop
-data_rawa['net_p'] = data_rawa['dvc'] + data_rawa['prstkc'] + 2*data_rawa['pstkrv'] - data_rawa['sstk']
-data_rawa['nop'] = data_rawa['net_p'] / data_rawa['me']
-data_rawa['nop'] = np.where(data_rawa['nop']<=0, np.nan, data_rawa['nop'] )
-
-#ocp
-data_rawa['ocy'] = np.where(data_rawa['jdate'] < '1988-06-30', data_rawa['fopt'] - data_rawa['wcap'], data_rawa['fopt'] - data_rawa['oancf'])
-data_rawa['ocp'] = data_rawa['ocy'] / data_rawa['me']
-data_rawa['ocp'] = np.where(data_rawa['ocp']<=0, np.nan, data_rawa['ocp'] )
-
-#bm_t-5 (bm of year t-5)
-data_rawa['bm5'] = data_rawa.groupby(['permno'])['bm'].shift(5)
-
-#rB (five year log book return)
-#Reference: jf_06 page8 by KENT DANIEL
-data_rawa['rB'] = data_rawa['bm'] - data_rawa['bm5'] + data_rawa['ret5']
-
-#Regression and get ir
-#First get unique datelist
-datelist = data_rawa['jdate'].unique()
-for date in datelist:
-    temp = data_rawa[data_rawa['jdate'] == date]
-    n_row = temp.shape[0]
-    index = temp.index
-    X = pd.DataFrame()
-    X['bm5'] = temp['bm5']
-    X['rB'] = temp['rB']
-    X['intercept'] = 1
-    X = X[['intercept','rB','bm5']]
-    X = np.mat(X)
-    Y = np.mat(temp[['ret5']])
-    #These are residuals on one date
-    res = (np.identity(n_row) - X.dot(X.T.dot(X).I).dot(X.T)).dot(Y)
-    #put residuals back into data_rawa
-    data_rawa.loc[index,'ir'] = res
+# indmom
+df_temp = data_rawa.groupby(['date', 'ffi49'], as_index=False)['mom12m'].mean().rename(columns={'mom12m': 'indmom'})
+data_rawa = pd.merge(data_rawa, df_temp, how='left', on=['date', 'ffi49']).reset_index(drop=True)
 
 # Annual Accounting Variables
-chars_a = data_rawa[['cusip', 'ncusip', 'gvkey', 'permno', 'exchcd', 'shrcd', 'datadate', 'jdate',
-                     'sic', 'retadj', 'acc', 'agr', 'bm', 'cfp', 'ep', 'ni', 'op', 'rsup', 'cash', 'chcsho',
+chars_a = data_rawa[['cusip', 'ncusip', 'gvkey', 'permno', 'exchcd', 'shrcd', 'datadate', 'jdate', 'ticker', 'conm', 'comnam', 'prc', 'shrout',
+                     'sic', 'ret', 'retx', 'retadj', 'acc', 'agr', 'bm', 'cfp', 'ep', 'ni', 'op',
+                     'rsup', 'cash', 'chcsho',
                      'rd', 'cashdebt', 'pctacc', 'gma', 'lev', 'rdm', 'adm', 'sgr', 'sp', 'invest', 'roe',
                      'rd_sale', 'lgr', 'roa', 'depr', 'egr', 'chato', 'chtx', 'noa', 'rna', 'pm', 'ato', 'dy',
                      'roic', 'chinv', 'pchsale_pchinvt', 'pchsale_pchrect', 'pchgm_pchsale', 'pchsale_pchxsga',
@@ -1582,23 +1478,39 @@ chars_a = data_rawa[['cusip', 'ncusip', 'gvkey', 'permno', 'exchcd', 'shrcd', 'd
                      'salecash', 'salerec', 'saleinv', 'pchsaleinv', 'realestate', 'obklg', 'chobklg', 'grltnoa',
                      'conv', 'chdrc', 'rdbias', 'operprof', 'capxint', 'xadint', 'chpm', 'ala', 'alm',
                      'mom1m', 'mom6m', 'mom12m', 'mom60m', 'mom36m', 'seas1a', 'me', 'hire', 'herf', 'bm_ia',
-                     'me_ia', 'bmj','cp', 'ebp', 'em', 'dp', 'aci', 'dpia', 'dBe', 'dfnl', 'dfin', 'dcoa',
-                     'dlno', 'dnoa', 'cla', 'cop', 'cto', 'dIi', 'dnco', 'dnca', 'ir', 'nop', 'ocp',
-                     'ia', 'ig','2ig','ivc','ndf','nsi','oa','poa','ta','ol','etr']]
-
+                     'me_ia', 'turn', 'dolvol', 'absacc', 'age', 'cashpr', 'chatoia', 'chempia', 'chmom', 'chpmia',
+                     'convind', 'divi', 'divo', 'secured', 'securedind', 'sin', 'cfp_ia', 'indmom', 'pchcapx_ia',
+                     'tang', 'tb', 'm1', 'm2', 'm3', 'm4', 'm5', 'm6']]
 chars_a.reset_index(drop=True, inplace=True)
-print(chars_a)
-print('ME annual')
+
 ########################################
 #               Quarterly              #
 ########################################
 # bm
 data_rawq['bm'] = data_rawq['beq']/data_rawq['me']
 
+# bm_ia
+df_temp = data_rawq.groupby(['datadate', 'ffi49'], as_index=False)['bm'].mean()
+df_temp = df_temp.rename(columns={'bm': 'bm_ind'})
+data_rawq = pd.merge(data_rawq, df_temp, how='left', on=['datadate', 'ffi49']).reset_index(drop=True)
+data_rawq['bm_ia'] = data_rawq['bm'] - data_rawq['bm_ind']
+
+# me_ia
+df_temp = data_rawq.groupby(['datadate', 'ffi49'], as_index=False)['me'].mean()
+df_temp = df_temp.rename(columns={'me': 'me_ind'})
+data_rawq = pd.merge(data_rawq, df_temp, how='left', on=['datadate', 'ffi49']).reset_index(drop=True)
+data_rawq['me_ia'] = data_rawq['me'] - data_rawq['me_ind']
+
 # cfp
 data_rawq['cfp'] = np.where(data_rawq['dpq'].isnull(),
                             data_rawq['ibq4']/data_rawq['me'],
                             (data_rawq['ibq4']+data_rawq['dpq4'])/data_rawq['me'])
+
+# cfp_ia
+df_temp = data_rawq.groupby(['datadate', 'ffi49'], as_index=False)['cfp'].mean()
+df_temp = df_temp.rename(columns={'cfp': 'cfp_ind'})
+data_rawq = pd.merge(data_rawq, df_temp, how='left', on=['datadate', 'ffi49']).reset_index(drop=True)
+data_rawq['cfp_ia'] = data_rawq['cfp'] - data_rawq['cfp_ind']
 
 # ep
 data_rawq['ep'] = data_rawq['ibq4']/data_rawq['me']
@@ -1622,22 +1534,37 @@ data_rawq['rsup'] = (data_rawq['saleq'] - data_rawq['saleq_l4'])/data_rawq['me']
 # sgrvol
 data_rawq['sgrvol'] = chars_std(0, 15, data_rawq, 'rsup')
 
+# cashpr
+data_rawq['cashpr'] = ((data_rawq['me'] + data_rawq['dlttq'] - data_rawq['atq']) / data_rawq['cheq'])
+
+# indmom
+df_temp = data_rawq.groupby(['date', 'ffi49'], as_index=False)['mom12m'].mean().rename(columns={'mom12m': 'indmom'})
+data_rawq = pd.merge(data_rawq, df_temp, how='left', on=['date', 'ffi49']).reset_index(drop=True)
+
+# Mohanram (2005) score (Quarterly Related)
+df_temp = data_rawq.groupby(['fyearq', 'fqtr', 'ffi49'], as_index=False)['roavol'].median().rename(columns={'roavol': 'md_roavol'})
+data_rawq = pd.merge(data_rawq, df_temp, how='left', on=['fyearq', 'fqtr', 'ffi49']).reset_index(drop=True)
+
+df_temp = data_rawq.groupby(['fyearq', 'fqtr', 'ffi49'], as_index=False)['sgrvol'].median().rename(columns={'sgrvol': 'md_sgrvol'})
+data_rawq = pd.merge(data_rawq, df_temp, how='left', on=['fyearq', 'fqtr', 'ffi49']).reset_index(drop=True)
+
+data_rawq['m7'] = np.where(data_rawq['roavol'] < data_rawq['md_roavol'], 1, 0)
+data_rawq['m8'] = np.where(data_rawq['sgrvol'] < data_rawq['md_sgrvol'], 1, 0)
+
 # Quarterly Accounting Variables
-chars_q = data_rawq[['gvkey', 'permno', 'datadate', 'jdate', 'sic', 'exchcd', 'shrcd','retadj' ,'acc', 'bm', 'cfp',
-                     'ep', 'agr', 'ni', 'op', 'cash', 'chcsho', 'rd', 'cashdebt', 'pctacc', 'gma', 'lev',
+chars_q = data_rawq[['gvkey', 'permno', 'datadate', 'jdate', 'sic', 'exchcd', 'shrcd', 'ticker', 'conm', 'comnam', 'prc', 'shrout',
+                     'ret', 'retx', 'retadj', 'acc', 'bm', 'cfp',
+                     'ep', 'agr', 'ni', 'ope', 'opa', 'cop', 'cash', 'chcsho', 'rd', 'cashdebt', 'pctacc', 'gma', 'lev',
                      'rdm', 'sgr', 'sp', 'invest', 'rd_sale', 'lgr', 'roa', 'depr', 'egr', 'roe',
                      'chato', 'chpm', 'chtx', 'noa', 'rna', 'pm', 'ato', 'stdcf',
                      'grltnoa', 'ala', 'alm', 'rsup', 'stdacc', 'sgrvol', 'roavol', 'scf', 'cinvest',
                      'mom1m', 'mom6m', 'mom12m', 'mom60m', 'mom36m', 'seas1a', 'me', 'pscore', 'nincr',
-                     'turn', 'dolvol', 'iaq', 'almq', 'olq', 'rds']]
-
+                     'cfp_ia', 'bm_ia', 'me_ia', 'chatoia', 'chmom',
+                     'turn', 'dolvol', 'cashpr', 'indmom', 'm7', 'm8']]
 chars_q.reset_index(drop=True, inplace=True)
-print(chars_q)
-print('ME quarterly')
-with open('chars_a_60.pkl', 'wb') as f:
-    pkl.dump(chars_a, f)
-print('pkl a')
-with open('chars_q_60.pkl', 'wb') as f:
-    pkl.dump(chars_q, f)
-print('pkl q')
-print('Finished')
+
+with open('chars_a_accounting.feather', 'wb') as f:
+    feather.write_feather(chars_a, f)
+
+with open('chars_q_accounting.feather', 'wb') as f:
+    feather.write_feather(chars_q, f)

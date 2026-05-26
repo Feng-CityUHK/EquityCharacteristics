@@ -25,10 +25,8 @@ conn = wrds.Connection()
 
 # CRSP Block
 crsp = conn.raw_sql("""
-                    select a.permno, a.date, a.ret, (a.ret - b.rf) as exret, a.askhi, a.bidlo
+                    select a.permno, a.date, a.vol, a.shrout
                     from crsp.dsf as a
-                    left join ff.factors_daily as b
-                    on a.date=b.date
                     where a.date > '01/01/1959'
                     """)
 
@@ -40,6 +38,9 @@ crsp['permno'] = crsp['permno'].astype(int)
 
 # Line up date to be end of month
 crsp['date'] = pd.to_datetime(crsp['date'])
+
+# make sure same unit for vol and shrout (Added on 2025.02.23)
+crsp['shrout'] = crsp['shrout'] * 1000 # from thousands to 1 unit
 
 # find the closest trading day to the end of the month
 crsp['monthend'] = crsp['date'] + MonthEnd(0)
@@ -92,11 +93,14 @@ def get_baspread(df, firm_list):
             if temp['permno'].count() < 21:
                 pass
             else:
-                index = temp.tail(1).index
-                X = pd.DataFrame()
-                X[['askhi', 'bidlo']] = temp[['askhi', 'bidlo']]
-                bid = (X['askhi'] - X['bidlo'])/((X['askhi'] + X['bidlo'])/2).mean()
-                df.loc[index, 'baspread'] = bid
+                if temp['vol'].notna().sum() < 21:
+                    pass
+                else:
+                    index = temp.tail(1).index
+                    X = pd.DataFrame()
+                    X[['vol', 'shrout']] = temp[['vol', 'shrout']]
+                    std_turn = (X['vol'] / X['shrout']).std()
+                    df.loc[index, 'std_turn'] = std_turn
     return df
 
 
@@ -153,9 +157,9 @@ if __name__ == '__main__':
     crsp = main(0, 1, 0.05)
 
 # process dataframe
-crsp = crsp.dropna(subset=['baspread'])  # drop NA due to rolling
+crsp = crsp.dropna(subset=['std_turn'])  # drop NA due to rolling
 crsp = crsp.reset_index(drop=True)
-crsp = crsp[['permno', 'date', 'baspread']]
+crsp = crsp[['permno', 'date', 'std_turn']]
 
-with open('baspread.feather', 'wb') as f:
+with open('std_turn.feather', 'wb') as f:
     feather.write_feather(crsp, f)

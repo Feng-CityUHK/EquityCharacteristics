@@ -730,65 +730,75 @@ def fillna_atq(df_q, df_a):
     return df_q
 
 
-def fillna_ind(df, method, ffi):
+def fillna_ind(df, method, ffi, not_fill_col):
     df_fill = pd.DataFrame()
     na_columns_list = df.columns[df.isna().any()].tolist()
     for na_column in na_columns_list:
-        if method == 'mean':
-            df_temp = df.groupby(['date', 'ffi%s' % ffi])['%s' % na_column].mean()
-        elif method == 'median':
-            df_temp = df.groupby(['date', 'ffi%s' % ffi])['%s' % na_column].median()
+        if na_column in not_fill_col:
+            continue
         else:
-            None
-        df_fill = pd.concat([df_fill, df_temp], axis=1)
-        if method == 'mean':
-            df_fill = df_fill.rename(columns={'%s' % na_column: '%s_mean' % na_column})
-        elif method == 'median':
-            df_fill = df_fill.rename(columns={'%s' % na_column: '%s_median' % na_column})
-        else:
-            None
+            if method == 'mean':
+                df_temp = df.groupby(['date', 'ffi%s' % ffi])['%s' % na_column].mean()
+            elif method == 'median':
+                df_temp = df.groupby(['date', 'ffi%s' % ffi])['%s' % na_column].median()
+            else:
+                None
+            df_fill = pd.concat([df_fill, df_temp], axis=1)
+            if method == 'mean':
+                df_fill = df_fill.rename(columns={'%s' % na_column: '%s_mean' % na_column})
+            elif method == 'median':
+                df_fill = df_fill.rename(columns={'%s' % na_column: '%s_median' % na_column})
+            else:
+                None
     df_fill = df_fill.reset_index()
     # reset multiple index to date and ffi code
-    df_fill['index'] = df_fill['index'].astype(str)
-    index_temp = df_fill['index'].str.split(',', expand=True)
-    index_temp.columns = ['date', 'ffi%s' % ffi]
-    index_temp['date'] = index_temp['date'].str.strip('(Timestamp(\' \')')
-    index_temp['ffi%s' % ffi] = index_temp['ffi%s' % ffi].str.strip(')')
-    df_fill[['date', 'ffi%s' % ffi]] = index_temp[['date', 'ffi%s' % ffi]]
-    df_fill = df_fill.drop(['index'], axis=1)
+    # df_fill['index'] = df_fill['index'].astype(str)
+    # index_temp = df_fill['index'].str.split(',', expand=True)
+    # index_temp.columns = ['date', 'ffi%s' % ffi]
+    # index_temp['date'] = index_temp['date'].str.strip('(Timestamp(\' \')')
+    # index_temp['ffi%s' % ffi] = index_temp['ffi%s' % ffi].str.strip(')')
+    # df_fill[['date', 'ffi%s' % ffi]] = index_temp[['date', 'ffi%s' % ffi]]
+    # df_fill = df_fill.drop(['index'], axis=1)
+    df_fill = df_fill.rename(columns={'level_0':'date', 'level_1':'ffi49'})
     df_fill['date'] = pd.to_datetime(df_fill['date'])
     df_fill['ffi49'] = df_fill['ffi49'].astype(int)
     # fill na
     df = pd.merge(df, df_fill, how='left', on=['date', 'ffi%s' % ffi])
     for na_column in na_columns_list:
-        if method == 'mean':
-            df['%s' % na_column] = df['%s' % na_column].fillna(df['%s_mean' % na_column])
-            df = df.drop(['%s_mean' % na_column], axis=1)
-        elif method == 'median':
-            df['%s' % na_column] = df['%s' % na_column].fillna(df['%s_median' % na_column])
-            df = df.drop(['%s_median' % na_column], axis=1)
+        if na_column in not_fill_col:
+            continue
         else:
-            None
+            if method == 'mean':
+                df['%s' % na_column] = df['%s' % na_column].fillna(df['%s_mean' % na_column])
+                df = df.drop(['%s_mean' % na_column], axis=1)
+            elif method == 'median':
+                df['%s' % na_column] = df['%s' % na_column].fillna(df['%s_median' % na_column])
+                df = df.drop(['%s_median' % na_column], axis=1)
+            else:
+                None
     return df
 
 
-def fillna_all(df, method):
+def fillna_all(df, method, not_fill_col):
     df_fill = pd.DataFrame()
     na_columns_list = df.columns[df.isna().any()].tolist()
     for na_column in na_columns_list:
-        if method == 'mean':
-            df_temp = df.groupby(['date'])['%s' % na_column].mean()
-        elif method == 'median':
-            df_temp = df.groupby(['date'])['%s' % na_column].median()
+        if na_column in not_fill_col:
+            continue
         else:
-            None
-        df_fill = pd.concat([df_fill, df_temp], axis=1)
-        if method == 'mean':
-            df_fill = df_fill.rename(columns={'%s' % na_column: '%s_mean' % na_column})
-        elif method == 'median':
-            df_fill = df_fill.rename(columns={'%s' % na_column: '%s_median' % na_column})
-        else:
-            None
+            if method == 'mean':
+                df_temp = df.groupby(['date'])['%s' % na_column].mean()
+            elif method == 'median':
+                df_temp = df.groupby(['date'])['%s' % na_column].median()
+            else:
+                None
+            df_fill = pd.concat([df_fill, df_temp], axis=1)
+            if method == 'mean':
+                df_fill = df_fill.rename(columns={'%s' % na_column: '%s_mean' % na_column})
+            elif method == 'median':
+                df_fill = df_fill.rename(columns={'%s' % na_column: '%s_median' % na_column})
+            else:
+                None
     df_fill = df_fill.reset_index()
     # reset multiple index to date and ffi code
     df_fill['index'] = df_fill['index'].astype(str)
@@ -801,14 +811,17 @@ def fillna_all(df, method):
     # fill na
     df = pd.merge(df, df_fill, how='left', on='date')
     for na_column in na_columns_list:
-        if method == 'mean':
-            df['%s' % na_column] = df['%s' % na_column].fillna(df['%s_mean' % na_column])
-            df = df.drop(['%s_mean' % na_column], axis=1)
-        elif method == 'median':
-            df['%s' % na_column] = df['%s' % na_column].fillna(df['%s_median' % na_column])
-            df = df.drop(['%s_median' % na_column], axis=1)
+        if na_column in not_fill_col:
+            continue
         else:
-            None
+            if method == 'mean':
+                df['%s' % na_column] = df['%s' % na_column].fillna(df['%s_mean' % na_column])
+                df = df.drop(['%s_mean' % na_column], axis=1)
+            elif method == 'median':
+                df['%s' % na_column] = df['%s' % na_column].fillna(df['%s_median' % na_column])
+                df = df.drop(['%s_median' % na_column], axis=1)
+            else:
+                None
     return df
 
 
@@ -816,7 +829,7 @@ def standardize(df):
     # exclude the the information columns
     col_names = df.columns.values.tolist()
     list_to_remove = ['permno', 'date', 'date', 'datadate', 'gvkey', 'sic', 'count', 'exchcd', 'shrcd', 'ffi49', 'ret',
-                      'retadj', 'retx', 'lag_me']
+                      'retadj', 'retx', 'lag_me', 'ticker', 'conm', 'comnam', 'prc', 'shrout']
     col_names = list(set(col_names).difference(set(list_to_remove)))
     for col_name in tqdm(col_names):
         print('processing %s' % col_name)
@@ -829,5 +842,5 @@ def standardize(df):
         df['%s_rank' % col_name] = df.groupby(['date'])['%s' % col_name].rank(method='dense')
         df['rank_%s' % col_name] = (df['%s_rank' % col_name] - 1) / (df['count'] - 1) * 2 - 1
         df = df.drop(['%s_rank' % col_name, '%s' % col_name, 'count'], axis=1)
-    df = df.fillna(0)
+        df['rank_%s' % col_name] = df['rank_%s' % col_name].fillna(0)
     return df

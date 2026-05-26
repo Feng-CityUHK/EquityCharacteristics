@@ -25,10 +25,12 @@ conn = wrds.Connection()
 
 # CRSP Block
 crsp = conn.raw_sql("""
-                    select a.permno, a.date, a.vol, a.shrout
-                    from crsp.dsf as a
-                    where a.date > '01/01/1959'
-                    """)
+                      select a.permno, a.date, a.ret, a.vol, b.rf, b.mktrf, b.smb, b.hml
+                      from crsp.dsf as a
+                      left join ff.factors_daily as b
+                      on a.date=b.date
+                      where a.date > '01/01/1959'
+                      """)
 
 # sort variables by permno and date
 crsp = crsp.sort_values(by=['permno', 'date'])
@@ -38,6 +40,23 @@ crsp['permno'] = crsp['permno'].astype(int)
 
 # Line up date to be end of month
 crsp['date'] = pd.to_datetime(crsp['date'])
+
+# add delisting return
+dlret = conn.raw_sql("""
+                     select permno, dlret, dlstdt 
+                     from crsp.dsedelist
+                     """)
+
+dlret.permno = dlret.permno.astype(int)
+dlret['dlstdt'] = pd.to_datetime(dlret['dlstdt'])
+dlret['date'] = dlret['dlstdt']
+
+# merge delisting return to crsp return
+crsp = pd.merge(crsp, dlret, how='left', on=['permno', 'date'])
+crsp['dlret'] = crsp['dlret'].fillna(0)
+crsp['ret'] = crsp['ret'].fillna(0)
+crsp['retadj'] = (1 + crsp['ret']) * (1 + crsp['dlret']) - 1
+crsp['exret'] = crsp['retadj'] - crsp['rf']
 
 # find the closest trading day to the end of the month
 crsp['monthend'] = crsp['date'] + MonthEnd(0)
@@ -70,11 +89,11 @@ df_firm = df_firm.rename(columns={'index': 'count'})
 df_firm['month_num'] = month_num
 
 ######################
-# Calculate residual #
+# Calculate the beta #
 ######################
 
 
-def get_baspread(df, firm_list):
+def get_beta(df, firm_list):
     """
 
     :param df: stock dataframe
@@ -87,14 +106,21 @@ def get_baspread(df, firm_list):
         for i in range(count + 1):
             # if you want to change the rolling window, please change here: i - 2 means 3 months is a window.
             temp = df[(df['permno'] == firm) & (i - 2 <= df['month_count']) & (df['month_count'] <= i)]
+            # if observations in last 3 months are less 21, we drop the rvar of this month
             if temp['permno'].count() < 21:
                 pass
             else:
-                index = temp.tail(1).index
-                X = pd.DataFrame()
-                X[['vol', 'shrout']] = temp[['vol', 'shrout']]
-                std_turn = (X['vol'] / X['shrout']).std()
-                df.loc[index, 'std_turn'] = std_turn
+                if temp['vol'].notna().sum() < 21:
+                    pass
+                else:
+                    rolling_window = temp['permno'].count()
+                    index = temp.tail(1).index
+                    X = np.mat(temp[['mktrf']])
+                    Y = np.mat(temp[['exret']])
+                    ones = np.mat(np.ones(rolling_window)).T
+                    M = np.identity(rolling_window) - ones.dot((ones.T.dot(ones)).I).dot(ones.T)
+                    beta = (X.T.dot(M).dot(X)).I.dot((X.T.dot(M).dot(Y)))
+                    df.loc[index, 'beta'] = beta
     return df
 
 
@@ -134,7 +160,7 @@ def main(start, end, step):
     pool = mp.Pool()
     p_dict = {}
     for i in range(int((end-start)/step)):
-        p_dict['p' + str(i)] = pool.apply_async(get_baspread, (df['crsp%s' % i], df['firm%s' % i],))
+        p_dict['p' + str(i)] = pool.apply_async(get_beta, (df['crsp%s' % i], df['firm%s' % i],))
     pool.close()
     pool.join()
     result = pd.DataFrame()
@@ -151,9 +177,9 @@ if __name__ == '__main__':
     crsp = main(0, 1, 0.05)
 
 # process dataframe
-crsp = crsp.dropna(subset=['std_turn'])  # drop NA due to rolling
+crsp = crsp.dropna(subset=['beta'])  # drop NA due to rolling
 crsp = crsp.reset_index(drop=True)
-crsp = crsp[['permno', 'date', 'std_turn']]
+crsp = crsp[['permno', 'date', 'beta']]
 
-with open('std_turn.feather', 'wb') as f:
+with open('beta.feather', 'wb') as f:
     feather.write_feather(crsp, f)

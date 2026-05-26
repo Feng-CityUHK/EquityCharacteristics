@@ -25,7 +25,7 @@ comp = conn.raw_sql("""
                     and datafmt = 'STD'
                     and popsrc = 'D'
                     and consol = 'C'
-                    and datadate >= '01/01/1959'
+                    and datadate >= '01/01/1925'
                     """)
 
 comp['datadate'] = pd.to_datetime(comp['datadate'])
@@ -63,7 +63,7 @@ ccm2 = ccm2[['gvkey', 'datadate', 'rdq', 'fyearq', 'fqtr', 'permno']]
 crsp_dsi = conn.raw_sql("""
                         select distinct date
                         from crsp.dsi
-                        where date >= '01/01/1959'
+                        where date >= '01/01/1925'
                         """)
 
 crsp_dsi['date'] = pd.to_datetime(crsp_dsi['date'])
@@ -98,7 +98,7 @@ crsp_d = conn.raw_sql("""
                       on a.permno=b.permno
                       and b.namedt<=a.date
                       and a.date<=b.nameendt
-                      where a.date >= '01/01/1959'
+                      where a.date >= '01/01/1925'
                       and b.exchcd between 1 and 3
                       and b.shrcd in (10,11)
                       """)
@@ -115,7 +115,7 @@ crsp_d['date'] = pd.to_datetime(crsp_d['date'])
 dlret = conn.raw_sql("""
                      select permno, dlret, dlstdt 
                      from crsp.dsedelist
-                     where dlstdt >= '01/01/1959'
+                     where dlstdt >= '01/01/1925'
                      """)
 
 dlret.permno = dlret.permno.astype(int)
@@ -131,7 +131,7 @@ crsp_d = crsp_d.sort_values(by=['date', 'permno', 'meq'])
 crspsp500d = conn.raw_sql("""
                           select date, sprtrn 
                           from crsp.dsi
-                          where date >= '01/01/1959'
+                          where date >= '01/01/1925'
                           """)
 
 crspsp500d['date'] = pd.to_datetime(crspsp500d['date'])
@@ -204,7 +204,7 @@ print('='*10, 'start populate', '='*10)
 crsp_msf = conn.raw_sql("""
                         select distinct date
                         from crsp.msf
-                        where date >= '01/01/1959'
+                        where date >= '01/01/1925'
                         """)
 
 df['datadate'] = pd.to_datetime(df['datadate'])

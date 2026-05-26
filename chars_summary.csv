@@ -1,0 +1,102 @@
+﻿Acronym,Description,Author,Pub Year,Category
+abr,cumulative abnormal returns around earnings announcement dates,"Chan, Jegadeesh, and Lakonishok",1996,Momentum
+absacc,Absolute accruals,"Bandyopadhyay, Huang, and Wirjanto",2010,Investment
+acc,Operating Accruals,Sloan,1996,Investment
+adm,Advertising Expense-to-market,"Chan, Lakonishok, and Sougiannis",2001,Intangibles
+age,# years since first Compustat coverage,"Jiang, Lee, and Zhang",2005,Intangibles
+agr,Asset growth,"Cooper, Gulen, and Schill",2008,Investment 
+alm,Quarterly Asset Liquidity,Ortiz-Molina and Phillips,2014,Intangibles
+ato,Asset Turnover,Soliman,2008,Profitability
+baspread,Bid-ask spread rolling 3m,Amihud and Mendelson,1989,Trading frictions 
+beta,Beta rolling 3m,Fama and MacBeth,1973,Trading frictions 
+bm ,Book-to-market equity,"Rosenberg, Reid, and Lanstein ",1985,Value-versus-growth
+bm_ia,Industry-adjusted book to market,"Asness, Porter, and Stevens",2000,Value-versus-growth
+cash,Cash holdings,"Lakonishok, Shleifer, and Vishny ",1994,Value-versus-growth
+cashdebt,Cash flow to debt,Ou and Penman,1989,Value-versus-growth
+cashpr,Cash productivity,Chandrashekar and Rao,2009,Value-versus-growth
+cfp,Cash flow to price ratio,"Lakonishok, Shleifer, and Vishny ",1994,Value-versus-growth
+cfp_ia,Industry-adjusted cash flow to price ratio,"Asness, Porter, and Stevens",2000,Value-versus-growth
+chatoia,Industry-adjusted change in asset turnover,Soliman,2008,Profitability
+chcsho,Change in shares outstanding,Pontiff and Woodgate,2008,Investment 
+chempia,Industry-adjusted change in employees,"Asness, Porter, and Stevens",2000,Intangibles
+chinv,Change in inventory,Thomas and Zhang,2002,Investment
+chmom,Change in 6-month momentum,Gettleman and Marks,2006,Momentum
+chpmia,Industry-adjusted change in profit margin,Soliman,2008,Profitability 
+chtx,Change in tax expense,Thomas and Zhang,2011,Momentum 
+cinvest,Corporate investment,"Titman, Wei, and Xie",2004,Investment 
+convind,Convertible debt indicator,Valta,2016,Intangibles
+currat,Current ratio,Ou and Penman,1989,Profitability
+depr,Depreciation / PP and E,Holthausen and Larcker,1992,Momentum 
+divi,Dividend initiation,"Michaely, Thaler, and Womack",1995,Value-versus-growth
+divo,Dividend omission,"Michaely, Thaler, and Womack",1995,Value-versus-growth
+dolvol,Dollar trading volume,"Chordia, Subrahmanyam, and Anshuman",2001,Trading frictions 
+dy,Dividend yield,Litzenberger and Ramaswamy,1979,Value-versus-growth
+egr,Growth in common shareholder equity,"Richardson, Sloan, Soliman, and Tuna",2005,Investment
+ep,Earnings-to-price,Basu,1977,Value-versus-growth
+gma,Gross profitability,Novy-Marx,2013,Investment
+grcapx,Growth in capital expenditures,Anderson and Garcia-Feijoo,2006,Investment
+grltnoa,Growth in long-term net operating assets,"Fairfield, Whisenant, and Yohn",2003,Investment
+herf,Industry sales concentration,Hou and Robinson,2006,Intangibles 
+hire,Employee growth rate,"Bazdresch, Belo, and Lin",2014,Intangibles 
+ill,Illiquidity rolling 3m,Amihud,2002,Trading frictions 
+indmom,Industry momentum,Moskowitz and Grinblatt,1999,Momentum
+invest,Capital expenditures and inventory,Chen and Zhang,2010,Investment
+lev,Leverage,Bhandari,1988,Value-versus-growth 
+lgr,Growth in long-term debt,"Richardson, Sloan, Soliman, and Tuna",2005,Investment 
+maxret,Maximum daily returns rolling 3m,"Bali, Cakici, and Whitelaw",2011,Trading frictions 
+me ,the market equity,Banz,1981,Trading frictions 
+me_ia ,Industry-adjusted size,"Asness, Porter, and Stevens",2000,Trading frictions 
+mom12m,Momentum rolling 12m,Jegadeesh,1990,Momentum 
+mom1m,Momentum ,Jegadeesh and Titman,1993,Momentum 
+mom36m,Momentum rolling 36m,Jegadeesh and Titman,1993,Momentum 
+mom60m,Momentum rolling 60m,Jegadeesh and Titman,1993,Momentum 
+mom6m,Momentum rolling 6m,Jegadeesh and Titman,1993,Momentum 
+ni ,Net Stock Issues,Pontiff and Woodgate,2008,Investment
+nincr,Number of earnings increases,"Barth, Elliott, and Finn",1999,Momentum 
+noa,(Changes in) Net Operating Assets,"Hirshleifer, Hou, Teoh, and Zhang",2004,Investment
+op,Operating profitability,Fama and French,2015,Profitability 
+pchcapx_ia,Industry adjusted % change in capital expenditures,Abarbanell and Bushee,1998,Intangibles
+pchcurrat,% change in current ratio,Ou and Penman,1989,Profitability
+pchdepr,% change in depreciation,Holthausen and Larcker,1992,Momentum 
+pchgm_pchsale,% change in gross margin - % change in sales,Abarbanell and Bushee,1998,Intangibles
+pchquick,% change in quick ratio,Ou and Penman,1989,Profitability
+pchsale_pchinvt,% change in sales - % change in inventory,Abarbanell and Bushee,1998,Intangibles
+pchsale_pchrect,% change in sales - % change in A or R,Abarbanell and Bushee,1998,Intangibles
+pchsale_pchxsga,% change in sales - % change in SG and A,Abarbanell and Bushee,1998,Intangibles
+pchsaleinv,% change sales-to-inventory,Ou and Penman,1989,Intangibles
+pctacc,Percent operating accruals,"Hafzalla, Lundholm, and Van Winkle",2011,Investment
+pm ,profit margin,Soliman,2008,Profitability
+pscore,Performance Score,Piotroski,2000,Profitability 
+quick,Quick ratio,Ou and Penman,1989,Profitability
+rd,R and D increase,"Eberhart, Maxwell, and Siddique",2004,Intangibles
+rd_sale,R and D to sales,"Guo, Lev, and Shi",2006,Intangibles 
+rdm ,R and D Expense-to-market,"Chan, Lakonishok, and Sougiannis",2001,Intangibles
+re,Revisions in analysts earnings forecasts,"Chan, Jegadeesh, and Lakonishok",1996,Intangibles 
+realestate,Real estate holdings,Tuzel,2010,Intangibles
+rna ,"Quarterly Return on Net Operating Assets, Quarterly Asset Turnover",Soliman,2008,Profitability
+roa,Return on assets,"Balakrishnan, Bartov, and Faurel",2010,Profitability
+roavol,Earnings volatility,"Francis, LaFond, Olsson, and Schipper",2004,Intangibles
+roe ,Return on equity,"Hou, Xue, and Zhang",2015,Profitability
+roic,Return on invested capital ,Brown and Rowe,2007,Profitability
+rsup,Revenue surprise,Kama,2009,Momentum 
+rvar_capm,Residual variance - CAPM rolling 3m,Daily Stock residual variance of CAPM,,Trading frictions 
+rvar_ff3,Residual variance - ff3 rolling 3m,Daily Stock residual variance of Fama French 3 factors,,Trading frictions 
+rvar_mean,return variance rolling 3m,Daily Stock return variance,,Trading frictions 
+salecash,Sales to cash,Ou and Penman,1989,Intangibles
+saleinv,Sales to inventory,Ou and Penman,1989,Intangibles
+salerec,Sales to receivables,Ou and Penman,1989,Intangibles
+seas1a,Seasonality,Heston and Sadka,2008,Intangibles
+secured,Secured debt,Valta,2016,Intangibles
+securedind,Secured debt indicator,Valta,2016,Intangibles
+sgr,Sales growth,"Lakonishok, Shleifer, and Vishny",1994,Value-versus-growth 
+sin,Sin stocks,Hong and Kacperczyk,2009,Investment
+sp,Sales-to-price,"Barbee, Mukherji, and Raines",1996,Value-versus-growth
+std_dolvol,Std. of dollar trading volume rolling 3m,"Chordia, Subrahmanyam, and Anshuman",2001,Trading frictions 
+std_turn,Std. of Share turnover rolling 3m,"Chordia, Subrahmanyam, and Anshuman",2001,Trading frictions 
+stdacc,Accrual volatility,"Bandyopadhyay, Huang, and Wirjanto",2010,Investment
+stdcf,Cash flow volatility,Huang,2009,Intangibles
+sue,Unexpected quarterly earnings,"Rendelman, Jones, and Latane",1982,Momentum 
+tang,Debt capacity or firm tangibility,Almeida and Campello,2007,Intangibles
+tb,Tax income to book income,Lev and Nissim,2004,Profitability
+turn,Shares turnover,"Datar, Naik, and Radcliffe",1998,Trading frictions 
+zerotrade,Number of zero-trading days rolling 3m,Liu,2006,Trading frictions 
