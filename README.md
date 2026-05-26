@@ -5,6 +5,7 @@
 ### Version
 
 - All in Python
+- 2026 Update: CIZ Version: [EquityChars](https://github.com/ericma4/EquityChars)
 - The SAS version is here [EquityCharacteristicsSAS](https://feng-cityuhk.github.io/EquityCharacteristicsSAS/)
 
 ## Academic Background
